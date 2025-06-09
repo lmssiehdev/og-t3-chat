@@ -1,7 +1,6 @@
 
 import { Todo } from '@/app/page'
 import { db } from '@/db/instant'
-import { useAuth } from '@clerk/nextjs'
 import { id } from '@instantdb/react'
 import { useEffect, useState } from 'react'
 

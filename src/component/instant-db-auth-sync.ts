@@ -27,7 +27,7 @@ export default function InstantDBAuthSync() {
     } else {
       db.auth.signOut()
     };
-  }, [isSignedIn])
+  }, [isSignedIn, getToken])
 
   return null
 }

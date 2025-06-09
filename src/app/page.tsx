@@ -2,7 +2,7 @@
 
 import { TodoForm } from '@/component/add-todo'
 import { db, schema } from '@/db/instant'
-import { id, InstaQLEntity } from '@instantdb/react'
+import { InstaQLEntity } from '@instantdb/react'
 
 export type Todo = InstaQLEntity<typeof schema, 'todos'>
 
