@@ -1,6 +1,8 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
+import InstantDBAuthSync from "@/component/instant-db-auth-sync";
+import { ClerkProvider, SignedIn, SignedOut, SignInButton } from "@clerk/nextjs";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -24,11 +26,19 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
+      <ClerkProvider>
+      <InstantDBAuthSync />
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
+        <SignedOut>
+            <SignInButton />
+        </SignedOut>
+        <SignedIn>
         {children}
+        </SignedIn>
       </body>
+      </ClerkProvider>
     </html>
   );
 }
