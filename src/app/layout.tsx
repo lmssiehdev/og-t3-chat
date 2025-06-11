@@ -1,18 +1,7 @@
+import { ClerkProvider } from "@clerk/nextjs";
+import { dark } from '@clerk/themes';
 import type { Metadata } from "next";
-import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
-import InstantDBAuthSync from "@/component/instant-db-auth-sync";
-import { ClerkProvider, SignedIn, SignedOut, SignInButton } from "@clerk/nextjs";
-
-const geistSans = Geist({
-  variable: "--font-geist-sans",
-  subsets: ["latin"],
-});
-
-const geistMono = Geist_Mono({
-  variable: "--font-geist-mono",
-  subsets: ["latin"],
-});
 
 export const metadata: Metadata = {
   title: "Create Next App",
@@ -25,18 +14,12 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en">
-      <ClerkProvider>
-      <InstantDBAuthSync />
-      <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased`}
-      >
-        <SignedOut>
-            <SignInButton />
-        </SignedOut>
-        <SignedIn>
+    <html lang="en" className="dark">
+      <ClerkProvider appearance={{
+        baseTheme: dark,
+      }}>
+      <body>
         {children}
-        </SignedIn>
       </body>
       </ClerkProvider>
     </html>

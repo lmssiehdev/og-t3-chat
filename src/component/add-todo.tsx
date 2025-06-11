@@ -1,24 +1,15 @@
 
-import { Todo } from '@/app/page'
-import { db } from '@/db/instant'
-import { id } from '@instantdb/react'
-import { useEffect, useState } from 'react'
+"use client";
+
+import { Todo } from '@/app/(main)/page';
+import { db } from '@/db/instant';
+import { useInstantAuth } from '@/providers/instant-auth';
+import { id } from '@instantdb/react';
 
 
 export function TodoForm({ todos }: { todos: Todo[] }) {
-    const [userAuthId, setUserAuthId] = useState<string | undefined>();
-    
-    useEffect(() => {
-        const getUserAuthId = async () => {
-            console.log("RAN");
-            const auth = await db.getAuth()
-            setUserAuthId(auth?.id)
-        };
-        getUserAuthId();
-    }, []);
-    
+  const { userAuthId } = useInstantAuth();
     if ( userAuthId === undefined) return null
-
 
   return (
     <div className="flex items-center h-10 border-b border-gray-300">

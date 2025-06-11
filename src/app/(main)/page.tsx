@@ -1,10 +1,11 @@
 'use client'
 
 import { TodoForm } from '@/component/add-todo'
-import { db, schema } from '@/db/instant'
+import { db } from '@/db/instant'
 import { InstaQLEntity } from '@instantdb/react'
+import schema from '../../../instant.schema'
 
-export type Todo = InstaQLEntity<typeof schema, 'todos'>
+export type Todo = InstaQLEntity<typeof schema  , 'todos'>
 
 function App() {
   const { isLoading, error, data } = db.useQuery({ todos: {} })
