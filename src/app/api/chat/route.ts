@@ -79,7 +79,7 @@ export async function POST(req: Request) {
 	}
 }
 
-export async function generateTitleFromUserMessage({
+async function generateTitleFromUserMessage({
 	message,
 	threadId,
 }: {

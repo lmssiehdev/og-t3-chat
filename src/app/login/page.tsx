@@ -15,7 +15,7 @@ export default function LoginPage() {
 	);
 }
 
-export function GoogleSignInButton() {
+function GoogleSignInButton() {
 	return (
 		<Button
 			type="submit"
