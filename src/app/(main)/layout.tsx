@@ -13,7 +13,7 @@ export default function RootLayout({
     return (
         <>
                 <SignedOut>
-                    <SignInButton></SignInButton>
+                    <SignInButton />
                 </SignedOut>
                 <SignedIn>
                     <SidebarProvider>
