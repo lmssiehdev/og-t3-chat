@@ -2,6 +2,7 @@
 
 import { i, id } from "@instantdb/react";
 
+// npx instant-cli@latest push schema
 const _schema = i.schema({
   entities: {
     $files: i.entity({
@@ -19,7 +20,7 @@ const _schema = i.schema({
       userAuthId: i.string(),
     }),
     messages: i.entity({
-      createdBy: i.string<"user" | "ai">().optional(),
+      role: i.string<"user" | "ai">().optional(),
       createdAt: i.number(),
       text: i.string(),
       metadata: i.json(),
@@ -28,6 +29,7 @@ const _schema = i.schema({
     threads: i.entity({
       createdAt: i.number(),
       title: i.string(),
+      updatedTitle: i.boolean().optional(),
       updatedAt: i.date(),
       metadata: i.json(),
       userAuthId: i.string(),

@@ -1,5 +1,5 @@
 
-import { Content } from "./_components";
+import { Content } from "../../_components";
 
 export default async  function Page({
     params,
