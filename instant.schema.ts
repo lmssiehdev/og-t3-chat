@@ -13,12 +13,6 @@ const _schema = i.schema({
       id: i.string().unique().indexed().optional(),
       email: i.string().unique().indexed().optional(),
     }),
-    todos: i.entity({
-      createdAt: i.number(),
-      done: i.boolean(),
-      text: i.string(),
-      userAuthId: i.string(),
-    }),
     messages: i.entity({
       role: i.string<"user" | "ai">().optional(),
       createdAt: i.number(),

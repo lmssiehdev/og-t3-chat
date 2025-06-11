@@ -3,7 +3,7 @@
 import type { InstantRules } from "@instantdb/react";
 
 const rules = {
-  todos: {
+  $default: {
     bind: ["isOwner", "auth.id != null && auth.id == data.userAuthId"],
     allow: {
       $default: "isOwner",
