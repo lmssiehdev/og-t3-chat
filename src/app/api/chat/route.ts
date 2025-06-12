@@ -1,8 +1,9 @@
-import { createMessage } from "@/app/(main)/_components";
 import { id, init } from "@instantdb/admin";
 import { createOpenRouter } from "@openrouter/ai-sdk-provider";
 import { type UIMessage, generateText, streamText } from "ai";
 import schema from "../../../../instant.schema";
+import { z } from "zod";
+import { SUPPORTED_MODELS } from "@/constants";
 
 const db = init({
 	appId: process.env.NEXT_PUBLIC_INSTANTDB_APP_ID!,
@@ -14,26 +15,26 @@ const openrouter = createOpenRouter({
 	apiKey: process.env.OPENROUTER_API_KEY,
 });
 
-const headers = {
-	"Cache-Control": "no-cache",
-	Connection: "keep-alive",
-	"X-Accel-Buffering": "no",
-};
+const zRouteParams = z.object({
+	threadId: z.string(),
+	userAuthId: z.string(),
+	messages: z.any(),
+	model: z.enum(SUPPORTED_MODELS),
+});
 
 export async function POST(req: Request) {
 	try {
 		const body = await req.json();
-		const { messages, isFirstMessage, threadId, userAuthId } = body; // Note: messages array, not single message
-
-		if (!messages || !Array.isArray(messages) || messages.length === 0) {
-			return new Response(
-				JSON.stringify({ error: "Messages array is required" }),
-				{
-					status: 400,
-					headers: { "Content-Type": "application/json" },
-				},
-			);
+		const parsedBody = zRouteParams.safeParse(body);
+		
+		if ( !parsedBody.success ) {
+			const error = parsedBody.error.message;
+			console.log({ error})
+			return new Response(JSON.stringify({ error }), {
+				status: 400
+			})
 		}
+		const { messages, model, threadId, userAuthId } = parsedBody.data; 
 
 		// Get the latest user message for title generation
 		const latestMessage = messages[messages.length - 1];
@@ -46,7 +47,7 @@ export async function POST(req: Request) {
 
 		// Stream the AI response using the full conversation history
 		const result = streamText({
-			model: openrouter.chat("google/gemma-3-1b-it:free"),
+			model: openrouter.chat(model),
 			messages,
 			onFinish: async ({ text, finishReason, usage }) => {
 				const messageId = id();
@@ -77,7 +78,7 @@ export async function POST(req: Request) {
 			},
 		);
 	}
-}
+};
 
 async function generateTitleFromUserMessage({
 	message,
@@ -96,7 +97,7 @@ async function generateTitleFromUserMessage({
 			},
 		},
 	});
-	console.log(data.threads);
+
 	if (data.threads[0].updatedTitle) return;
 
 	const { text: title } = await generateText({

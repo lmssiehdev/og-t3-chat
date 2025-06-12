@@ -14,6 +14,7 @@ import {
 import { db } from "@/db/instant";
 import { UserButton, useUser } from "@clerk/nextjs";
 import Link from "next/link";
+import { usePathname, useRouter } from "next/navigation";
 
 // Menu items.
 const items = [
@@ -34,6 +35,8 @@ const items = [
 
 export function AppSidebar() {
 	const { isSignedIn, user } = useUser();
+	const path = usePathname();
+	const router = useRouter();
 
 	const {
 		data: threadData,
@@ -45,9 +48,12 @@ export function AppSidebar() {
 		},
 	});
 
-	function deleteThread(threadId: string) {
+	async function deleteThread(threadId: string) {
 		// TODO: moddal confirmation
-		db.transact(db.tx.threads[threadId].delete());
+		if (path.includes(threadId)) await router.push("/chat");
+		setTimeout(() => {
+			db.transact(db.tx.threads[threadId].delete());
+		}, 200)
 	}
 
 	return (

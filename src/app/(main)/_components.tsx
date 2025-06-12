@@ -1,11 +1,14 @@
 "use client";
 "use client";
 
+import { DropdownMenuRadioGroupDemo } from "@/component/model-selector";
+import { SUPPORTED_MODELS } from "@/constants";
 import { db } from "@/db/instant";
 import { useInstantAuth } from "@/providers/instant-auth";
 import { useChat } from "@ai-sdk/react";
 import { id } from "@instantdb/react";
 import { useEffect, useMemo, useState } from "react";
+import { useLocalStorage } from "usehooks-ts";
 
 export function Content({ threadId }: { threadId: string }) {
 	const {
@@ -48,7 +51,8 @@ export function ChatComponent({
 			messages: {},
 		},
 	});
-
+	const [modelInStorage, setModelInStorage] = useLocalStorage<string>('last-model', SUPPORTED_MODELS[0])
+  	const [selectedModel, setSelectedModel] = useState<string>(modelInStorage) 
 	const [messsage, setMessage] = useState<string>("");
 
 	const [completedMessageIds, setCompletedMessageIds] = useState(new Set());
@@ -59,6 +63,7 @@ export function ChatComponent({
 				threadId,
 				isFirstMessage: false,
 				userAuthId,
+				model: selectedModel,
 			},
 			onFinish: ({ id }) => {
 				setCompletedMessageIds(new Set([...completedMessageIds, id]));
@@ -76,7 +81,7 @@ export function ChatComponent({
 		}));
 
 	useEffect(() => {
-		if (!dbMessages) return;
+		if (!dbMessages || !dbMessages?.threads[0]?.messages) return;
 		const messagesInThread = dbMessages.threads[0].messages;
 		const lastDbMessage = messagesInThread[messagesInThread.length - 1];
 		const lastStreamedMessage = messages[messages.length - 1];
@@ -90,12 +95,13 @@ export function ChatComponent({
 		}
 	}, [dbMessages, messages, isLoading]);
 
-	if (!dbMessages) return null;
 
-	const messagesToRender = [
+	if (!dbMessages || !dbMessages?.threads[0]?.messages) return null;
+
+	const messagesToRender = threadId ? [
 		...dbMessages.threads[0].messages,
 		...activeStreamingMessages,
-	];
+	]: [];
 
 	return (
 		<div>
@@ -138,6 +144,8 @@ export function ChatComponent({
 					}}
 					className="mx-auto mt-auto flex w-full items-stretch gap-2 rounded-t-xl bg-[#2D2D2D] px-3 py-3 shadow-[inset_0_2px_4px_rgba(0,0,0,0.4)] sm:max-w-3xl"
 				>
+					<div className="relative flex-grow">
+
 					<textarea
 						value={input}
 						disabled={isLoading}
@@ -145,9 +153,18 @@ export function ChatComponent({
 							handleInputChange(e);
 							setMessage(e.target.value);
 						}}
-						className="focus-none border-none flex-grow resize-none bg-transparent text-base leading-6 h-[72px] text-neutral-100 outline-none"
+						className="focus-none border-none w-full flex-grow resize-none bg-transparent text-base leading-6 h-[72px] text-neutral-100 outline-none mb-8"
 						placeholder="Type your message here..."
 					/>
+					<div className="absolute bottom-0 left-0">
+
+						<DropdownMenuRadioGroupDemo position={selectedModel} sestPosition={(v) => {
+							setSelectedModel(v)
+							setModelInStorage(v)
+						}} />
+					</div>
+					</div>
+
 					<button
 						type="submit"
 						disabled={isLoading}
