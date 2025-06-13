@@ -1,30 +1,16 @@
 "use client";
-"use client";
-
+import { Message } from "@/component/llm-ui";
 import { DropdownMenuRadioGroupDemo } from "@/component/model-selector";
 import { SUPPORTED_MODELS } from "@/constants";
 import { db } from "@/db/instant";
 import { useInstantAuth } from "@/providers/instant-auth";
 import { useChat } from "@ai-sdk/react";
 import { id } from "@instantdb/react";
-import { useEffect, useMemo, useState } from "react";
+import { usePathname, useRouter } from "next/navigation";
+import { useCallback, useMemo, useState } from "react";
 import { useLocalStorage } from "usehooks-ts";
 
 export function Content({ threadId }: { threadId: string }) {
-	const {
-		data: threadData,
-		error: threadError,
-		isLoading: threadIsLoading,
-	} = db.useQuery({
-		threads: {
-			$: {
-				limit: 1,
-				where: {
-					id: threadId,
-				},
-			},
-		},
-	});
 	return (
 		<>
 			<ChatComponent threadId={threadId} />
@@ -34,74 +20,90 @@ export function Content({ threadId }: { threadId: string }) {
 
 export function ChatComponent({
 	threadId,
-}: { children?: React.ReactNode; threadId: string }) {
+	shouldCreateThread = false,
+}: {
+	threadId: string;
+	shouldCreateThread?: boolean;
+}) {
 	const { userAuthId } = useInstantAuth();
-
-	const {
-		data: dbMessages,
-		error,
-		isLoading: threadIsLoading,
-	} = db.useQuery({
-		threads: {
-			$: {
-				where: {
-					id: threadId,
-				},
-			},
-			messages: {},
-		},
-	});
-	const [modelInStorage, setModelInStorage] = useLocalStorage<string>('last-model', SUPPORTED_MODELS[0])
-  	const [selectedModel, setSelectedModel] = useState<string>(modelInStorage) 
-	const [messsage, setMessage] = useState<string>("");
-
-	const [completedMessageIds, setCompletedMessageIds] = useState(new Set());
-	const { messages, input, handleInputChange, handleSubmit, isLoading } =
-		useChat({
+	const [completedMessageIds, setCompletedMessageIds] = useState(
+		new Set<string>(),
+	);
+	const pathname = usePathname();
+	const router = useRouter();
+	const chatConfig = useMemo(
+		() => ({
 			api: "/api/chat",
 			body: {
 				threadId,
-				isFirstMessage: false,
 				userAuthId,
-				model: selectedModel,
+				shouldCreateThread,
 			},
-			onFinish: ({ id }) => {
-				setCompletedMessageIds(new Set([...completedMessageIds, id]));
+			onFinish: ({ id }: { id: string }) => {
+				setCompletedMessageIds((c) => {
+					const newSet = new Set(c);
+					newSet.add(id);
+					return newSet;
+				});
+				if (!shouldCreateThread) return;
+				if (!pathname.includes(threadId)) router.push(`/chat/${threadId}`);
 			},
-		});
+		}),
+		[threadId, userAuthId, shouldCreateThread, pathname, router],
+	);
 
-	const activeStreamingMessages = messages
-		.filter(
-			(message) =>
-				!completedMessageIds.has(message.id) && message.role === "assistant",
-		)
-		.map((m) => ({
-			text: m?.content,
-			...m,
-		}));
+	const { messages, append, isLoading } = useChat(chatConfig);
+	console.log("rerendering chat component");
+	const { data: dbMessages } = db.useQuery({
+		threads: {
+			$: { where: { id: threadId } },
+			messages: {},
+		},
+	});
 
-	useEffect(() => {
-		if (!dbMessages || !dbMessages?.threads[0]?.messages) return;
-		const messagesInThread = dbMessages.threads[0].messages;
-		const lastDbMessage = messagesInThread[messagesInThread.length - 1];
-		const lastStreamedMessage = messages[messages.length - 1];
+	const activeStreamingMessages = useMemo(() => {
+		if (!messages || messages?.length === 0) return undefined;
 
-		if (!lastDbMessage || !lastStreamedMessage) return;
+		const lastMessage = messages[messages.length - 1];
 
-		if (lastDbMessage.text === lastStreamedMessage?.content) {
-			setCompletedMessageIds(
-				new Set([...completedMessageIds, lastDbMessage.id]),
-			);
+		if (
+			!completedMessageIds.has(lastMessage.id) &&
+			lastMessage.role !== "user"
+		) {
+			return lastMessage;
 		}
-	}, [dbMessages, messages, isLoading]);
 
+		return undefined;
+	}, [messages, completedMessageIds]);
 
-	if (!dbMessages || !dbMessages?.threads[0]?.messages) return null;
+	const onSubmit = async (
+		message: string,
+		additionalData: Record<string, unknown> = {},
+	) => {
+		if (!message.trim()) return;
+		try {
+			await append(
+				{ role: "user", content: message },
+				{
+					body: {
+						...additionalData,
+					},
+				},
+			);
+		} catch (error) {
+			console.error("Failed to send message:", error);
+		}
+	};
 
-	const messagesToRender = threadId ? [
-		...dbMessages.threads[0].messages,
-		...activeStreamingMessages,
-	]: [];
+	if (!dbMessages?.threads[0]?.messages) {
+		return (
+			<ChartInput
+				isLoading={isLoading}
+				payload={{ threadId, userAuthId }}
+				onSubmit={onSubmit}
+			/>
+		);
+	}
 
 	return (
 		<div>
@@ -109,76 +111,101 @@ export function ChatComponent({
 				<h1>Chat</h1>
 			</div>
 			<div className="flex flex-col">
-				<div className="min-h-[400px] overflow-y-auto  p-4 mb-4">
-					{messagesToRender.map((message, index) => (
-						<div
-							key={message.id}
-							className={`mb-4 ${message.role === "user" ? "text-right" : "text-left"}`}
-						>
-							<div
-								className={`inline-block p-3 rounded-lg ${
-									message.role === "user"
-										? "bg-blue-500 text-white"
-										: "bg-gray-200 text-black"
-								}`}
-							>
-								{message.text}
-							</div>
-						</div>
+				<div className="min-h-[400px] overflow-y-auto p-4 mb-4">
+					{dbMessages.threads[0].messages.map((m) => (
+						<Message
+							role={m.role!}
+							key={m.id}
+							message={m.text}
+							isStreamFinished={true}
+						/>
 					))}
-					{threadIsLoading && (
-						<div className="text-left">
-							<div className="inline-block p-3 rounded-lg bg-gray-200">
-								Thinking...
-							</div>
-						</div>
-					)}
+					{activeStreamingMessages?.content}
 				</div>
-				{/* Input form */}
-				<form
-					onSubmit={(e) => {
-						e.preventDefault();
-						createMessage(threadId, userAuthId!, messsage, "user");
-						handleSubmit(e);
-						setMessage("");
-					}}
-					className="mx-auto mt-auto flex w-full items-stretch gap-2 rounded-t-xl bg-[#2D2D2D] px-3 py-3 shadow-[inset_0_2px_4px_rgba(0,0,0,0.4)] sm:max-w-3xl"
-				>
-					<div className="relative flex-grow">
-
-					<textarea
-						value={input}
-						disabled={isLoading}
-						onChange={(e) => {
-							handleInputChange(e);
-							setMessage(e.target.value);
-						}}
-						className="focus-none border-none w-full flex-grow resize-none bg-transparent text-base leading-6 h-[72px] text-neutral-100 outline-none mb-8"
-						placeholder="Type your message here..."
-					/>
-					<div className="absolute bottom-0 left-0">
-
-						<DropdownMenuRadioGroupDemo position={selectedModel} sestPosition={(v) => {
-							setSelectedModel(v)
-							setModelInStorage(v)
-						}} />
-					</div>
-					</div>
-
-					<button
-						type="submit"
-						disabled={isLoading}
-						className="px-4 py-2 bg-blue-500 text-white rounded disabled:opacity-50"
-					>
-						Send
-					</button>{" "}
-				</form>
 			</div>
+			<ChartInput
+				isLoading={isLoading}
+				payload={{ threadId, userAuthId }}
+				onSubmit={onSubmit}
+			/>
 		</div>
 	);
 }
 
-export async function createMessage(
+function ChartInput({
+	onSubmit,
+	isLoading,
+	payload,
+}: {
+	onSubmit: (message: string, additionalData: Record<string, unknown>) => void;
+	isLoading: boolean;
+	payload: {
+		threadId: string;
+		userAuthId: string;
+	};
+}) {
+	const [modelInStorage, setModelInStorage] = useLocalStorage<string>(
+		"last-model",
+		SUPPORTED_MODELS[0],
+	);
+	const [selectedModel, setSelectedModel] = useState<string>(modelInStorage);
+
+	const { threadId, userAuthId } = payload;
+
+	const handleFormSubmit = useCallback(
+		async (e: React.FormEvent<HTMLFormElement>) => {
+			e.preventDefault();
+			const formData = new FormData(e.target as HTMLFormElement);
+			const message = formData.get("message") as string;
+
+			if (!message.trim()) return;
+
+			(e.target as HTMLFormElement).reset();
+
+			try {
+				createMessage(threadId, userAuthId!, message, "user");
+				onSubmit(message, { model: selectedModel });
+			} catch (error) {
+				console.error("Failed to send message:", error);
+			}
+		},
+		[threadId, userAuthId, onSubmit, selectedModel],
+	);
+
+	return (
+		<form
+			onSubmit={handleFormSubmit}
+			className="mx-auto mt-auto flex w-full items-stretch gap-2 rounded-t-xl bg-[#2D2D2D] px-3 py-3 shadow-[inset_0_2px_4px_rgba(0,0,0,0.4)] sm:max-w-3xl"
+		>
+			<div className="relative flex-grow">
+				<textarea
+					name="message"
+					disabled={isLoading}
+					className="focus-none border-none w-full flex-grow resize-none bg-transparent text-base leading-6 h-[72px] text-neutral-100 outline-none mb-8"
+					placeholder="Type your message here..."
+				/>
+				<div className="absolute bottom-0 left-0">
+					<DropdownMenuRadioGroupDemo
+						position={selectedModel}
+						sestPosition={(v) => {
+							setSelectedModel(v);
+							setModelInStorage(v);
+						}}
+					/>
+				</div>
+			</div>
+			<button
+				type="submit"
+				disabled={isLoading}
+				className="px-4 py-2 bg-blue-500 text-white rounded disabled:opacity-50"
+			>
+				Send
+			</button>
+		</form>
+	);
+}
+
+async function createMessage(
 	threadId: string,
 	userAuthId: string,
 	text: string,
@@ -193,9 +220,7 @@ export async function createMessage(
 			metadata: {},
 			userAuthId,
 		}),
-		//   // Link the message to the thread
-		//   db.tx.threads[threadId].link({ messages: messageId }),
-		//   // Link the message to the user
+		//  Linking, there is one extra, remove it
 		db.tx.$users[userAuthId].link({ messages: messageId }),
 		db.tx.messages[messageId].link({ thread: threadId }),
 		db.tx.threads[threadId].link({ messages: messageId }),

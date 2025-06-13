@@ -1,9 +1,9 @@
-import { id, init } from "@instantdb/admin";
+import { SUPPORTED_MODELS } from "@/constants";
+import { type UpdateParams, id, init } from "@instantdb/admin";
 import { createOpenRouter } from "@openrouter/ai-sdk-provider";
 import { type UIMessage, generateText, streamText } from "ai";
-import schema from "../../../../instant.schema";
 import { z } from "zod";
-import { SUPPORTED_MODELS } from "@/constants";
+import schema, { type AppSchema } from "../../../../instant.schema";
 
 const db = init({
 	appId: process.env.NEXT_PUBLIC_INSTANTDB_APP_ID!,
@@ -20,36 +20,51 @@ const zRouteParams = z.object({
 	userAuthId: z.string(),
 	messages: z.any(),
 	model: z.enum(SUPPORTED_MODELS),
+	shouldCreateThread: z.boolean().default(false),
 });
 
 export async function POST(req: Request) {
 	try {
 		const body = await req.json();
 		const parsedBody = zRouteParams.safeParse(body);
-		
-		if ( !parsedBody.success ) {
-			const error = parsedBody.error.message;
-			console.log({ error})
-			return new Response(JSON.stringify({ error }), {
-				status: 400
-			})
-		}
-		const { messages, model, threadId, userAuthId } = parsedBody.data; 
 
+		if (!parsedBody.success) {
+			const error = parsedBody.error.message;
+			console.log({ error });
+			return new Response(JSON.stringify({ error }), {
+				status: 400,
+			});
+		}
+		const { messages, model, threadId, userAuthId, shouldCreateThread } =
+			parsedBody.data;
+		console.log({ messages, model, threadId, userAuthId, shouldCreateThread });
 		// Get the latest user message for title generation
 		const latestMessage = messages[messages.length - 1];
 
-		// Generate title from first message if needed
-		await generateTitleFromUserMessage({
-			message: latestMessage.content,
-			threadId,
-		});
+		const payload: UpdateParams<AppSchema, "threads"> = {
+			createdAt: Date.now(),
+			updatedAt: Date.now(),
+		};
+
+		if (shouldCreateThread) {
+			payload.title = "New Chat!";
+			payload.userAuthId = userAuthId;
+			payload.metadata = {};
+		}
+
+		await db.transact([
+			db.tx.threads[threadId].update(payload),
+			db.tx.$users[userAuthId].link({ threads: threadId }),
+		]);
 
 		// Stream the AI response using the full conversation history
 		const result = streamText({
 			model: openrouter.chat(model),
 			messages,
-			onFinish: async ({ text, finishReason, usage }) => {
+			onError: (error) => {
+				console.error("Error streaming AI response:", error);
+			},
+			onFinish: async ({ text }) => {
 				const messageId = id();
 				await db.transact([
 					db.tx.messages[messageId].update({
@@ -67,6 +82,8 @@ export async function POST(req: Request) {
 			},
 		});
 
+		console.log({ result });
+
 		return result.toDataStreamResponse();
 	} catch (error) {
 		console.error("Error in chat API:", error);
@@ -78,6 +95,27 @@ export async function POST(req: Request) {
 			},
 		);
 	}
+}
+
+const createThread = async (
+	threadId: string,
+	userAuthId: string,
+	title: string,
+) => {
+	if (userAuthId === undefined) return;
+
+	await db.transact([
+		db.tx.threads[threadId].update({
+			createdAt: Date.now(),
+			title,
+			updatedAt: Date.now(),
+			metadata: {},
+			userAuthId,
+		}),
+		// Link the thread to the user
+		db.tx.$users[userAuthId].link({ threads: threadId }),
+	]);
+	return threadId;
 };
 
 async function generateTitleFromUserMessage({

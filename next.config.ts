@@ -1,10 +1,16 @@
+import million from "million/compiler";
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
 	eslint: {
-		// !! gonne use biome instead :)
+		// !! using biome for linting instead
 		ignoreDuringBuilds: true,
 	},
+	reactStrictMode: true,
 };
 
-export default nextConfig;
+const millionConfig = {
+	auto: true,
+};
+
+export default million.next(nextConfig as any, millionConfig);

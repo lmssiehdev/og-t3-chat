@@ -53,7 +53,7 @@ export function AppSidebar() {
 		if (path.includes(threadId)) await router.push("/chat");
 		setTimeout(() => {
 			db.transact(db.tx.threads[threadId].delete());
-		}, 200)
+		}, 200);
 	}
 
 	return (
