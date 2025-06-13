@@ -3,7 +3,13 @@
 import type { InstantRules } from "@instantdb/react";
 
 const rules = {
-	$default: {
+	threads: {
+		bind: ["isOwner", "auth.id != null && auth.id == data.userAuthId"],
+		allow: {
+			$default: "isOwner",
+		},
+	},
+	messages: {
 		bind: ["isOwner", "auth.id != null && auth.id == data.userAuthId"],
 		allow: {
 			$default: "isOwner",
