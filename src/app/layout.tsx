@@ -2,6 +2,7 @@
 import { ClerkProvider } from "@clerk/nextjs";
 import { dark } from "@clerk/themes";
 import "./globals.css";
+import { Toaster } from "sonner";
 
 export default function RootLayout({
 	children,
@@ -15,7 +16,9 @@ export default function RootLayout({
 					baseTheme: dark,
 				}}
 			>
-				<body>{children}</body>
+				<body>{children}
+				<Toaster />
+				</body>
 			</ClerkProvider>
 		</html>
 	);

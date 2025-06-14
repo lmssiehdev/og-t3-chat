@@ -1,4 +1,4 @@
-import { SUPPORTED_MODELS } from "@/constants";
+import { AvailableModels, modelsInfo, SUPPORTED_MODELS } from "@/constants";
 import { type UpdateParams, id, init } from "@instantdb/admin";
 import { createOpenRouter } from "@openrouter/ai-sdk-provider";
 import { type UIMessage, generateText, streamText } from "ai";
@@ -11,23 +11,20 @@ const db = init({
 	schema,
 });
 
-const openrouter = createOpenRouter({
-	apiKey: process.env.OPENROUTER_API_KEY,
-});
-
 const zRouteParams = z.object({
 	threadId: z.string(),
 	userAuthId: z.string(),
 	messages: z.any(),
 	model: z.enum(SUPPORTED_MODELS),
 	shouldCreateThread: z.boolean().default(false),
+	apiKey: z.string().optional(),
 });
 
 export async function POST(req: Request) {
 	try {
 		const body = await req.json();
 		const parsedBody = zRouteParams.safeParse(body);
-
+		
 		if (!parsedBody.success) {
 			const error = parsedBody.error.message;
 			console.log({ error });
@@ -35,8 +32,15 @@ export async function POST(req: Request) {
 				status: 400,
 			});
 		}
-		const { messages, model, threadId, userAuthId, shouldCreateThread } =
+		const { apiKey: clientApiKey, messages, model, threadId, userAuthId, shouldCreateThread } =
 			parsedBody.data;
+
+
+		if ( modelsInfo[model].requireApiKey && !clientApiKey ) {
+			return new Response(JSON.stringify({ error: "Missing API key" }), {
+				status: 400,
+			});
+		}
 		// Get the latest user message for title generation
 		const latestMessage = messages[messages.length - 1];
 
@@ -56,12 +60,36 @@ export async function POST(req: Request) {
 			db.tx.$users[userAuthId].link({ threads: threadId }),
 		]);
 
-		// Stream the AI response using the full conversation history
+		const apiKey = clientApiKey ?? process.env.OPENROUTER_API_KEY;
+		
+		console.log({ clientApiKey, apiKey, model})
+		const openrouter = createOpenRouter({
+			apiKey: apiKey || process.env.OPENROUTER_API_KEY,
+		});
+
+		const errorToMsg = {
+			"invalid_api_key": {
+				status: 401,
+				error: "Invalid API key provided"
+			},
+			"default_error": {
+				status: 500,
+				error: "Failed to process chat request"
+			}
+		}
+		let errorMessageKey: keyof typeof errorToMsg= "default_error";
+
 		const result = streamText({
 			model: openrouter.chat(model),
 			messages,
-			onError: (error) => {
-				console.error("Error streaming AI response:", error);
+			onError: ({ error }) => {
+				console.error("Error streaming text:", error);
+
+				// Store the error message to be used later
+				// @ts-expect-error error is not typed
+				if (error?.status === 401 || error?.statusCode === 401) {
+					errorMessageKey = "invalid_api_key";
+				}
 			},
 			onFinish: async ({ text }) => {
 				const messageId = id();
@@ -73,7 +101,6 @@ export async function POST(req: Request) {
 						metadata: {},
 						userAuthId,
 					}),
-
 					db.tx.$users[userAuthId].link({ messages: messageId }),
 					db.tx.messages[messageId].link({ thread: threadId }),
 					db.tx.threads[threadId].link({ messages: messageId }),
@@ -81,7 +108,13 @@ export async function POST(req: Request) {
 			},
 		});
 
-		return result.toDataStreamResponse();
+		// Return the stream response with error handling
+		return result.toDataStreamResponse({
+			status: errorMessageKey === "default_error" ? 200 : 500,
+			getErrorMessage(error) {
+				return errorToMsg[errorMessageKey].error;
+			},
+		});
 	} catch (error) {
 		console.error("Error in chat API:", error);
 		return new Response(

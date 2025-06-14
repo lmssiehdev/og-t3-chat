@@ -1,13 +1,14 @@
 "use client";
 import { ChatMesssageUi, Message } from "@/component/llm-ui";
 import { DropdownMenuRadioGroupDemo } from "@/component/model-selector";
-import { SUPPORTED_MODELS } from "@/constants";
+import { AvailableModels, modelsInfo, SUPPORTED_MODELS } from "@/constants";
 import { db } from "@/db/instant";
 import { useInstantAuth } from "@/providers/instant-auth";
 import { useChat } from "@ai-sdk/react";
 import { id } from "@instantdb/react";
 import { usePathname, useRouter } from "next/navigation";
 import { useCallback, useMemo, useState } from "react";
+import { toast } from "sonner";
 import { useLocalStorage } from "usehooks-ts";
 
 
@@ -24,28 +25,30 @@ export function ChatComponent({
 	);
 	const pathname = usePathname();
 	const router = useRouter();
-	const chatConfig = useMemo(
-		() => ({
-			api: "/api/chat",
-			body: {
-				threadId,
-				userAuthId,
-				shouldCreateThread,
-			},
-			onFinish: ({ id }: { id: string }) => {
-				setCompletedMessageIds((c) => {
-					const newSet = new Set(c);
-					newSet.add(id);
-					return newSet;
-				});
-				if (!shouldCreateThread) return;
-				if (!pathname.includes(threadId)) router.push(`/chat/${threadId}`);
-			},
-		}),
-		[threadId, userAuthId, shouldCreateThread, pathname, router],
-	);
 
-	const { messages, append, isLoading } = useChat(chatConfig);
+	const { messages, append, isLoading } = useChat({
+		api: "/api/chat",
+		body: {
+			threadId,
+			userAuthId,
+			shouldCreateThread,
+		},
+		onError: (error) => {
+			console.error("Error streaming text:", error);
+			if (error?.message.startsWith("3:")) {
+				toast.error(error.message.substring(2).replaceAll('"', ""));
+			}
+		},
+		onFinish: ({ id }: { id: string }) => {
+			setCompletedMessageIds((c) => {
+				const newSet = new Set(c);
+				newSet.add(id);
+				return newSet;
+			});
+			if (!shouldCreateThread) return;
+			if (!pathname.includes(threadId)) router.push(`/chat/${threadId}`);
+		},
+	});
 	const { data: dbMessages } = db.useQuery({
 		threads: {
 			$: { where: { id: threadId } },
@@ -88,6 +91,7 @@ export function ChatComponent({
 	};
 
 	if (!dbMessages?.threads[0]?.messages) {
+		if (!shouldCreateThread) return <div>No thread found</div>;
 		return (
 			<ChartInput
 				isLoading={isLoading}
@@ -98,11 +102,11 @@ export function ChatComponent({
 	}
 
 	return (
-		<div>
-			<div className="flex-1">
+		<div className="flex flex-col h-full">
+			<div className="">
 				<h1>Chat</h1>
 			</div>
-			<div className="flex flex-col">
+			<div className="flex-1 flex flex-col">
 				<div className="min-h-[400px] overflow-y-auto p-4 mb-4">
 					{dbMessages.threads[0].messages.map((m) => (
 						<Message
@@ -112,17 +116,17 @@ export function ChatComponent({
 							isStreamFinished={true}
 						/>
 					))}
-					{ activeStreamingMessages?.content.length &&
+					{activeStreamingMessages?.content.length &&
 						<ChatMesssageUi role={"ai"}>
-						{activeStreamingMessages?.content}
-					</ChatMesssageUi>
-}
+							{activeStreamingMessages?.content}
+						</ChatMesssageUi>
+					}
 					{isLoading && (
-					<div className="text-left">
-						<div className="inline-block p-3 rounded-lg bg-gray-200">
-							Thinking...
+						<div className="text-left">
+							<div className="inline-block p-3 rounded-lg bg-gray-200">
+								Thinking...
+							</div>
 						</div>
-					</div>
 					)}
 				</div>
 			</div>
@@ -147,13 +151,18 @@ function ChartInput({
 		userAuthId: string;
 	};
 }) {
+	const [apiKeyInLocalStorage, setApiKeyInLocalStorage] = useLocalStorage<string>(
+		"api-key",
+		"",
+	);
 	const [modelInStorage, setModelInStorage] = useLocalStorage<string>(
 		"last-model",
-		SUPPORTED_MODELS[0],
+		modelsInfo[SUPPORTED_MODELS[0]].name,
 	);
 	const [selectedModel, setSelectedModel] = useState<string>(modelInStorage);
 
 	const { threadId, userAuthId } = payload;
+
 
 	const handleFormSubmit = useCallback(
 		async (e: React.FormEvent<HTMLFormElement>) => {
@@ -167,7 +176,9 @@ function ChartInput({
 
 			try {
 				createMessage(threadId, userAuthId!, message, "user");
-				onSubmit(message, { model: selectedModel });
+				// get it directly from local storage
+				const currentApiKey = JSON.parse(localStorage.getItem("api-key") || '""');
+				onSubmit(message, { model: selectedModel, apiKey: currentApiKey });
 			} catch (error) {
 				console.error("Failed to send message:", error);
 			}
@@ -181,6 +192,7 @@ function ChartInput({
 			className="mx-auto mt-auto flex w-full items-stretch gap-2 rounded-t-xl bg-[#2D2D2D] px-3 py-3 shadow-[inset_0_2px_4px_rgba(0,0,0,0.4)] sm:max-w-3xl"
 		>
 			<div className="relative flex-grow">
+				{apiKeyInLocalStorage}
 				<textarea
 					name="message"
 					disabled={isLoading}
@@ -190,7 +202,12 @@ function ChartInput({
 				<div className="absolute bottom-0 left-0">
 					<DropdownMenuRadioGroupDemo
 						position={selectedModel}
-						sestPosition={(v) => {
+						setPosition={(v) => {
+							if (modelsInfo[v as AvailableModels].requireApiKey) {
+								const data = prompt("This model requires an API key", apiKeyInLocalStorage);
+								if (!data?.trim()) return;
+								setApiKeyInLocalStorage(data)
+							}
 							setSelectedModel(v);
 							setModelInStorage(v);
 						}}
