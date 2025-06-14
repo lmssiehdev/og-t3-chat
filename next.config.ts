@@ -10,7 +10,7 @@ const nextConfig: NextConfig = {
 };
 
 const millionConfig = {
-	auto: true,
+	// auto: true,
 };
 
-export default million.next(nextConfig as any, millionConfig);
+export default million.next(nextConfig as any, {log: "info"});

@@ -15,6 +15,7 @@ import { db } from "@/db/instant";
 import { UserButton, useUser } from "@clerk/nextjs";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
+import { Fragment, memo, useEffect, useState } from "react";
 
 // Menu items.
 const items = [
@@ -34,15 +35,10 @@ const items = [
 ];
 
 export function AppSidebar() {
-	const { isSignedIn, user } = useUser();
 	const path = usePathname();
 	const router = useRouter();
 
-	const {
-		data: threadData,
-		error: threadError,
-		isLoading: threadIsLoading,
-	} = db.useQuery({
+	const { data: threadData } = db.useQuery({
 		threads: {
 			$: {},
 		},
@@ -118,27 +114,26 @@ export function AppSidebar() {
 					</SidebarGroupContent>
 				</SidebarGroup>
 			</SidebarContent>
-			<div>
-				{isSignedIn ? (
-					<div className="p-4 flex gap-3 h-20">
-						<UserButton
-							appearance={{
-								elements: {
-									avatarBox: "h-10! w-10!",
-								},
-							}}
-						/>
-						<div className="">
-							<div className="font-semibold">{user.fullName}</div>
-							<div className="text-gray-400/70 text-sm font-semibold">Noob</div>
-						</div>
-					</div>
-				) : (
-					<div className="mt-auto flex flex-row justify-between border-t border-neutral-700 p-4">
-						<a href="/login">Login</a>
-					</div>
-				)}
-			</div>
+			<SideBarUserArea />
 		</Sidebar>
+	);
+}
+function SideBarUserArea() {
+	const { isSignedIn, user } = useUser();
+
+	return (
+		<div className="p-4 flex gap-3 h-20">
+			<UserButton
+				appearance={{
+					elements: {
+						avatarBox: "h-10! w-10!",
+					},
+				}}
+			/>
+			<div className="">
+				<div className="font-semibold">{user?.fullName ?? "No name"}</div>
+				<div className="text-gray-400/70 text-sm font-semibold">Noob</div>
+			</div>
+		</div>
 	);
 }

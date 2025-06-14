@@ -1,5 +1,5 @@
 "use client";
-import { Message } from "@/component/llm-ui";
+import { ChatMesssageUi, Message } from "@/component/llm-ui";
 import { DropdownMenuRadioGroupDemo } from "@/component/model-selector";
 import { SUPPORTED_MODELS } from "@/constants";
 import { db } from "@/db/instant";
@@ -10,13 +10,6 @@ import { usePathname, useRouter } from "next/navigation";
 import { useCallback, useMemo, useState } from "react";
 import { useLocalStorage } from "usehooks-ts";
 
-export function Content({ threadId }: { threadId: string }) {
-	return (
-		<>
-			<ChatComponent threadId={threadId} />
-		</>
-	);
-}
 
 export function ChatComponent({
 	threadId,
@@ -53,7 +46,6 @@ export function ChatComponent({
 	);
 
 	const { messages, append, isLoading } = useChat(chatConfig);
-	console.log("rerendering chat component");
 	const { data: dbMessages } = db.useQuery({
 		threads: {
 			$: { where: { id: threadId } },
@@ -120,7 +112,18 @@ export function ChatComponent({
 							isStreamFinished={true}
 						/>
 					))}
-					{activeStreamingMessages?.content}
+					{ activeStreamingMessages?.content.length &&
+						<ChatMesssageUi role={"ai"}>
+						{activeStreamingMessages?.content}
+					</ChatMesssageUi>
+}
+					{isLoading && (
+					<div className="text-left">
+						<div className="inline-block p-3 rounded-lg bg-gray-200">
+							Thinking...
+						</div>
+					</div>
+					)}
 				</div>
 			</div>
 			<ChartInput

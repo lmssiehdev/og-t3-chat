@@ -37,7 +37,6 @@ export async function POST(req: Request) {
 		}
 		const { messages, model, threadId, userAuthId, shouldCreateThread } =
 			parsedBody.data;
-		console.log({ messages, model, threadId, userAuthId, shouldCreateThread });
 		// Get the latest user message for title generation
 		const latestMessage = messages[messages.length - 1];
 
@@ -81,8 +80,6 @@ export async function POST(req: Request) {
 				]);
 			},
 		});
-
-		console.log({ result });
 
 		return result.toDataStreamResponse();
 	} catch (error) {

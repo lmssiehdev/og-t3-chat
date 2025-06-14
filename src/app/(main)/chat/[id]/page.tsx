@@ -1,11 +1,6 @@
-import { Content } from "../../_components";
+"use client";
+import dynamic from 'next/dynamic';
 
-export default async function Page({
-	params,
-}: {
-	params: Promise<{ id: string }>;
-}) {
-	const { id } = await params;
-
-	return <Content threadId={id} />;
-}
+export default dynamic(() => import('./_client-page'), {
+  ssr: false,
+});

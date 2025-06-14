@@ -7,12 +7,14 @@ const rules = {
 		bind: ["isOwner", "auth.id != null && auth.id == data.userAuthId"],
 		allow: {
 			$default: "isOwner",
+			view: "true",
 		},
 	},
 	messages: {
 		bind: ["isOwner", "auth.id != null && auth.id == data.userAuthId"],
 		allow: {
 			$default: "isOwner",
+			view: "true",
 		},
 	},
 } satisfies InstantRules;
