@@ -11,7 +11,7 @@ import {
 	DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { modelsInfo, SUPPORTED_MODELS } from "@/constants";
-import { ChevronDown } from "lucide-react";
+import { ChevronDown, EyeIcon, KeyIcon } from "lucide-react";
 import * as React from "react";
 
 export function DropdownMenuRadioGroupDemo({
@@ -25,19 +25,35 @@ export function DropdownMenuRadioGroupDemo({
 		<DropdownMenu>
 			<DropdownMenuTrigger asChild>
 				<Button
-					variant="outline"
-					className="flex items-center justify-center text-sm font-medium"
+					type="button"
+					variant="ghost"
+					className="rounded-sm flex items-center justify-center text-xs h-auto p-1"
 				>
-					{modelsInfo[position as typeof SUPPORTED_MODELS[number]].name} <ChevronDown className="size-4" />
+					{modelsInfo[position as (typeof SUPPORTED_MODELS)[number]]?.name}{" "}
+					<ChevronDown className="size-4" />
 				</Button>
-			</DropdownMenuTrigger>	
-			<DropdownMenuContent className="w-fit">
+			</DropdownMenuTrigger>
+			<DropdownMenuContent className="w-fit bg-background">
 				<DropdownMenuLabel>Pick Model</DropdownMenuLabel>
 				<DropdownMenuSeparator />
 				<DropdownMenuRadioGroup value={position} onValueChange={setPosition}>
-					{SUPPORTED_MODELS.map((m) => (
-						<DropdownMenuRadioItem key={m} value={m}>
-							{modelsInfo[m].name} { modelsInfo[m].requireApiKey && <span className="ml-2 text-red-500 text-xs">(Requires API Key)</span> }
+					{SUPPORTED_MODELS.map((m, i) => (
+						<DropdownMenuRadioItem key={m} value={m} defaultChecked={i === 0}>
+							<>
+								{modelsInfo[m].name}
+								<div className="flex gap-2">
+								{modelsInfo[m]?.requireApiKey && (
+									<div className=" text-pink-400 text-xs">
+										<KeyIcon className="text-pink-400 text-xs" />
+									</div>
+								)}
+								{modelsInfo[m]?.supportVision && (
+									<div className=" text-pink-400 text-xs">
+										<EyeIcon className="text-pink-400 text-xs" />
+									</div>
+								)}
+								</div>
+							</>
 						</DropdownMenuRadioItem>
 					))}
 				</DropdownMenuRadioGroup>

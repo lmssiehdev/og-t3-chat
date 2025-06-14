@@ -1,16 +1,21 @@
 "use client";
-import { ChatMesssageUi, Message } from "@/component/llm-ui";
+import { ChatUiMessageWithImageSupport } from "@/components/t3-components";
 import { DropdownMenuRadioGroupDemo } from "@/component/model-selector";
-import { AvailableModels, modelsInfo, SUPPORTED_MODELS } from "@/constants";
+import { FileUploadChatInputDemo } from "@/components/chat-input";
+import {
+	type AvailableModels,
+	SUPPORTED_MODELS,
+	modelsInfo,
+} from "@/constants";
 import { db } from "@/db/instant";
+import { createMessage } from "@/db/mutators";
 import { useInstantAuth } from "@/providers/instant-auth";
-import { useChat } from "@ai-sdk/react";
-import { id } from "@instantdb/react";
+import { type UseChatHelpers, useChat } from "@ai-sdk/react";
+import type { UIMessage } from "ai";
 import { usePathname, useRouter } from "next/navigation";
 import { useCallback, useMemo, useState } from "react";
 import { toast } from "sonner";
 import { useLocalStorage } from "usehooks-ts";
-
 
 export function ChatComponent({
 	threadId,
@@ -26,7 +31,14 @@ export function ChatComponent({
 	const pathname = usePathname();
 	const router = useRouter();
 
-	const { messages, append, isLoading } = useChat({
+	const {
+		messages,
+		input,
+		handleSubmit,
+		handleInputChange,
+		status,
+		isLoading,
+	} = useChat({
 		api: "/api/chat",
 		body: {
 			threadId,
@@ -34,9 +46,11 @@ export function ChatComponent({
 			shouldCreateThread,
 		},
 		onError: (error) => {
-			console.error("Error streaming text:", error);
+			console.error("Error streaming text:", error, error.message);
 			if (error?.message.startsWith("3:")) {
 				toast.error(error.message.substring(2).replaceAll('"', ""));
+			} else {
+				toast.error(error.message);
 			}
 		},
 		onFinish: ({ id }: { id: string }) => {
@@ -49,7 +63,7 @@ export function ChatComponent({
 			if (!pathname.includes(threadId)) router.push(`/chat/${threadId}`);
 		},
 	});
-	const { data: dbMessages } = db.useQuery({
+	const { data: dbMessages, isLoading: isDbMessagesLoading } = db.useQuery({
 		threads: {
 			$: { where: { id: threadId } },
 			messages: {},
@@ -71,69 +85,63 @@ export function ChatComponent({
 		return undefined;
 	}, [messages, completedMessageIds]);
 
-	const onSubmit = async (
-		message: string,
-		additionalData: Record<string, unknown> = {},
-	) => {
-		if (!message.trim()) return;
-		try {
-			await append(
-				{ role: "user", content: message },
-				{
-					body: {
-						...additionalData,
-					},
-				},
-			);
-		} catch (error) {
-			console.error("Failed to send message:", error);
-		}
-	};
-
 	if (!dbMessages?.threads[0]?.messages) {
+		if (isDbMessagesLoading) return null;
 		if (!shouldCreateThread) return <div>No thread found</div>;
 		return (
-			<ChartInput
-				isLoading={isLoading}
-				payload={{ threadId, userAuthId }}
-				onSubmit={onSubmit}
+			<FileUploadChatInputDemo
+				threadId={threadId}
+				useChat={
+					{
+						messages,
+						input,
+						handleSubmit,
+						handleInputChange,
+						status,
+					} as UseChatHelpers
+				}
 			/>
 		);
 	}
 
+	if (!dbMessages?.threads[0]?.messages) {
+		return null;
+	}
+
 	return (
 		<div className="flex flex-col h-full">
-			<div className="">
-				<h1>Chat</h1>
-			</div>
-			<div className="flex-1 flex flex-col">
+			<div className="flex-1 mx-auto flex w-full max-w-3xl flex-col space-y-12 p-4 pb-16">
 				<div className="min-h-[400px] overflow-y-auto p-4 mb-4">
-					{dbMessages.threads[0].messages.map((m) => (
-						<Message
-							role={m.role!}
-							key={m.id}
-							message={m.text}
-							isStreamFinished={true}
-						/>
-					))}
-					{activeStreamingMessages?.content.length &&
-						<ChatMesssageUi role={"ai"}>
-							{activeStreamingMessages?.content}
-						</ChatMesssageUi>
-					}
+					{dbMessages.threads[0].messages
+						.map((m) => ({ ...m, content: m.text }))
+						.map((m) => (
+							<ChatUiMessageWithImageSupport
+								key={m.id}
+								message={m as unknown as UIMessage}
+							/>
+						))}
+					{activeStreamingMessages?.content.length && (
+						<ChatUiMessageWithImageSupport message={activeStreamingMessages} />
+					)}
+
 					{isLoading && (
 						<div className="text-left">
-							<div className="inline-block p-3 rounded-lg bg-gray-200">
-								Thinking...
-							</div>
+							<span className="animate-pulse">▊</span>
 						</div>
 					)}
 				</div>
 			</div>
-			<ChartInput
-				isLoading={isLoading}
-				payload={{ threadId, userAuthId }}
-				onSubmit={onSubmit}
+			<FileUploadChatInputDemo
+				threadId={threadId}
+				useChat={
+					{
+						messages,
+						input,
+						handleSubmit,
+						handleInputChange,
+						status,
+					} as UseChatHelpers
+				}
 			/>
 		</div>
 	);
@@ -151,10 +159,8 @@ function ChartInput({
 		userAuthId: string;
 	};
 }) {
-	const [apiKeyInLocalStorage, setApiKeyInLocalStorage] = useLocalStorage<string>(
-		"api-key",
-		"",
-	);
+	const [apiKeyInLocalStorage, setApiKeyInLocalStorage] =
+		useLocalStorage<string>("api-key", "");
 	const [modelInStorage, setModelInStorage] = useLocalStorage<string>(
 		"last-model",
 		modelsInfo[SUPPORTED_MODELS[0]].name,
@@ -162,7 +168,6 @@ function ChartInput({
 	const [selectedModel, setSelectedModel] = useState<string>(modelInStorage);
 
 	const { threadId, userAuthId } = payload;
-
 
 	const handleFormSubmit = useCallback(
 		async (e: React.FormEvent<HTMLFormElement>) => {
@@ -177,7 +182,9 @@ function ChartInput({
 			try {
 				createMessage(threadId, userAuthId!, message, "user");
 				// get it directly from local storage
-				const currentApiKey = JSON.parse(localStorage.getItem("api-key") || '""');
+				const currentApiKey = JSON.parse(
+					localStorage.getItem("api-key") || '""',
+				);
 				onSubmit(message, { model: selectedModel, apiKey: currentApiKey });
 			} catch (error) {
 				console.error("Failed to send message:", error);
@@ -204,9 +211,12 @@ function ChartInput({
 						position={selectedModel}
 						setPosition={(v) => {
 							if (modelsInfo[v as AvailableModels].requireApiKey) {
-								const data = prompt("This model requires an API key", apiKeyInLocalStorage);
+								const data = prompt(
+									"This model requires an API key",
+									apiKeyInLocalStorage,
+								);
 								if (!data?.trim()) return;
-								setApiKeyInLocalStorage(data)
+								setApiKeyInLocalStorage(data);
 							}
 							setSelectedModel(v);
 							setModelInStorage(v);
@@ -223,28 +233,4 @@ function ChartInput({
 			</button>
 		</form>
 	);
-}
-
-async function createMessage(
-	threadId: string,
-	userAuthId: string,
-	text: string,
-	role: "user" | "ai",
-) {
-	const messageId = id();
-	await db.transact([
-		db.tx.messages[messageId].update({
-			createdAt: Date.now(),
-			text,
-			role,
-			metadata: {},
-			userAuthId,
-		}),
-		//  Linking, there is one extra, remove it
-		db.tx.$users[userAuthId].link({ messages: messageId }),
-		db.tx.messages[messageId].link({ thread: threadId }),
-		db.tx.threads[threadId].link({ messages: messageId }),
-	]);
-
-	return messageId;
 }

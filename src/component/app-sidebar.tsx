@@ -16,6 +16,7 @@ import { UserButton, useUser } from "@clerk/nextjs";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { Fragment, memo, useEffect, useState } from "react";
+import { ThreadLink } from "@/components/t3-components";
 
 // Menu items.
 const items = [
@@ -35,22 +36,11 @@ const items = [
 ];
 
 export function AppSidebar() {
-	const path = usePathname();
-	const router = useRouter();
-
 	const { data: threadData } = db.useQuery({
 		threads: {
 			$: {},
 		},
 	});
-
-	async function deleteThread(threadId: string) {
-		// TODO: moddal confirmation
-		if (path.includes(threadId)) await router.push("/chat");
-		setTimeout(() => {
-			db.transact(db.tx.threads[threadId].delete());
-		}, 200);
-	}
 
 	return (
 		<Sidebar>
@@ -72,42 +62,13 @@ export function AppSidebar() {
 						<span className="">New Chat</span>
 					</Link>
 				</div>
-				<SidebarGroup className="p-0">
-					<SidebarGroupLabel className="p-0 my-2">
-						Recent Threads
-					</SidebarGroupLabel>
+				<SidebarGroup className="p-0 space-y-2">
+					<h2 className="font-semibold text-neutral-400 ">Recent Threads</h2>
 					<SidebarGroupContent>
 						<SidebarMenu>
 							{(threadData?.threads ?? []).map((item) => (
 								<SidebarMenuItem key={item.id}>
-									<SidebarMenuButton
-										className="justify-between px-2 group/button"
-										asChild
-									>
-										<div className="flex w-full">
-											<Link
-												href={`/chat/${item.id}`}
-												className="flex flex-row gap-2 rounded-sm flex-1 overflow-hidden"
-											>
-												<div className="p-1">
-													<MessageSquare className="size-3" />
-												</div>
-												<div className="line-clamp-2 overflow-hidden text-ellipsis">
-													{item.title}
-												</div>
-											</Link>
-
-											<button
-												className="flex items-center gap-1 ml-2"
-												onClick={(e) => {
-													e.stopPropagation();
-													deleteThread(item.id);
-												}}
-											>
-												<XIcon className="cursor-pointer size-4 hover:text-red-500 opacity-0 group-hover/button:opacity-100 transition-opacity duration-200" />
-											</button>
-										</div>
-									</SidebarMenuButton>
+										<ThreadLink threadId={item.id} title={item.title} />
 								</SidebarMenuItem>
 							))}
 						</SidebarMenu>

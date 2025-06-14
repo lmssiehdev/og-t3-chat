@@ -1,7 +1,7 @@
 import { AvailableModels, modelsInfo, SUPPORTED_MODELS } from "@/constants";
 import { type UpdateParams, id, init } from "@instantdb/admin";
 import { createOpenRouter } from "@openrouter/ai-sdk-provider";
-import { type UIMessage, generateText, streamText } from "ai";
+import { type CoreMessage, type UIMessage, convertToCoreMessages, generateText, streamText } from "ai";
 import { z } from "zod";
 import schema, { type AppSchema } from "../../../../instant.schema";
 
@@ -17,8 +17,84 @@ const zRouteParams = z.object({
 	messages: z.any(),
 	model: z.enum(SUPPORTED_MODELS),
 	shouldCreateThread: z.boolean().default(false),
-	apiKey: z.string().optional(),
+	apiKey: z.string().min(2).optional(),
 });
+
+const errorToMsg = {
+	"invalid_api_key": {
+		status: 401,
+		error: "Invalid API key provided"
+	},
+	"default_error": {
+		status: 500,
+		error: "Failed to process chat request"
+	}
+};
+
+const processMessages = async (messages: UIMessage[]) => {
+	const processedMessages: CoreMessage[] = [];
+	
+	for (const message of messages) {
+	  if (!message.experimental_attachments || message.experimental_attachments.length === 0) {
+		processedMessages.push({
+		  role: message.role as 'user' | 'assistant' | 'system',
+		  content: message.content,
+		});
+		continue;
+	  }
+  
+	  const content: (
+		| { type: 'text'; text: string }
+		| { type: 'image'; image: string }
+	  )[] = [
+		{ type: 'text', text: message.content }
+	  ];
+  
+	  for (const attachment of message.experimental_attachments) {
+		if (!attachment || !attachment.contentType) continue;
+		
+		if (attachment.contentType.startsWith('image/')) {
+		  content.push({
+			type: 'image',
+			image: attachment.url,
+		  });
+		} else if (attachment.contentType.startsWith('text/')) {
+		  try {
+			if (attachment.url.startsWith('data:')) {
+			  const base64Data = attachment.url.split(',')[1];
+			  const textContent = atob(base64Data);
+			  content.push({
+				type: 'text',
+				text: `File: ${attachment.name}\n\n${textContent}`,
+			  });
+			}
+		  } catch (error) {
+			console.error('Error processing text attachment:', error);
+			content.push({
+			  type: 'text',
+			  text: `[Could not process file: ${attachment.name}]`,
+			});
+		  }
+		} else {
+			// we only add metadata for other file types
+		  const fileSize = attachment.url ? Math.round(attachment.url.length * 0.75 / 1024) : 0;
+		  content.push({
+			type: 'text',
+			text: `[Attached file: ${attachment.name} (${attachment.contentType}, ~${fileSize}KB)]`,
+		  });
+		}
+	  }
+  
+	  processedMessages.push({
+		// @ts-expect-error look into it later
+		role: message.role,
+		content: content,
+
+	  });
+	}
+  
+	return processedMessages;
+  };
 
 export async function POST(req: Request) {
 	try {
@@ -53,35 +129,26 @@ export async function POST(req: Request) {
 			payload.title = "New Chat!";
 			payload.userAuthId = userAuthId;
 			payload.metadata = {};
+			db.tx.$users[userAuthId].link({ threads: threadId })
 		}
 
 		await db.transact([
 			db.tx.threads[threadId].update(payload),
-			db.tx.$users[userAuthId].link({ threads: threadId }),
 		]);
 
-		const apiKey = clientApiKey ?? process.env.OPENROUTER_API_KEY;
-		
-		console.log({ clientApiKey, apiKey, model})
+		let errorMessageKey: keyof typeof errorToMsg= "default_error";
+		const apiKey = clientApiKey?.trim() ?? process.env.OPENROUTER_API_KEY;
 		const openrouter = createOpenRouter({
 			apiKey: apiKey || process.env.OPENROUTER_API_KEY,
 		});
 
-		const errorToMsg = {
-			"invalid_api_key": {
-				status: 401,
-				error: "Invalid API key provided"
-			},
-			"default_error": {
-				status: 500,
-				error: "Failed to process chat request"
-			}
-		}
-		let errorMessageKey: keyof typeof errorToMsg= "default_error";
 
+		// Process messages with attachments
+		const processedMessages = await processMessages(messages);
+		console.log({ processedMessages, model, apiKey, clientApiKey })
 		const result = streamText({
 			model: openrouter.chat(model),
-			messages,
+			messages: processedMessages,
 			onError: ({ error }) => {
 				console.error("Error streaming text:", error);
 
@@ -108,7 +175,6 @@ export async function POST(req: Request) {
 			},
 		});
 
-		// Return the stream response with error handling
 		return result.toDataStreamResponse({
 			status: errorMessageKey === "default_error" ? 200 : 500,
 			getErrorMessage(error) {
@@ -126,27 +192,6 @@ export async function POST(req: Request) {
 		);
 	}
 }
-
-const createThread = async (
-	threadId: string,
-	userAuthId: string,
-	title: string,
-) => {
-	if (userAuthId === undefined) return;
-
-	await db.transact([
-		db.tx.threads[threadId].update({
-			createdAt: Date.now(),
-			title,
-			updatedAt: Date.now(),
-			metadata: {},
-			userAuthId,
-		}),
-		// Link the thread to the user
-		db.tx.$users[userAuthId].link({ threads: threadId }),
-	]);
-	return threadId;
-};
 
 async function generateTitleFromUserMessage({
 	message,

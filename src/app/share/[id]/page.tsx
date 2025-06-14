@@ -1,6 +1,7 @@
 import { init } from "@instantdb/admin";
 import schema from "../../../../instant.schema";
-import { ChatMesssageUi } from "@/component/llm-ui";
+import { ChatUiMessageWithImageSupport } from "@/component/llm-ui";
+import type { UIMessage } from "ai";
 
 const db = init({
 	appId: process.env.NEXT_PUBLIC_INSTANTDB_APP_ID!,
@@ -30,10 +31,8 @@ export default async function Page({ params }: { params: { id: string } }) {
 			<h1 className="font-bold p-2 text-center">{dbMessages.threads[0].title}</h1>
             <div>
 
-			{messages.map((m) => (
-                <ChatMesssageUi role={m.role} key={m.id}>
-					{m.text}
-				</ChatMesssageUi>
+			{messages.map(m => Object.assign(m, ({ content: m.text})) as unknown as UIMessage ).map((m) => (
+                <ChatUiMessageWithImageSupport message={m} key={m.id} />
 			))}
             </div>
 		</div>

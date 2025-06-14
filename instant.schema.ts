@@ -20,6 +20,7 @@ const _schema = i.schema({
 			text: i.string(),
 			metadata: i.json(),
 			userAuthId: i.string().indexed(),
+			isBranch: i.boolean().optional(),
 		}),
 		threads: i.entity({
 			id: i.string().unique().indexed(),
