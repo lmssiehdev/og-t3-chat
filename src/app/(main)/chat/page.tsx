@@ -8,7 +8,7 @@ export default function Page() {
 	const { userAuthId } = useInstantAuth();
 
 	if (!userAuthId) return null;
-	
+
 	const threadId = id();
 
 	return (

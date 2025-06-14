@@ -1,6 +1,6 @@
 // Docs: https://www.instantdb.com/docs/modeling-data
 
-import { i, id } from "@instantdb/react";
+import { i } from "@instantdb/react";
 
 // npx instant-cli@latest push schema
 const _schema = i.schema({
@@ -34,15 +34,30 @@ const _schema = i.schema({
 	},
 	links: {
 		threadMessages: {
-			forward: { on: "messages", has: "one", label: "thread", onDelete: "cascade" },
+			forward: {
+				on: "messages",
+				has: "one",
+				label: "thread",
+				onDelete: "cascade",
+			},
 			reverse: { on: "threads", has: "many", label: "messages" },
 		},
 		userMessages: {
-			forward: { on: "messages", has: "one", label: "user" , onDelete: "cascade"},
+			forward: {
+				on: "messages",
+				has: "one",
+				label: "user",
+				onDelete: "cascade",
+			},
 			reverse: { on: "$users", has: "many", label: "messages" },
 		},
 		userThreads: {
-			forward: { on: "threads", has: "one", label: "user" , onDelete: "cascade"},
+			forward: {
+				on: "threads",
+				has: "one",
+				label: "user",
+				onDelete: "cascade",
+			},
 			reverse: { on: "$users", has: "many", label: "threads" },
 		},
 	},

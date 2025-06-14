@@ -1,11 +1,11 @@
 "use client";
 import { db } from "@/db/instant";
+import type { UIMessage } from "ai";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
+import { memo } from "react";
 import { toast } from "sonner";
 import { useCopyToClipboard } from "usehooks-ts";
-import type { UIMessage } from "ai";
-import { memo } from "react";
 
 // in their raw html form aka their purest
 export const ChatUiMessageWithImageSupport = memo(

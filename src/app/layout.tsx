@@ -16,8 +16,9 @@ export default function RootLayout({
 					baseTheme: dark,
 				}}
 			>
-				<body>{children}
-				<Toaster />
+				<body>
+					{children}
+					<Toaster />
 				</body>
 			</ClerkProvider>
 		</html>

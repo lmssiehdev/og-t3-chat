@@ -6,5 +6,5 @@ export function cn(...inputs: ClassValue[]) {
 }
 
 export function randomItemFromArray<T>(arr: T[]): T {
-	return arr[Math.floor((Math.random()*arr.length))];
-  }
+	return arr[Math.floor(Math.random() * arr.length)];
+}

@@ -1,5 +1,6 @@
 "use client";
 
+import { DropdownMenuRadioGroupDemo } from "@/component/model-selector";
 import { Button } from "@/components/ui/button";
 import {
 	FileUpload,
@@ -13,22 +14,19 @@ import {
 	type FileUploadProps,
 	FileUploadTrigger,
 } from "@/components/ui/file-upload";
-import { Textarea } from "@/components/ui/textarea";
+import {
+	type AvailableModels,
+	SUPPORTED_MODELS,
+	modelsInfo,
+} from "@/constants";
+import { createMessage } from "@/db/mutators";
+import { randomItemFromArray } from "@/lib/utils";
+import { useInstantAuth } from "@/providers/instant-auth";
+import type { UseChatHelpers } from "@ai-sdk/react";
 import { ArrowUp, Paperclip, Upload, X } from "lucide-react";
 import * as React from "react";
 import { toast } from "sonner";
 import { useLocalStorage } from "usehooks-ts";
-import {
-	type AvailableModels,
-	cheekyPhrases,
-	modelsInfo,
-	SUPPORTED_MODELS,
-} from "@/constants";
-import { DropdownMenuRadioGroupDemo } from "@/component/model-selector";
-import { useInstantAuth } from "@/providers/instant-auth";
-import { createMessage } from "@/db/mutators";
-import { useChat, type UseChatHelpers } from "@ai-sdk/react";
-import { randomItemFromArray } from "@/lib/utils";
 
 type FileUploadChatInputProps = {
 	threadId: string;

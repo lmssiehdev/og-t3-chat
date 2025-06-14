@@ -1,7 +1,7 @@
 "use client";
-import { ChatUiMessageWithImageSupport } from "@/components/t3-components";
 import { DropdownMenuRadioGroupDemo } from "@/component/model-selector";
 import { FileUploadChatInputDemo } from "@/components/chat-input";
+import { ChatUiMessageWithImageSupport } from "@/components/t3-components";
 import {
 	type AvailableModels,
 	SUPPORTED_MODELS,

@@ -1,22 +1,18 @@
 "use client";
-import { MessageSquare, MessageSquarePlus, XIcon } from "lucide-react";
+import { MessageSquarePlus } from "lucide-react";
 
+import { ThreadLink } from "@/components/t3-components";
 import {
 	Sidebar,
 	SidebarContent,
 	SidebarGroup,
 	SidebarGroupContent,
-	SidebarGroupLabel,
 	SidebarMenu,
-	SidebarMenuButton,
 	SidebarMenuItem,
 } from "@/components/ui/sidebar";
 import { db } from "@/db/instant";
 import { UserButton, useUser } from "@clerk/nextjs";
 import Link from "next/link";
-import { usePathname, useRouter } from "next/navigation";
-import { Fragment, memo, useEffect, useState } from "react";
-import { ThreadLink } from "@/components/t3-components";
 
 // Menu items.
 const items = [
@@ -68,7 +64,7 @@ export function AppSidebar() {
 						<SidebarMenu>
 							{(threadData?.threads ?? []).map((item) => (
 								<SidebarMenuItem key={item.id}>
-										<ThreadLink threadId={item.id} title={item.title} />
+									<ThreadLink threadId={item.id} title={item.title} />
 								</SidebarMenuItem>
 							))}
 						</SidebarMenu>

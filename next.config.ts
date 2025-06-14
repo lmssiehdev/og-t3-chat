@@ -13,4 +13,4 @@ const millionConfig = {
 	// auto: true,
 };
 
-export default million.next(nextConfig as any, {log: "info"});
+export default million.next(nextConfig as any, { log: "info" });

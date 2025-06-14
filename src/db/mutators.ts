@@ -22,7 +22,6 @@ export const createThread = async (
 	return threadId;
 };
 
-
 export async function createMessage(
 	threadId: string,
 	userAuthId: string,

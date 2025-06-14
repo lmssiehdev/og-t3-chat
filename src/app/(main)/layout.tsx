@@ -5,11 +5,10 @@ import { InstantAuthProvider } from "@/providers/instant-auth";
 import { SignInButton, SignedIn, SignedOut } from "@clerk/nextjs";
 import "../globals.css";
 import dynamic from "next/dynamic";
-import { InstantDataProvider } from "@/providers/instant-data";
 
-export default dynamic(() => Promise.resolve(RootLayout), {ssr: false})
+export default dynamic(() => Promise.resolve(RootLayout), { ssr: false });
 
-export  function RootLayout({
+export function RootLayout({
 	children,
 }: Readonly<{
 	children: React.ReactNode;

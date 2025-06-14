@@ -10,9 +10,8 @@ import {
 	DropdownMenuSeparator,
 	DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { modelsInfo, SUPPORTED_MODELS } from "@/constants";
+import { SUPPORTED_MODELS, modelsInfo } from "@/constants";
 import { ChevronDown, EyeIcon, KeyIcon } from "lucide-react";
-import * as React from "react";
 
 export function DropdownMenuRadioGroupDemo({
 	position,
@@ -42,16 +41,16 @@ export function DropdownMenuRadioGroupDemo({
 							<>
 								{modelsInfo[m].name}
 								<div className="flex gap-2">
-								{modelsInfo[m]?.requireApiKey && (
-									<div className=" text-pink-400 text-xs">
-										<KeyIcon className="text-pink-400 text-xs" />
-									</div>
-								)}
-								{modelsInfo[m]?.supportVision && (
-									<div className=" text-pink-400 text-xs">
-										<EyeIcon className="text-pink-400 text-xs" />
-									</div>
-								)}
+									{modelsInfo[m]?.requireApiKey && (
+										<div className=" text-pink-400 text-xs">
+											<KeyIcon className="text-pink-400 text-xs" />
+										</div>
+									)}
+									{modelsInfo[m]?.supportVision && (
+										<div className=" text-pink-400 text-xs">
+											<EyeIcon className="text-pink-400 text-xs" />
+										</div>
+									)}
 								</div>
 							</>
 						</DropdownMenuRadioItem>
