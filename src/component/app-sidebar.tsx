@@ -35,6 +35,9 @@ export function AppSidebar() {
 	const { data: threadData } = db.useQuery({
 		threads: {
 			$: {
+				order: {
+					createdAt: "desc",
+				},
 			},
 		},
 	});

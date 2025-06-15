@@ -22,9 +22,11 @@ export default async function Page({
 				limit: 1,
 			},
 			messages: {
-				$:{order: {
-					createdAt: 'asc',
-				  }},
+				$: {
+					order: {
+						createdAt: "asc",
+					},
+				},
 			},
 		},
 	});

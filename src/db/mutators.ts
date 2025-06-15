@@ -52,72 +52,72 @@ export type Thread = InstaQLResult<AppSchema, { threads: {} }>["threads"][0];
 
 // biome-ignore lint/complexity/noBannedTypes: <explanation>
 export type Message = InstaQLResult<AppSchema, { messages: {} }>["messages"][0];
-const batchSize = 30;
+const batchSize = 100;
 export async function createNewBranch(
-  data: Thread,
-  messages: Message[],
-  userAuthId: string,
-  messageId: string,
+	data: Thread,
+	messages: Message[],
+	userAuthId: string,
+	messageId: string,
 ) {
-  const newThreadId = id();
-  const baseTimestamp = Date.now();
-  
-  // create new thread
-  await db.transact([
-    db.tx.threads[newThreadId].update({
-      createdAt: baseTimestamp,
-      updatedAt: baseTimestamp,
-      metadata: {},
-      title: data.title ?? "New Branch",
-      userAuthId,
-      isBranch: true,
-    }),
-  ]);
+	const newThreadId = id();
+	const baseTimestamp = Date.now();
 
-  let currentBatch = [];
-  const batches = [];
+	// create new thread
+	await db.transact([
+		db.tx.threads[newThreadId].update({
+			createdAt: baseTimestamp,
+			updatedAt: baseTimestamp,
+			metadata: {},
+			title: data.title ?? "New Branch",
+			userAuthId,
+			isBranch: true,
+		}),
+	]);
 
-  for (let i = 0; i < messages.length; i++) {
-    const message = messages[i];
-    const newMessageId = id();
+	let currentBatch = [];
+	const batches = [];
 
-    console.log({
-      currMessageId: message.id,
-      originalId: message.originalId,
-      newMessageId,
-      messageId
-    });
+	for (let i = 0; i < messages.length; i++) {
+		const message = messages[i];
+		const newMessageId = id();
 
-    currentBatch.push(
-      db.tx.messages[newMessageId].update({
-        createdAt: message.createdAt,
-        text: message.text,
-        role: message.role,
-        metadata: message.metadata,
-        userAuthId,
-        originalId: message.originalId ?? newMessageId,
-      }),
-      db.tx.$users[userAuthId].link({ messages: newMessageId }),
-      db.tx.messages[newMessageId].link({ thread: newThreadId }),
-      db.tx.threads[newThreadId].link({ messages: newMessageId }),
-    );
+		console.log({
+			currMessageId: message.id,
+			originalId: message.originalId,
+			newMessageId,
+			messageId,
+		});
 
-    if (currentBatch.length >= batchSize) {
-      batches.push(currentBatch);
-      currentBatch = [];
-    }
-    if ( message.id === messageId) {
-      break;
-    }
-  }
+		currentBatch.push(
+			db.tx.messages[newMessageId].update({
+				createdAt: message.createdAt,
+				text: message.text,
+				role: message.role,
+				metadata: message.metadata,
+				userAuthId,
+				originalId: message.originalId ?? newMessageId,
+			}),
+			db.tx.$users[userAuthId].link({ messages: newMessageId }),
+			db.tx.messages[newMessageId].link({ thread: newThreadId }),
+			db.tx.threads[newThreadId].link({ messages: newMessageId }),
+		);
 
-  if (currentBatch.length) {
-    batches.push(currentBatch);
-  }
+		if (currentBatch.length >= batchSize) {
+			batches.push(currentBatch);
+			currentBatch = [];
+		}
+		if (message.id === messageId) {
+			break;
+		}
+	}
 
-  for (const batch of batches) {
-    await db.transact(batch);
-  }
-  
-  return newThreadId;
+	if (currentBatch.length) {
+		batches.push(currentBatch);
+	}
+
+	for (const batch of batches) {
+		await db.transact(batch);
+	}
+
+	return newThreadId;
 }

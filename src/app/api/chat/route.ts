@@ -1,10 +1,13 @@
 import { SUPPORTED_MODELS, modelsInfo } from "@/constants";
 import { type UpdateParams, id, init } from "@instantdb/admin";
-import { createOpenRouter, type LanguageModelV1 } from "@openrouter/ai-sdk-provider";
+import {
+	type LanguageModelV1,
+	createOpenRouter,
+} from "@openrouter/ai-sdk-provider";
 import { type CoreMessage, type UIMessage, generateText, streamText } from "ai";
+import { after } from "next/server";
 import { z } from "zod";
 import schema, { type AppSchema } from "../../../../instant.schema";
-import { after } from 'next/server'
 
 const db = init({
 	appId: process.env.NEXT_PUBLIC_INSTANTDB_APP_ID!,
@@ -185,12 +188,13 @@ export async function POST(req: Request) {
 			},
 		});
 
-
 		// after the stream is finished, we generate a title from the first message
-		if ( shouldCreateThread ) {
-			db.transact([db.tx.threads[threadId].update({
-				title: "Updating...",
-			})]);
+		if (shouldCreateThread) {
+			db.transact([
+				db.tx.threads[threadId].update({
+					title: "Updating...",
+				}),
+			]);
 			const latestMessage = messages[0];
 			after(async () => {
 				await generateTitleFromUserMessage({

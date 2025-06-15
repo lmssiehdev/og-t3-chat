@@ -49,8 +49,9 @@ export function FileUploadChatInputDemo({
 		"last-model",
 		SUPPORTED_MODELS[0],
 	);
-	const [selectedModel, setSelectedModel] =
-		React.useState<AvailableModels>(modelInStorage as AvailableModels);
+	const [selectedModel, setSelectedModel] = React.useState<AvailableModels>(
+		modelInStorage as AvailableModels,
+	);
 
 	const onUpload: NonNullable<FileUploadProps["onUpload"]> = React.useCallback(
 		async (files, { onProgress, onSuccess, onError }) => {
@@ -155,8 +156,8 @@ export function FileUploadChatInputDemo({
 	const onInput = React.useCallback(
 		(event: React.ChangeEvent<HTMLTextAreaElement>) => {
 			const target = event.target;
-			target.style.height = 'auto';
-  
+			target.style.height = "auto";
+
 			const MAX_HEIGHT = 200;
 			const newHeight = Math.min(target.scrollHeight, MAX_HEIGHT);
 			target.style.height = `${newHeight}px`;

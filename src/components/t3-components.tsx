@@ -56,10 +56,12 @@ export const ChatUiMessageWithImageSupport = memo(
 
 function CreateBranchButton({ onBranching }: { onBranching?: () => void }) {
 	return (
-		<button 			className="inline-flex items-center justify-center gap-2 whitespace-nowrap font-medium focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50 [&amp;_svg]:pointer-events-none [&amp;_svg]:size-4 [&amp;_svg]:shrink-0 bg-secondary text-secondary-foreground shadow-sm hover:bg-secondary/80 h-8 rounded-md px-3 text-xs transition-opacity group-hover:opacity-100 mt-4 z-10" onClick={onBranching}>
-			<GitBranch className="mr-2 h-4 w-4" />	
+		<button
+			className="inline-flex items-center justify-center gap-2 whitespace-nowrap font-medium focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50 [&amp;_svg]:pointer-events-none [&amp;_svg]:size-4 [&amp;_svg]:shrink-0 bg-secondary text-secondary-foreground shadow-sm hover:bg-secondary/80 h-8 rounded-md px-3 text-xs transition-opacity group-hover:opacity-100 mt-4 z-10"
+			onClick={onBranching}
+		>
+			<GitBranch className="mr-2 h-4 w-4" />
 			Create branch{" "}
-
 		</button>
 	);
 }

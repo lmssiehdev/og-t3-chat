@@ -62,9 +62,9 @@ export function ChatComponent({
 			messages: {
 				$: {
 					order: {
-						createdAt: 'asc',
+						createdAt: "asc",
 					},
-				}
+				},
 			},
 		},
 	});
@@ -106,7 +106,7 @@ export function ChatComponent({
 	if (!dbMessages?.threads[0]?.messages) {
 		return null;
 	}
-	const thread = dbMessages?.threads[0]
+	const thread = dbMessages?.threads[0];
 	return (
 		<div className="flex flex-col h-full">
 			<div className="flex-1 mx-auto flex w-full max-w-3xl flex-col space-y-12 p-4 pb-16">
@@ -115,19 +115,32 @@ export function ChatComponent({
 						.map((m) => ({ ...m, content: m.text }))
 						.map((m) => (
 							<ChatUiMessageWithImageSupport
-							onBranching={async (messageId: string) => {
-								const newThreadId = await createNewBranch(thread, thread.messages, userAuthId, messageId);
-								router.push(`/chat/${newThreadId}`);
-							}}
+								onBranching={async (messageId: string) => {
+									const newThreadId = await createNewBranch(
+										thread,
+										thread.messages,
+										userAuthId,
+										messageId,
+									);
+									router.push(`/chat/${newThreadId}`);
+								}}
 								key={m.id}
 								message={m as unknown as UIMessage}
 							/>
 						))}
 					{activeStreamingMessages?.content.length && (
-						<ChatUiMessageWithImageSupport onBranching={async (messageId: string) => {
-							const newThreadId = await createNewBranch(thread, thread.messages, userAuthId, messageId);
-							router.push(`/chat/${newThreadId}`);
-						}} message={activeStreamingMessages} />
+						<ChatUiMessageWithImageSupport
+							onBranching={async (messageId: string) => {
+								const newThreadId = await createNewBranch(
+									thread,
+									thread.messages,
+									userAuthId,
+									messageId,
+								);
+								router.push(`/chat/${newThreadId}`);
+							}}
+							message={activeStreamingMessages}
+						/>
 					)}
 
 					{isLoading && (

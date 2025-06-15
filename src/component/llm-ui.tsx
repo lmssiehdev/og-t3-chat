@@ -15,9 +15,7 @@ export function ChatUiMessageWithImageSupport({
 		>
 			<div className="group relative bg-[#2D2D2D] rounded-2xl p-4 inline-block text-left max-w-[80%] break-words">
 				<div key={message.id}>
-					<div>
-					{message.content}
-					</div>
+					<div>{message.content}</div>
 					{/* Display image attachments */}
 					{hasImages && (
 						<div className="flex flex-wrap gap-2">
