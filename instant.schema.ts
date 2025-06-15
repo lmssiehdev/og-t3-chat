@@ -16,19 +16,21 @@ const _schema = i.schema({
 		messages: i.entity({
 			id: i.string().unique().indexed(),
 			role: i.string<"user" | "ai">().optional(),
-			createdAt: i.number(),
+			createdAt: i.number().indexed(),
 			text: i.string(),
 			metadata: i.json(),
 			userAuthId: i.string().indexed(),
 			isBranch: i.boolean().optional(),
+			originalId: i.string().optional()
 		}),
 		threads: i.entity({
 			id: i.string().unique().indexed(),
-			createdAt: i.number(),
+			createdAt: i.number().indexed(),
 			title: i.string(),
 			updatedTitle: i.boolean().optional(),
 			updatedAt: i.date(),
 			metadata: i.json(),
+			isBranch: i.boolean(),
 			userAuthId: i.string().indexed(),
 		}),
 	},
