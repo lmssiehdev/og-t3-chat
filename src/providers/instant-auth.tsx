@@ -4,7 +4,9 @@ import { db } from "@/db/instant";
 import { useAuth, useUser } from "@clerk/nextjs";
 import { createContext, useContext, useEffect, useMemo, useState } from "react";
 
-const instantAuthContext = createContext<any>(null);
+const instantAuthContext = createContext({} as {
+	userAuthId: string | undefined;
+});
 
 export function useInstantAuth() {
 	const context = useContext(instantAuthContext);
