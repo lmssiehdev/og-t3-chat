@@ -1,17 +1,17 @@
 "use client";
 
-import { GitBranch, MessageSquare } from "lucide-react";
-import * as React from "react";
 import {
-  CommandDialog,
-  CommandEmpty,
-  CommandGroup,
-  CommandInput,
-  CommandItem,
-  CommandList,
-  CommandSeparator,
+	CommandDialog,
+	CommandEmpty,
+	CommandGroup,
+	CommandInput,
+	CommandItem,
+	CommandList,
+	CommandSeparator,
 } from "@/components/ui/command";
 import { db } from "@/db/instant";
+import { GitBranch, MessageSquare } from "lucide-react";
+import * as React from "react";
 import { useNavigate } from "react-router";
 
 export function SearchThreads() {

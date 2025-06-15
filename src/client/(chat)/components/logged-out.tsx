@@ -11,34 +11,31 @@ import {
 	SidebarMenuItem,
 } from "@/components/ui/sidebar";
 import { NavLink } from "react-router";
-import { ThreadLink } from "./t3-chat";
 import { useParams } from "react-router";
+import { ThreadLink } from "./t3-chat";
 import { PageData } from "./welcome";
 
 export function LoggedoutChatComponent() {
-	const { id }  = useParams<{ id: string }>();
+	const { id } = useParams<{ id: string }>();
 	if (!id) return null;
 
 	const { component, input } = PageData[id as keyof typeof PageData];
 	return (
 		<>
-		{
-			component()
-		}
-		<FileUploadChatInputDemo
-			threadId={""}
-			useChat={
-				{
-					messages: [],
-					input: input,
-					handleSubmit: () => {},
-					handleInputChange: () => {},
-					status: "",
-				} as unknown as UseChatHelpers
-			}
-		/>
+			{component()}
+			<FileUploadChatInputDemo
+				threadId={""}
+				useChat={
+					{
+						messages: [],
+						input: input,
+						handleSubmit: () => {},
+						handleInputChange: () => {},
+						status: "",
+					} as unknown as UseChatHelpers
+				}
+			/>
 		</>
-
 	);
 }
 
@@ -83,7 +80,7 @@ export function LoggedoutAppSidebar() {
 					<h2 className="font-semibold text-neutral-400 ">Recent Threads</h2>
 					<SidebarGroupContent>
 						<SidebarMenu>
-							{( items).map((item) => (
+							{items.map((item) => (
 								<SidebarMenuItem key={item.url}>
 									<ThreadLink
 										isBranch={false}

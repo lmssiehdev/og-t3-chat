@@ -1,18 +1,18 @@
-
 export const PageData = {
-    "welcome": {
-        component: WelcomePage,
-        input: "No auth wasn't one off the requirements 💅🏻"
-    },
-    "why-ot-t3-chat": {
-        component: WelcomePage,
-        input: "GitHub or any email works (no validation), what are you waiting for?"
-    },
-    "faq": {
-        component: WelcomePage,
-        input: "Just... please? The app is actually cool 😭"
-    }
-}
+	welcome: {
+		component: WelcomePage,
+		input: "No auth wasn't one off the requirements 💅🏻",
+	},
+	"why-ot-t3-chat": {
+		component: WelcomePage,
+		input:
+			"GitHub or any email works (no validation), what are you waiting for?",
+	},
+	faq: {
+		component: WelcomePage,
+		input: "Just... please? The app is actually cool 😭",
+	},
+};
 function WelcomePage() {
 	return (
 		<>

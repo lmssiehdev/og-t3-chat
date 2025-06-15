@@ -1,7 +1,6 @@
 "use client";
 import { MessageSquarePlus } from "lucide-react";
 
-import { ThreadLink } from "./t3-chat";
 import {
 	Sidebar,
 	SidebarContent,
@@ -13,6 +12,7 @@ import {
 import { db } from "@/db/instant";
 import { UserButton, useUser } from "@clerk/nextjs";
 import { NavLink } from "react-router";
+import { ThreadLink } from "./t3-chat";
 
 export function AppSidebar() {
 	const { data: threadData } = db.useQuery({

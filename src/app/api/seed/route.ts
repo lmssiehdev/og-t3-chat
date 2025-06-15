@@ -1,6 +1,6 @@
-import { id, init } from "@instantdb/admin";
 import { faker } from "@faker-js/faker";
-import schema, { type AppSchema } from "../../../../instant.schema";
+import { id, init } from "@instantdb/admin";
+import schema from "../../../../instant.schema";
 
 const db = init({
 	appId: process.env.NEXT_PUBLIC_INSTANTDB_APP_ID!,

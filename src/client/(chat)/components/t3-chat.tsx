@@ -1,26 +1,26 @@
 "use client";
 import { db } from "@/db/instant";
+import { cn } from "@/lib/utils";
 import type { UIMessage } from "ai";
 import { GitBranch } from "lucide-react";
 import { memo } from "react";
-import { NavLink, useLocation, useNavigate } from "react-router";
-import remarkGfm from "remark-gfm";
 import ReactMarkdown from "react-markdown";
+import { NavLink, useLocation, useNavigate } from "react-router";
+import rehypeHighlight from "rehype-highlight";
+import remarkGfm from "remark-gfm";
 import { toast } from "sonner";
-import { useCopyToClipboard } from "usehooks-ts";
 import { useDebounce } from "use-debounce";
-import { cn } from "@/lib/utils";
-import rehypeHighlight from 'rehype-highlight';
-import 'highlight.js/styles/github-dark.css';
+import { useCopyToClipboard } from "usehooks-ts";
+import "highlight.js/styles/github-dark.css";
 
 const MemoizedMarkdownComponent = memo(({ content }: { content: string }) => (
-  <ReactMarkdown
-    className="prose prose-invert [&>pre]:!bg-transparent"
-    remarkPlugins={[remarkGfm]}
-    rehypePlugins={[rehypeHighlight]}
-    // biome-ignore lint/correctness/noChildrenProp: uhhh
-	children={content}
-  />
+	<ReactMarkdown
+		className="prose prose-invert [&>pre]:!bg-transparent"
+		remarkPlugins={[remarkGfm]}
+		rehypePlugins={[rehypeHighlight]}
+		// biome-ignore lint/correctness/noChildrenProp: uhhh
+		children={content}
+	/>
 ));
 
 // in their raw html form aka their purest

@@ -1,13 +1,13 @@
-import { FileUploadChatInputDemo } from "./input";
-import { ChatUiMessageWithImageSupport } from "./t3-chat";
 import { db } from "@/db/instant";
 import { createNewBranch } from "@/db/mutators";
 import { useInstantAuth } from "@/providers/instant-auth";
 import { type UseChatHelpers, useChat } from "@ai-sdk/react";
 import type { UIMessage } from "ai";
-import { useLocation, useNavigate } from "react-router";
 import { useMemo, useState } from "react";
+import { useLocation, useNavigate } from "react-router";
 import { toast } from "sonner";
+import { FileUploadChatInputDemo } from "./input";
+import { ChatUiMessageWithImageSupport } from "./t3-chat";
 
 export function ChatComponent({
 	threadId,

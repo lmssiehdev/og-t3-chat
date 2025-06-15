@@ -1,8 +1,7 @@
+import { ChatUiMessageWithImageSupport } from "@/client/(chat)/components/t3-chat";
 import { init } from "@instantdb/admin";
 import type { UIMessage } from "ai";
 import schema from "../../../../instant.schema";
-import { ChatUiMessageWithImageSupport } from "@/client/(chat)/components/t3-chat";
-import { LLMUIComponent } from "@/component/llm-ui";
 
 const db = init({
 	appId: process.env.NEXT_PUBLIC_INSTANTDB_APP_ID!,
@@ -47,7 +46,11 @@ export default async function Page({
 							Object.assign(m, { content: m.text }) as unknown as UIMessage,
 					)
 					.map((m) => (
-						<ChatUiMessageWithImageSupport showChatButtons={false} message={m} key={m.id} />
+						<ChatUiMessageWithImageSupport
+							showChatButtons={false}
+							message={m}
+							key={m.id}
+						/>
 					))}
 			</div>
 		</div>

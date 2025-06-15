@@ -4,14 +4,14 @@ import type { NextConfig } from "next";
 const nextConfig: NextConfig = {
 	rewrites: async () => {
 		return [
-		  {
-			source: "/chat/:slug*",
-			destination: "/static-app-shell",
-		  },
-		  {
-			source: "/",
-			destination: "/static-app-shell"
-		  }
+			{
+				source: "/chat/:slug*",
+				destination: "/static-app-shell",
+			},
+			{
+				source: "/",
+				destination: "/static-app-shell",
+			},
 		];
 	},
 	eslint: {
