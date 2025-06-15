@@ -1,5 +1,6 @@
 "use client";
 
+import type { RouteParams } from "@/app/api/chat/route";
 import { DropdownMenuRadioGroupDemo } from "@/component/model-selector";
 import { Button } from "@/components/ui/button";
 import {
@@ -49,7 +50,7 @@ export function FileUploadChatInputDemo({
 		SUPPORTED_MODELS[0],
 	);
 	const [selectedModel, setSelectedModel] =
-		React.useState<string>(modelInStorage);
+		React.useState<AvailableModels>(modelInStorage as AvailableModels);
 
 	const onUpload: NonNullable<FileUploadProps["onUpload"]> = React.useCallback(
 		async (files, { onProgress, onSuccess, onError }) => {
@@ -140,7 +141,8 @@ export function FileUploadChatInputDemo({
 					apiKey: modelsInfo[selectedModel as AvailableModels].requireApiKey
 						? JSON.parse(localStorage.getItem("api-key") || '""')
 						: undefined,
-				},
+					timestamp: Date.now(),
+				} satisfies Partial<RouteParams>,
 				experimental_attachments: attachments, // Now in correct format
 			});
 
@@ -150,6 +152,18 @@ export function FileUploadChatInputDemo({
 		[files, handleSubmit, selectedModel, userAuthId, threadId],
 	);
 
+	const onInput = React.useCallback(
+		(event: React.ChangeEvent<HTMLTextAreaElement>) => {
+			const target = event.target;
+			target.style.height = 'auto';
+  
+			const MAX_HEIGHT = 200;
+			const newHeight = Math.min(target.scrollHeight, MAX_HEIGHT);
+			target.style.height = `${newHeight}px`;
+			handleInputChange(event);
+		},
+		[handleInputChange],
+	);
 	return (
 		<>
 			<CheekyPhrases />
@@ -186,7 +200,7 @@ export function FileUploadChatInputDemo({
 
 					<form
 						onSubmit={onSubmit}
-						className=" relative flex w-full items-stretch gap-2 rounded-t-xl bg-[#2D2D2D] px-3 py-3 shadow-[inset_0_2px_4px_rgba(0,0,0,0.4)] sm:max-w-3xl"
+						className=" relative w-full items-stretch gap-2 rounded-t-xl bg-[#2D2D2D] px-3 py-3 shadow-[inset_0_2px_4px_rgba(0,0,0,0.4)] sm:max-w-3xl"
 					>
 						<FileUploadList
 							orientation="horizontal"
@@ -219,9 +233,9 @@ export function FileUploadChatInputDemo({
 						<textarea
 							name="message"
 							value={input}
-							onChange={handleInputChange}
+							onChange={onInput}
 							placeholder="Type your message here..."
-							className="w-full resize-none bg-transparent pb-8 text-base leading-6 text-neutral-100 outline-none "
+							className="w-full resize-none bg-transparent mb-8 text-base leading-6 text-neutral-100 outline-none "
 							disabled={isUploading || status !== "ready"}
 						/>
 
@@ -241,7 +255,8 @@ export function FileUploadChatInputDemo({
 								<DropdownMenuRadioGroupDemo
 									position={selectedModel}
 									setPosition={(v) => {
-										if (modelsInfo[v as AvailableModels].requireApiKey) {
+										const model = v as AvailableModels;
+										if (modelsInfo[model].requireApiKey) {
 											const data = prompt(
 												"This model requires an API key",
 												apiKeyInLocalStorage,
@@ -249,8 +264,8 @@ export function FileUploadChatInputDemo({
 											if (!data?.trim()) return;
 											setApiKeyInLocalStorage(data);
 										}
-										setSelectedModel(v);
-										setModelInStorage(v);
+										setSelectedModel(model);
+										setModelInStorage(model);
 									}}
 								/>
 								<FileUploadTrigger asChild>

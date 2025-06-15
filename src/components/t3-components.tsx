@@ -1,6 +1,7 @@
 "use client";
 import { db } from "@/db/instant";
 import type { UIMessage } from "ai";
+import { GitBranch } from "lucide-react";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { memo } from "react";
@@ -9,7 +10,10 @@ import { useCopyToClipboard } from "usehooks-ts";
 
 // in their raw html form aka their purest
 export const ChatUiMessageWithImageSupport = memo(
-	function ChatUiMessageWithImageSupport({ message }: { message: UIMessage }) {
+	function ChatUiMessageWithImageSupport({
+		message,
+		onBranching,
+	}: { message: UIMessage; onBranching?: (messageId: string) => void }) {
 		const hasImages = message.experimental_attachments?.filter((attachment) =>
 			attachment.contentType?.startsWith("image/"),
 		);
@@ -34,17 +38,37 @@ export const ChatUiMessageWithImageSupport = memo(
 							</div>
 						)}
 					</div>
-					<CopyThreadButton content={message.content} />
+					<div className="inline-flex items-center justify-center gap-2 whitespace-nowrap font-medium focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50 [&amp;_svg]:pointer-events-none [&amp;_svg]:size-4 [&amp;_svg]:shrink-0 text-secondary-foreground shadow-sm h-8 rounded-md px-3 text-xs absolute -bottom-8 right-2 opacity-0 transition-opacity group-hover:opacity-100 mt-4 z-10 bg-transparent">
+						{message.role !== "user" && (
+							<CreateBranchButton
+								onBranching={() => {
+									if (onBranching) onBranching(message.id);
+								}}
+							/>
+						)}
+						<CopyThreadButton content={message.content} />
+					</div>
 				</div>
 			</div>
 		);
 	},
 );
 
+function CreateBranchButton({ onBranching }: { onBranching?: () => void }) {
+	return (
+		<button 			className="inline-flex items-center justify-center gap-2 whitespace-nowrap font-medium focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50 [&amp;_svg]:pointer-events-none [&amp;_svg]:size-4 [&amp;_svg]:shrink-0 bg-secondary text-secondary-foreground shadow-sm hover:bg-secondary/80 h-8 rounded-md px-3 text-xs transition-opacity group-hover:opacity-100 mt-4 z-10" onClick={onBranching}>
+			<GitBranch className="mr-2 h-4 w-4" />	
+			Create branch{" "}
+
+		</button>
+	);
+}
+
 export function ThreadLink({
 	threadId,
 	title,
-}: { threadId: string; title: string }) {
+	isBranch,
+}: { threadId: string; title: string; isBranch?: boolean }) {
 	const pathname = usePathname();
 	const router = useRouter();
 	const isActive = pathname.includes(threadId);
@@ -54,7 +78,7 @@ export function ThreadLink({
 		if (pathname.includes(threadId)) await router.push("/chat");
 		setTimeout(() => {
 			db.transact(db.tx.threads[threadId].delete());
-		}, 100);
+		}, 200);
 	}
 
 	return (
@@ -63,20 +87,25 @@ export function ThreadLink({
 			className={`group/item relative flex items-start rounded-sm hover:bg-[#2D2D2D]/40 ${isActive ? "bg-[#2D2D2D]/60" : ""}`}
 		>
 			<div className="flex flex-row gap-2 rounded-sm px-2 py-1 pr-8">
-				<svg
-					xmlns="http://www.w3.org/2000/svg"
-					width="24"
-					height="24"
-					viewBox="0 0 24 24"
-					fill="none"
-					stroke="currentColor"
-					strokeWidth="2"
-					strokeLinecap="round"
-					strokeLinejoin="round"
-					className="lucide lucide-message-square mt-1.5 size-3 shrink-0 text-neutral-400"
-				>
-					<path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" />
-				</svg>
+				{isBranch ? (
+					<GitBranch className="mt-1.5 size-3 shrink-0 text-neutral-400" />
+				) : (
+					<svg
+						xmlns="http://www.w3.org/2000/svg"
+						width="24"
+						height="24"
+						viewBox="0 0 24 24"
+						fill="none"
+						stroke="currentColor"
+						strokeWidth="2"
+						strokeLinecap="round"
+						strokeLinejoin="round"
+						className="lucide lucide-message-square mt-1.5 size-3 shrink-0 text-neutral-400"
+					>
+						<path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" />
+					</svg>
+				)}
+
 				<div className="line-clamp-2 overflow-hidden text-ellipsis">
 					{title}
 				</div>
@@ -84,6 +113,8 @@ export function ThreadLink({
 			<button
 				onClick={(e) => {
 					e.stopPropagation();
+					e.preventDefault();
+
 					deleteThread();
 				}}
 				className="absolute right-2 top-1/2 -translate-y-1/2 opacity-0 hover:text-red-500 group-hover/item:opacity-100"
@@ -127,7 +158,7 @@ export function CopyThreadButton({ content }: { content: string }) {
 				console.log("content", content);
 				handleCopy(content);
 			}}
-			className="inline-flex items-center justify-center gap-2 whitespace-nowrap font-medium focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50 [&amp;_svg]:pointer-events-none [&amp;_svg]:size-4 [&amp;_svg]:shrink-0 bg-secondary text-secondary-foreground shadow-sm hover:bg-secondary/80 h-8 rounded-md px-3 text-xs absolute -bottom-8 right-2 opacity-0 transition-opacity group-hover:opacity-100 mt-4 z-10"
+			className="inline-flex items-center justify-center gap-2 whitespace-nowrap font-medium focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50 [&amp;_svg]:pointer-events-none [&amp;_svg]:size-4 [&amp;_svg]:shrink-0 bg-secondary text-secondary-foreground shadow-sm hover:bg-secondary/80 h-8 rounded-md px-3 text-xs transition-opacity group-hover:opacity-100 mt-4 z-10"
 		>
 			<svg
 				xmlns="http://www.w3.org/2000/svg"

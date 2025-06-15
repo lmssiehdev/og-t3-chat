@@ -1,4 +1,5 @@
-import { id } from "@instantdb/react";
+import { type InstaQLResult, id } from "@instantdb/react";
+import type { AppSchema } from "../../instant.schema";
 import { db } from "./instant";
 
 export const createThread = async (
@@ -44,4 +45,79 @@ export async function createMessage(
 	]);
 
 	return messageId;
+}
+
+// biome-ignore lint/complexity/noBannedTypes: <explanation>
+export type Thread = InstaQLResult<AppSchema, { threads: {} }>["threads"][0];
+
+// biome-ignore lint/complexity/noBannedTypes: <explanation>
+export type Message = InstaQLResult<AppSchema, { messages: {} }>["messages"][0];
+const batchSize = 30;
+export async function createNewBranch(
+  data: Thread,
+  messages: Message[],
+  userAuthId: string,
+  messageId: string,
+) {
+  const newThreadId = id();
+  const baseTimestamp = Date.now();
+  
+  // create new thread
+  await db.transact([
+    db.tx.threads[newThreadId].update({
+      createdAt: baseTimestamp,
+      updatedAt: baseTimestamp,
+      metadata: {},
+      title: data.title ?? "New Branch",
+      userAuthId,
+      isBranch: true,
+    }),
+  ]);
+
+  let currentBatch = [];
+  const batches = [];
+
+  for (let i = 0; i < messages.length; i++) {
+    const message = messages[i];
+    const newMessageId = id();
+
+    console.log({
+      currMessageId: message.id,
+      originalId: message.originalId,
+      newMessageId,
+      messageId
+    });
+
+    currentBatch.push(
+      db.tx.messages[newMessageId].update({
+        createdAt: message.createdAt,
+        text: message.text,
+        role: message.role,
+        metadata: message.metadata,
+        userAuthId,
+        originalId: message.originalId ?? newMessageId,
+      }),
+      db.tx.$users[userAuthId].link({ messages: newMessageId }),
+      db.tx.messages[newMessageId].link({ thread: newThreadId }),
+      db.tx.threads[newThreadId].link({ messages: newMessageId }),
+    );
+
+    if (currentBatch.length >= batchSize) {
+      batches.push(currentBatch);
+      currentBatch = [];
+    }
+    if ( message.id === messageId) {
+      break;
+    }
+  }
+
+  if (currentBatch.length) {
+    batches.push(currentBatch);
+  }
+
+  for (const batch of batches) {
+    await db.transact(batch);
+  }
+  
+  return newThreadId;
 }

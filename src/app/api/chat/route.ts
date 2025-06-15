@@ -18,7 +18,10 @@ const zRouteParams = z.object({
 	model: z.enum(SUPPORTED_MODELS),
 	shouldCreateThread: z.boolean().default(false),
 	apiKey: z.string().min(2).optional(),
+	timestamp: z.number().optional(),
 });
+
+export type RouteParams = z.infer<typeof zRouteParams>;
 
 const errorToMsg = {
 	invalid_api_key: {
@@ -117,6 +120,7 @@ export async function POST(req: Request) {
 			threadId,
 			userAuthId,
 			shouldCreateThread,
+			timestamp
 		} = parsedBody.data;
 
 		if (modelsInfo[model].requireApiKey && !clientApiKey) {
@@ -128,14 +132,15 @@ export async function POST(req: Request) {
 		const latestMessage = messages[messages.length - 1];
 
 		const payload: UpdateParams<AppSchema, "threads"> = {
-			createdAt: Date.now(),
-			updatedAt: Date.now(),
+			createdAt: timestamp,
+			updatedAt: timestamp,
 		};
 
 		if (shouldCreateThread) {
 			payload.title = "New Chat!";
 			payload.userAuthId = userAuthId;
 			payload.metadata = {};
+			payload.isBranch = false;
 			db.tx.$users[userAuthId].link({ threads: threadId });
 		}
 
@@ -166,7 +171,7 @@ export async function POST(req: Request) {
 				const messageId = id();
 				await db.transact([
 					db.tx.messages[messageId].update({
-						createdAt: Date.now(),
+						createdAt: timestamp,
 						text,
 						role: "ai",
 						metadata: {},

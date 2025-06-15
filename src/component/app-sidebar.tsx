@@ -34,7 +34,8 @@ const items = [
 export function AppSidebar() {
 	const { data: threadData } = db.useQuery({
 		threads: {
-			$: {},
+			$: {
+			},
 		},
 	});
 
@@ -64,7 +65,11 @@ export function AppSidebar() {
 						<SidebarMenu>
 							{(threadData?.threads ?? []).map((item) => (
 								<SidebarMenuItem key={item.id}>
-									<ThreadLink threadId={item.id} title={item.title} />
+									<ThreadLink
+										isBranch={item.isBranch}
+										threadId={item.id}
+										title={item.title}
+									/>
 								</SidebarMenuItem>
 							))}
 						</SidebarMenu>
@@ -79,7 +84,7 @@ function SideBarUserArea() {
 	const { isSignedIn, user } = useUser();
 
 	return (
-		<div className="p-4 flex gap-3 h-20">
+		<div className="p-4 flex gap-3 h-20 border-t-2">
 			<UserButton
 				appearance={{
 					elements: {

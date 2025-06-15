@@ -21,7 +21,11 @@ export default async function Page({
 				},
 				limit: 1,
 			},
-			messages: {},
+			messages: {
+				$:{order: {
+					createdAt: 'asc',
+				  }},
+			},
 		},
 	});
 

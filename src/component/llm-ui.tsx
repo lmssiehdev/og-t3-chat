@@ -2,8 +2,6 @@
 
 import { CopyThreadButton } from "@/components/t3-components";
 import type { UIMessage } from "ai";
-import Markdown from "react-markdown";
-import remarkGfm from "remark-gfm";
 
 export function ChatUiMessageWithImageSupport({
 	message,
@@ -17,7 +15,9 @@ export function ChatUiMessageWithImageSupport({
 		>
 			<div className="group relative bg-[#2D2D2D] rounded-2xl p-4 inline-block text-left max-w-[80%] break-words">
 				<div key={message.id}>
-					<Markdown remarkPlugins={[remarkGfm]}>{message.content}</Markdown>
+					<div>
+					{message.content}
+					</div>
 					{/* Display image attachments */}
 					{hasImages && (
 						<div className="flex flex-wrap gap-2">
