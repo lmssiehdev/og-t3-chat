@@ -1,9 +1,10 @@
 import { SUPPORTED_MODELS, modelsInfo } from "@/constants";
 import { type UpdateParams, id, init } from "@instantdb/admin";
-import { createOpenRouter } from "@openrouter/ai-sdk-provider";
-import { type CoreMessage, type UIMessage, streamText } from "ai";
+import { createOpenRouter, type LanguageModelV1 } from "@openrouter/ai-sdk-provider";
+import { type CoreMessage, type UIMessage, generateText, streamText } from "ai";
 import { z } from "zod";
 import schema, { type AppSchema } from "../../../../instant.schema";
+import { after } from 'next/server'
 
 const db = init({
 	appId: process.env.NEXT_PUBLIC_INSTANTDB_APP_ID!,
@@ -120,7 +121,7 @@ export async function POST(req: Request) {
 			threadId,
 			userAuthId,
 			shouldCreateThread,
-			timestamp
+			timestamp,
 		} = parsedBody.data;
 
 		if (modelsInfo[model].requireApiKey && !clientApiKey) {
@@ -128,8 +129,6 @@ export async function POST(req: Request) {
 				status: 400,
 			});
 		}
-		// Get the latest user message for title generation
-		const latestMessage = messages[messages.length - 1];
 
 		const payload: UpdateParams<AppSchema, "threads"> = {
 			createdAt: timestamp,
@@ -148,15 +147,17 @@ export async function POST(req: Request) {
 
 		let errorMessageKey: keyof typeof errorToMsg = "default_error";
 		const apiKey = clientApiKey?.trim() ?? process.env.OPENROUTER_API_KEY;
+
 		const openrouter = createOpenRouter({
 			apiKey: apiKey || process.env.OPENROUTER_API_KEY,
 		});
 
+		const openRouterModel: LanguageModelV1 = openrouter.chat(model);
+
 		// Process messages with attachments
 		const processedMessages = await processMessages(messages);
-		console.log({ processedMessages, model, apiKey, clientApiKey });
 		const result = streamText({
-			model: openrouter.chat(model),
+			model: openRouterModel,
 			messages: processedMessages,
 			onError: ({ error }) => {
 				console.error("Error streaming text:", error);
@@ -184,6 +185,22 @@ export async function POST(req: Request) {
 			},
 		});
 
+
+		// after the stream is finished, we generate a title from the first message
+		if ( shouldCreateThread ) {
+			db.transact([db.tx.threads[threadId].update({
+				title: "Updating...",
+			})]);
+			const latestMessage = messages[0];
+			after(async () => {
+				await generateTitleFromUserMessage({
+					openRouterModel,
+					message: latestMessage?.content,
+					threadId,
+				});
+			});
+		}
+
 		return result.toDataStreamResponse({
 			status: errorMessageKey === "default_error" ? 200 : 500,
 			getErrorMessage(error) {
@@ -202,45 +219,28 @@ export async function POST(req: Request) {
 	}
 }
 
-// async function generateTitleFromUserMessage({
-// 	message,
-// 	threadId,
-// }: {
-// 	message: UIMessage;
-// 	threadId: string;
-// }) {
-// 	const data = await db.query({
-// 		threads: {
-// 			$: {
-// 				where: {
-// 					id: threadId,
-// 				},
-// 				limit: 1,
-// 			},
-// 		},
-// 	});
-
-// 	if (data.threads[0].updatedTitle) return;
-
-// 	const { text: title } = await generateText({
-// 		model: openrouter.chat("google/gemma-3-1b-it:free"),
-// 		system: `
-// - you will generate a short title based on the first message a user begins a conversation with
-// - ensure it is not more than 80 characters long
-// - the title should be a summary of the user's message
-// - do not use quotes or colons`,
-// 		prompt: JSON.stringify(message),
-// 	});
-
-// 	try {
-// 		await db.transact([
-// 			db.tx.threads[threadId].update({
-// 				title,
-// 				updatedTitle: true,
-// 				updatedAt: Date.now(),
-// 			}),
-// 		]);
-// 	} catch (titleError) {
-// 		console.error("Error updating title:", titleError);
-// 	}
-// }
+async function generateTitleFromUserMessage({
+	openRouterModel,
+	message,
+	threadId,
+}: { openRouterModel: LanguageModelV1; message: string; threadId: string }) {
+	try {
+		const { text: title } = await generateText({
+			model: openRouterModel,
+			system: `
+	- you will generate a short title based on the first message a user begins a conversation with
+	- ensure it is not more than 80 characters long
+	- the title should be a summary of the user's message
+	- do not use quotes or colons`,
+			prompt: JSON.stringify(message),
+		});
+		await db.transact([
+			db.tx.threads[threadId].update({
+				title,
+				updatedTitle: true,
+			}),
+		]);
+	} catch (titleError) {
+		console.error("Error updating title:", titleError);
+	}
+}
