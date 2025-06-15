@@ -1,14 +1,10 @@
 "use client";
-import { AppSidebar } from "@/component/app-sidebar";
 import { SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar";
 import { InstantAuthProvider } from "@/providers/instant-auth";
 import { SignInButton, SignedIn, SignedOut } from "@clerk/nextjs";
-import "../globals.css";
-import dynamic from "next/dynamic";
+import { AppSidebar } from "./sidebar";
 
-export default dynamic(() => Promise.resolve(RootLayout), { ssr: false });
-
-export function RootLayout({
+export function ChatLayout({
 	children,
 }: Readonly<{
 	children: React.ReactNode;

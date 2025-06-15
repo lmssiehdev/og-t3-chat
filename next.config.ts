@@ -8,6 +8,10 @@ const nextConfig: NextConfig = {
 			source: "/chat/:slug*",
 			destination: "/static-app-shell",
 		  },
+		  {
+			source: "/",
+			destination: "/static-app-shell"
+		  }
 		];
 	},
 	eslint: {

@@ -1,4 +1,3 @@
-"use client";
 import { FileUploadChatInputDemo } from "@/components/chat-input";
 import { ChatUiMessageWithImageSupport } from "@/components/t3-components";
 import { db } from "@/db/instant";
@@ -6,7 +5,7 @@ import { createNewBranch } from "@/db/mutators";
 import { useInstantAuth } from "@/providers/instant-auth";
 import { type UseChatHelpers, useChat } from "@ai-sdk/react";
 import type { UIMessage } from "ai";
-import { usePathname, useRouter } from "next/navigation";
+import { useLocation, useNavigate } from "react-router";
 import { useMemo, useState } from "react";
 import { toast } from "sonner";
 
@@ -21,8 +20,8 @@ export function ChatComponent({
 	const [completedMessageIds, setCompletedMessageIds] = useState(
 		new Set<string>(),
 	);
-	const pathname = usePathname();
-	const router = useRouter();
+	const { pathname } = useLocation();
+	const navigate = useNavigate();
 
 	const {
 		messages,
@@ -53,7 +52,7 @@ export function ChatComponent({
 				return newSet;
 			});
 			if (!shouldCreateThread) return;
-			if (!pathname.includes(threadId)) router.push(`/chat/${threadId}`);
+			if (!pathname.includes(threadId)) navigate(`/chat/${threadId}`);
 		},
 	});
 	const { data: dbMessages, isLoading: isDbMessagesLoading } = db.useQuery({
@@ -85,7 +84,6 @@ export function ChatComponent({
 	}, [messages, completedMessageIds]);
 
 	if (!dbMessages?.threads[0]?.messages) {
-		if (isDbMessagesLoading) return null;
 		if (!shouldCreateThread) return <div>No thread found</div>;
 		return (
 			<FileUploadChatInputDemo
@@ -122,7 +120,7 @@ export function ChatComponent({
 										userAuthId,
 										messageId,
 									);
-									router.push(`/chat/${newThreadId}`);
+									navigate(`/chat/${newThreadId}`);
 								}}
 								key={m.id}
 								message={m as unknown as UIMessage}
@@ -137,7 +135,7 @@ export function ChatComponent({
 									userAuthId,
 									messageId,
 								);
-								router.push(`/chat/${newThreadId}`);
+								navigate(`/chat/${newThreadId}`);
 							}}
 							message={activeStreamingMessages}
 						/>

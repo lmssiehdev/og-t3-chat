@@ -1,7 +1,7 @@
 "use client";
 import { MessageSquarePlus } from "lucide-react";
 
-import { ThreadLink } from "@/components/t3-components";
+import { ThreadLink } from "./t3-chat";
 import {
 	Sidebar,
 	SidebarContent,
@@ -12,7 +12,7 @@ import {
 } from "@/components/ui/sidebar";
 import { db } from "@/db/instant";
 import { UserButton, useUser } from "@clerk/nextjs";
-import Link from "next/link";
+import { NavLink } from "react-router";
 
 // Menu items.
 const items = [
@@ -36,8 +36,8 @@ export function AppSidebar() {
 		threads: {
 			$: {
 				order: {
-					createdAt: 'desc',
-				}
+					createdAt: "desc",
+				},
 			},
 		},
 	});
@@ -54,13 +54,13 @@ export function AppSidebar() {
 					</a>
 				</h2>
 				<div className="pb-2 pt-4">
-					<Link
-						href="/chat"
+					<NavLink
+						to="/chat"
 						className="group flex flex-row items-center gap-2 text-pink-400 hover:opacity-80"
 					>
 						<MessageSquarePlus className="size-4" />
 						<span className="">New Chat</span>
-					</Link>
+					</NavLink>
 				</div>
 				<SidebarGroup className="p-0 space-y-2">
 					<h2 className="font-semibold text-neutral-400 ">Recent Threads</h2>
