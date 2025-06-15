@@ -86,18 +86,23 @@ export function ChatComponent({
 	if (!dbMessages?.threads[0]?.messages) {
 		if (!shouldCreateThread) return <div>No thread found</div>;
 		return (
-			<FileUploadChatInputDemo
-				threadId={threadId}
-				useChat={
-					{
-						messages,
-						input,
-						handleSubmit,
-						handleInputChange,
-						status,
-					} as UseChatHelpers
-				}
-			/>
+			<div className="flex flex-col h-full relative w-full">
+				<div className="flex-1 mx-auto flex w-full max-w-3xl flex-col space-y-12 h-[calc(100dvh-120px)]">
+					<div className="flex-1 mb-4" />
+					<FileUploadChatInputDemo
+						threadId={threadId}
+						useChat={
+							{
+								messages,
+								input,
+								handleSubmit,
+								handleInputChange,
+								status,
+							} as UseChatHelpers
+						}
+					/>
+				</div>
+			</div>
 		);
 	}
 
@@ -108,7 +113,7 @@ export function ChatComponent({
 	return (
 		<div className="flex flex-col h-full relative w-full">
 			<div className="flex-1 mx-auto flex w-full max-w-3xl flex-col space-y-12 h-[calc(100dvh-120px)]">
-				<div className="min-h-[400px] mb-4">
+				<div className="flex-1 mb-4">
 					{dbMessages.threads[0].messages
 						.map((m) => ({ ...m, content: m.text }))
 						.map((m) => (
