@@ -5,7 +5,7 @@ import { useAuth, useUser } from "@clerk/nextjs";
 import { createContext, useContext, useEffect, useMemo, useState } from "react";
 
 const instantAuthContext = createContext({} as {
-	userAuthId: string | undefined;
+	userAuthId: string;
 });
 
 export function useInstantAuth() {
@@ -50,7 +50,7 @@ export function InstantAuthProvider({
 
 	const value = useMemo(
 		() => ({
-			userAuthId,
+			userAuthId: userAuthId!,
 		}),
 		[userAuthId],
 	);

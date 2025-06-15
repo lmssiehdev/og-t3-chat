@@ -1,7 +1,8 @@
 "use client";
 import { SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar";
 import { InstantAuthProvider } from "@/providers/instant-auth";
-import { SignInButton, SignedIn, SignedOut } from "@clerk/nextjs";
+import { SignedIn, SignedOut } from "@clerk/nextjs";
+import { LoggedoutAppSidebar } from "./logged-out";
 import { AppSidebar } from "./sidebar";
 
 export function ChatLayout({
@@ -12,7 +13,15 @@ export function ChatLayout({
 	return (
 		<>
 			<SignedOut>
-				<SignInButton />
+				<SidebarProvider>
+					<LoggedoutAppSidebar />
+					<main className="flex flex-col w-full">
+						<div className="pt-2">
+							<SidebarTrigger className="rounded-sm size-10 cursor-pointer ml-1" />
+						</div>
+						{children}
+					</main>
+				</SidebarProvider>
 			</SignedOut>
 			<SignedIn>
 				<SidebarProvider>

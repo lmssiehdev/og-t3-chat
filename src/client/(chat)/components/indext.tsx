@@ -1,5 +1,5 @@
-import { FileUploadChatInputDemo } from "@/components/chat-input";
-import { ChatUiMessageWithImageSupport } from "@/components/t3-components";
+import { FileUploadChatInputDemo } from "./input";
+import { ChatUiMessageWithImageSupport } from "./t3-chat";
 import { db } from "@/db/instant";
 import { createNewBranch } from "@/db/mutators";
 import { useInstantAuth } from "@/providers/instant-auth";
@@ -106,9 +106,9 @@ export function ChatComponent({
 	}
 	const thread = dbMessages?.threads[0];
 	return (
-		<div className="flex flex-col h-full">
-			<div className="flex-1 mx-auto flex w-full max-w-3xl flex-col space-y-12 p-4 pb-16">
-				<div className="min-h-[400px] p-4 mb-4">
+		<div className="flex flex-col h-full relative w-full">
+			<div className="flex-1 mx-auto flex w-full max-w-3xl flex-col space-y-12 h-[calc(100dvh-120px)]">
+				<div className="min-h-[400px] mb-4">
 					{dbMessages.threads[0].messages
 						.map((m) => ({ ...m, content: m.text }))
 						.map((m) => (

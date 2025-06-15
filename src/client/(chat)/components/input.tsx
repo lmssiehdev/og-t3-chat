@@ -152,7 +152,7 @@ export function FileUploadChatInputDemo({
 			// Clear files after submission
 			setFiles([]);
 		},
-		[files, handleSubmit, selectedModel, userAuthId, threadId, pathname, navigate],
+		[files, handleSubmit, selectedModel, userAuthId, threadId],
 	);
 
 	const onInput = React.useCallback(
@@ -168,7 +168,7 @@ export function FileUploadChatInputDemo({
 		[handleInputChange],
 	);
 	return (
-		<>
+		<div className="sticky bottom-0 left-0 w-full bg-background z-20">
 			<CheekyPhrases />
 			<div className="flex flex-col gap-4 mt-auto">
 				{/* Messages Display */}
@@ -288,7 +288,7 @@ export function FileUploadChatInputDemo({
 					</form>
 				</FileUpload>
 			</div>
-		</>
+		</div>
 	);
 }
 
@@ -300,7 +300,7 @@ const CheekyPhrases = React.memo(function CheekyPhrases() {
 		"t3.chat for people with taste",
 		"clearly someone has to preserve good taste",
 		"mainstream t3.chat could never",
-		"t3.chat classic edition (unauthorized)",
+		"t3.chat classic edition",
 		"what t3.chat used to look like when it was cool",
 		"the t3.chat they don't want you to remember",
 		"inspired by t3.chat's better days",
@@ -308,8 +308,8 @@ const CheekyPhrases = React.memo(function CheekyPhrases() {
 	];
 
 	return (
-		<span className=" text-sm text-center text-neutral-400">
+		<div className="mt-1 text-sm text-center text-neutral-400">
 			{randomItemFromArray(cheekyPhrases)}
-		</span>
+		</div>
 	);
 });

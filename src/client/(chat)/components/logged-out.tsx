@@ -1,7 +1,7 @@
-"use client";
+import type { UseChatHelpers } from "@ai-sdk/react";
 import { MessageSquarePlus } from "lucide-react";
+import { FileUploadChatInputDemo } from "./input";
 
-import { ThreadLink } from "./t3-chat";
 import {
 	Sidebar,
 	SidebarContent,
@@ -10,21 +10,55 @@ import {
 	SidebarMenu,
 	SidebarMenuItem,
 } from "@/components/ui/sidebar";
-import { db } from "@/db/instant";
-import { UserButton, useUser } from "@clerk/nextjs";
 import { NavLink } from "react-router";
+import { ThreadLink } from "./t3-chat";
+import { useParams } from "react-router";
+import { PageData } from "./welcome";
 
-export function AppSidebar() {
-	const { data: threadData } = db.useQuery({
-		threads: {
-			$: {
-				order: {
-					createdAt: "desc",
-				},
-			},
-		},
-	});
+export function LoggedoutChatComponent() {
+	const { id }  = useParams<{ id: string }>();
+	if (!id) return null;
 
+	const { component, input } = PageData[id as keyof typeof PageData];
+	return (
+		<>
+		{
+			component()
+		}
+		<FileUploadChatInputDemo
+			threadId={""}
+			useChat={
+				{
+					messages: [],
+					input: input,
+					handleSubmit: () => {},
+					handleInputChange: () => {},
+					status: "",
+				} as unknown as UseChatHelpers
+			}
+		/>
+		</>
+
+	);
+}
+
+// Menu items.
+const items = [
+	{
+		title: "Welcome to OG T3 Chat",
+		url: "welcome",
+	},
+	{
+		title: "Why OG T3 Chat?",
+		url: "why-ot-t3-chat",
+	},
+
+	{
+		title: "FAQ",
+		url: "faq",
+	},
+];
+export function LoggedoutAppSidebar() {
 	return (
 		<Sidebar>
 			{/* // TODO: change border radius default in shadcn */}
@@ -49,11 +83,11 @@ export function AppSidebar() {
 					<h2 className="font-semibold text-neutral-400 ">Recent Threads</h2>
 					<SidebarGroupContent>
 						<SidebarMenu>
-							{(threadData?.threads ?? []).map((item) => (
-								<SidebarMenuItem key={item.id}>
+							{( items).map((item) => (
+								<SidebarMenuItem key={item.url}>
 									<ThreadLink
-										isBranch={item.isBranch}
-										threadId={item.id}
+										isBranch={false}
+										threadId={item.url}
 										title={item.title}
 									/>
 								</SidebarMenuItem>
@@ -62,26 +96,9 @@ export function AppSidebar() {
 					</SidebarGroupContent>
 				</SidebarGroup>
 			</SidebarContent>
-			<SideBarUserArea />
-		</Sidebar>
-	);
-}
-function SideBarUserArea() {
-	const { isSignedIn, user } = useUser();
-
-	return (
-		<div className="p-4 flex gap-3 h-20 border-t-2">
-			<UserButton
-				appearance={{
-					elements: {
-						avatarBox: "h-10! w-10!",
-					},
-				}}
-			/>
-			<div className="">
-				<div className="font-semibold">{user?.fullName ?? "No name"}</div>
-				<div className="text-gray-400/70 text-sm font-semibold">Noob</div>
+			<div>
+				<a>Login</a>
 			</div>
-		</div>
+		</Sidebar>
 	);
 }
