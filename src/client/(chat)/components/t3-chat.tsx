@@ -15,11 +15,12 @@ import {
 	FileVideoIcon,
 	GitBranch,
 } from "lucide-react";
-import { memo } from "react";
+import { memo, useCallback } from "react";
 import { NavLink, useLocation, useNavigate } from "react-router";
 import { toast } from "sonner";
 import { useDebounce } from "use-debounce";
 import { useCopyToClipboard } from "usehooks-ts";
+import { PrefetchThread } from "./chat-sidebar";
 
 // in their raw html form aka their purest
 export const ChatUiMessageWithImageSupport = memo(
@@ -112,6 +113,35 @@ function CreateBranchButton({ onBranching }: { onBranching?: () => void }) {
 	);
 }
 
+import { create } from "zustand";
+import { Link } from "./chat-link";
+
+interface PrefetchStore {
+	hoveredThreads: Set<string>;
+	prefetchedThreads: Set<string>;
+	setAsFetched: (threadId: string) => void;
+	triggerPrefetch: (threadId: string) => void;
+	shouldPrefetch: (threadId: string) => boolean;
+}
+
+const usePrefetchStore = create<PrefetchStore>((set, get) => ({
+	hoveredThreads: new Set(),
+	prefetchedThreads: new Set(),
+	triggerPrefetch: (threadId: string) => {
+		const { prefetchedThreads } = get();
+		console.log({ trigger: true, state: get()})
+		if (!prefetchedThreads.has(threadId)) {
+			set({  hoveredThreads: new Set([...get().hoveredThreads, threadId]) });
+		}
+	},
+	setAsFetched: (threadId: string) => {
+		const { prefetchedThreads } = get();
+		set({ prefetchedThreads: new Set([...prefetchedThreads, threadId]) });
+	},
+	shouldPrefetch: (threadId: string) => {
+		return !get().prefetchedThreads.has(threadId) && get().hoveredThreads.has(threadId);
+	},
+}));
 export const ThreadLink = memo(
 	({
 		threadId,
@@ -122,16 +152,24 @@ export const ThreadLink = memo(
 		title: string;
 		isBranch?: boolean;
 	}) => {
+		const { triggerPrefetch, shouldPrefetch, setAsFetched } = usePrefetchStore();
 		const { pathname } = useLocation();
 		const navigate = useNavigate();
+
+		const shouldfetch = shouldPrefetch(threadId);
+		// biome-ignore lint/correctness/useExhaustiveDependencies: <explanation>
+		const handleMouseEnter = useCallback(() => {
+			triggerPrefetch(threadId);
+		}, [threadId]);
+
 		return (
-			<NavLink
-				prefetch="intent"
+			<Link
 				to={`/chat/${threadId}`}
 				className={({ isActive }) =>
 					`group/item relative flex items-start rounded-sm hover:bg-[#2D2D2D]/40 ${isActive ? "bg-[#2D2D2D]/60" : ""}`
 				}
 			>
+				{shouldfetch && <PrefetchThread threadId={threadId} onFetched={() => setAsFetched(threadId)} />}
 				<div className="flex flex-row gap-2 rounded-sm px-2 py-1 pr-8">
 					{isBranch ? (
 						<GitBranch className="mt-1.5 size-3 shrink-0 text-neutral-400" />
@@ -181,7 +219,7 @@ export const ThreadLink = memo(
 						<path d="m6 6 12 12" />
 					</svg>
 				</button>
-			</NavLink>
+			</Link>
 		);
 	},
 	(prev, next) => {
