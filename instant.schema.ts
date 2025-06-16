@@ -2,6 +2,9 @@
 
 import { i } from "@instantdb/react";
 
+// @NOTE: this is a bug with the cascade delete
+// the instantdb team is on it
+
 // npx instant-cli@latest push schema
 const _schema = i.schema({
 	entities: {
@@ -40,7 +43,7 @@ const _schema = i.schema({
 				on: "messages",
 				has: "one",
 				label: "thread",
-				onDelete: "cascade",
+				// onDelete: "cascade",
 			},
 			reverse: { on: "threads", has: "many", label: "messages" },
 		},
@@ -49,7 +52,7 @@ const _schema = i.schema({
 				on: "messages",
 				has: "one",
 				label: "user",
-				onDelete: "cascade",
+				// onDelete: "cascade",
 			},
 			reverse: { on: "$users", has: "many", label: "messages" },
 		},
@@ -58,7 +61,7 @@ const _schema = i.schema({
 				on: "threads",
 				has: "one",
 				label: "user",
-				onDelete: "cascade",
+				// onDelete: "cascade",
 			},
 			reverse: { on: "$users", has: "many", label: "threads" },
 		},
