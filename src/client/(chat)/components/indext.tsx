@@ -167,6 +167,7 @@ export function ChatComponent({
 						handleSubmit,
 						handleInputChange,
 						status,
+						stop
 					} as UseChatHelpers
 				}
 			/>

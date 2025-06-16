@@ -24,9 +24,9 @@ import { createMessage, createThread } from "@/db/mutators";
 import { randomItemFromArray } from "@/lib/utils";
 import { useInstantAuth } from "@/providers/instant-auth";
 import type { UseChatHelpers } from "@ai-sdk/react";
-import { ArrowUp, Paperclip, Upload, X } from "lucide-react";
+import { ArrowUp, LoaderCircle, Paperclip, Upload, X } from "lucide-react";
 import * as React from "react";
-import { useLocation, useNavigate } from "react-router";
+import { useNavigate } from "react-router";
 import { toast } from "sonner";
 import { useLocalStorage } from "usehooks-ts";
 
@@ -40,11 +40,12 @@ type FileUploadChatInputProps = {
 export function FileUploadChatInputDemo({
 	threadId,
 	useChat,
-	shouldCreateThread = false
+	shouldCreateThread = false,
 }: FileUploadChatInputProps) {
 	const navigate = useNavigate();
 	const { userAuthId } = useInstantAuth();
-	const { input, handleSubmit, handleInputChange, status } = useChat;
+	const { input, handleSubmit, handleInputChange, status, stop, messages } =
+		useChat;
 	const [files, setFiles] = React.useState<File[]>([]);
 	const [isUploading, setIsUploading] = React.useState(false);
 	const [apiKeyInLocalStorage, setApiKeyInLocalStorage] =
@@ -136,8 +137,8 @@ export function FileUploadChatInputDemo({
 							}),
 						)
 					: undefined;
-			
-			if ( shouldCreateThread) {
+
+			if (shouldCreateThread) {
 				await createThread(threadId, userAuthId!, "New thread from the client");
 			}
 			// create message locally
@@ -160,7 +161,15 @@ export function FileUploadChatInputDemo({
 				navigate(`/chat/${threadId}`);
 			}
 		},
-		[files, handleSubmit, selectedModel, userAuthId, threadId, shouldCreateThread],
+		[
+			files,
+			handleSubmit,
+			selectedModel,
+			userAuthId,
+			threadId,
+			shouldCreateThread,
+			navigate,
+		],
 	);
 
 	const onInput = React.useCallback(
@@ -175,6 +184,21 @@ export function FileUploadChatInputDemo({
 		},
 		[handleInputChange],
 	);
+
+	const onStop = React.useCallback(async () => {
+		stop();
+		console.log({ messages });
+		stop();
+		if (messages.length === 0) return;
+		const lastMessage = messages.pop();
+		if (!lastMessage?.content) return;
+		await createMessage(
+			threadId,
+			userAuthId!,
+			lastMessage?.content,
+			"ai",
+		);
+	}, [stop,userAuthId, threadId, messages]);
 	return (
 		<div className="sticky bottom-0 left-0 w-full bg-background z-20">
 			<CheekyPhrases />
@@ -252,15 +276,34 @@ export function FileUploadChatInputDemo({
 
 						<div className="absolute justify-between w-full right-[8px] bottom-[7px] flex flex-row-reverse items-center gap-1.5 pl-2">
 							<div>
-								<Button
-									size="icon"
-									className="size-10 rounded-sm"
-									disabled={!input.trim() || isUploading || status !== "ready"}
-									type="submit"
-								>
-									<ArrowUp className="size-3.5" />
-									<span className="sr-only">Send message</span>
-								</Button>
+								{status !== "ready" ? (
+									<>
+										<Button
+											onClick={async (e) => {
+												e.preventDefault();
+												e.stopPropagation();
+												onStop();
+											}}
+											size="icon"
+											className="size-10 rounded-sm"
+										>
+											<LoaderCircle className="size-3.5 animate-spin" />
+											<span className="sr-only">Stop message</span>
+										</Button>
+									</>
+								) : (
+									<Button
+										size="icon"
+										className="size-10 rounded-sm"
+										disabled={
+											!input.trim() || isUploading || status !== "ready"
+										}
+										type="submit"
+									>
+										<ArrowUp className="size-3.5" />
+										<span className="sr-only">Send message</span>
+									</Button>
+								)}
 							</div>
 							<div className="flex items-center gap-1.5 w-full justify-between">
 								<DropdownMenuRadioGroupDemo
