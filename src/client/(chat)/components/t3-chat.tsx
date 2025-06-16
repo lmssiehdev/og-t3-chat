@@ -3,7 +3,7 @@ import { db } from "@/db/instant";
 import { cn } from "@/lib/utils";
 import type { UIMessage } from "ai";
 import { GitBranch } from "lucide-react";
-import { memo } from "react";
+import { memo, useMemo, useRef } from "react";
 import ReactMarkdown from "react-markdown";
 import { NavLink, useLocation, useNavigate } from "react-router";
 import rehypeHighlight from "rehype-highlight";
@@ -12,8 +12,9 @@ import { toast } from "sonner";
 import { useDebounce } from "use-debounce";
 import { useCopyToClipboard } from "usehooks-ts";
 import "highlight.js/styles/github-dark.css";
+import { marked } from 'marked';
 
-const MemoizedMarkdownComponent = memo(({ content }: { content: string }) => (
+const MemoizedMarkdownBlock = memo(({ content }: { content: string }) => (
 	<ReactMarkdown
 		className="prose prose-invert [&>pre]:!bg-transparent"
 		remarkPlugins={[remarkGfm]}
@@ -23,19 +24,58 @@ const MemoizedMarkdownComponent = memo(({ content }: { content: string }) => (
 	/>
 ));
 
+function parseMarkdownIntoBlocks(markdown: string): string[] {
+	try {
+	  const tokens = marked.lexer(markdown);
+	  return tokens.map(token => token.raw);
+	} catch (error) {
+	  // Fallback: split by double newlines if parsing fails
+	  return markdown.split('\n\n').filter(block => block.trim());
+	}
+  }
+  
+
+const StreamingMarkdownComponent = memo(({ content }: { content: string }) => {
+const previousContentRef = useRef<string>('');
+const blocksRef = useRef<string[]>([]);
+
+const blocks = useMemo(() => {
+	// Only re-parse if content actually changed
+	if (content !== previousContentRef.current) {
+	const newBlocks = parseMarkdownIntoBlocks(content);
+	previousContentRef.current = content;
+	blocksRef.current = newBlocks;
+	return newBlocks;
+	}
+	return blocksRef.current;
+}, [content]);
+
+return (
+	<div>
+	{blocks.map((block, index) => (
+		<MemoizedMarkdownBlock 
+		key={`block-${index}`}
+		content={block}
+		/>
+	))}
+	</div>
+);
+});
+
 // in their raw html form aka their purest
 export const ChatUiMessageWithImageSupport = memo(
 	function ChatUiMessageWithImageSupport({
 		message,
 		onBranching,
 		showChatButtons = true,
+		isStreaming = false,
 	}: {
 		showChatButtons?: boolean;
 		message: UIMessage;
+		isStreaming?: boolean;
 		onBranching?: (messageId: string) => void;
 	}) {
 		const [debouncedContent] = useDebounce(message.content, 50);
-
 		const hasImages = message.experimental_attachments?.filter((attachment) =>
 			attachment.contentType?.startsWith("image/"),
 		);
@@ -52,7 +92,10 @@ export const ChatUiMessageWithImageSupport = memo(
 					)}
 				>
 					<div key={message.id} className="space-y-2">
-						<MemoizedMarkdownComponent content={debouncedContent} />
+						{
+							isStreaming ? <StreamingMarkdownComponent content={debouncedContent} /> : <MemoizedMarkdownBlock content={debouncedContent} />
+						}
+						
 						{/* Display image attachments */}
 						{hasImages && (
 							<div className="flex flex-wrap gap-2">

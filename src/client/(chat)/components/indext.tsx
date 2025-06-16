@@ -30,6 +30,7 @@ export function ChatComponent({
 		handleInputChange,
 		status,
 		isLoading,
+		stop,
 	} = useChat({
 		api: "/api/chat",
 		body: {
@@ -99,6 +100,7 @@ export function ChatComponent({
 								handleSubmit,
 								handleInputChange,
 								status,
+								stop,
 							} as UseChatHelpers
 						}
 					/>
@@ -134,6 +136,7 @@ export function ChatComponent({
 						))}
 					{activeStreamingMessages?.content.length && (
 						<ChatUiMessageWithImageSupport
+							isStreaming={true}
 							onBranching={async (messageId: string) => {
 								const newThreadId = await createNewBranch(
 									thread,
