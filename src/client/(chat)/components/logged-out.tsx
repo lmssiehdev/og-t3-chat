@@ -17,13 +17,19 @@ import { PageData } from "./welcome";
 
 export function LoggedoutChatComponent() {
 	const { id } = useParams<{ id: string }>();
-	if (!id) return null;
-
+	if (!id || !Object.keys(PageData).includes(id) ){
+		return null
+	};
+	
 	const { component, input } = PageData[id as keyof typeof PageData];
+
+	console.log({ component})
 	return (
 		<>
 			{component()}
 			<FileUploadChatInputDemo
+				// @ts-expect-error
+				ref={undefined}
 				threadId={""}
 				useChat={
 					{
