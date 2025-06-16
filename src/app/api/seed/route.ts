@@ -25,7 +25,7 @@ export async function GET() {
 			}),
 		]);
 
-		const batchSize = 50;
+		const batchSize = 15;
 		let currentBatch = [];
 		const batches = [];
 
@@ -33,7 +33,7 @@ export async function GET() {
 		let isUser = true;
 		for (let i = 0; i < 400; i++) {
 			const min = isUser ? 2 : 10;
-			const max = isUser ? 50 : 1000;
+			const max = isUser ? 50 : Math.random() < 0.3 ? 1000 : 400;
 
 			const text = faker.lorem.sentence({ min, max });
 			const messageId = id();

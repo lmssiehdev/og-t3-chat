@@ -82,13 +82,6 @@ export async function createNewBranch(
 		const message = messages[i];
 		const newMessageId = id();
 
-		console.log({
-			currMessageId: message.id,
-			originalId: message.originalId,
-			newMessageId,
-			messageId,
-		});
-
 		currentBatch.push(
 			db.tx.messages[newMessageId].update({
 				createdAt: message.createdAt,

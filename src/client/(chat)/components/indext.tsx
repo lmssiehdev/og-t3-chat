@@ -3,7 +3,7 @@ import { createNewBranch } from "@/db/mutators";
 import { useInstantAuth } from "@/providers/instant-auth";
 import { type UseChatHelpers, useChat } from "@ai-sdk/react";
 import type { UIMessage } from "ai";
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useCallback, useMemo, useRef, useState } from "react";
 import { useLocation, useNavigate } from "react-router";
 import { toast } from "sonner";
 import { FileUploadChatInputDemo } from "./input";
@@ -16,6 +16,9 @@ export function ChatComponent({
 	threadId: string;
 	shouldCreateThread?: boolean;
 }) {
+	const [lastStreamingClientId, setLastStreamingClientId] = useState<
+		string | null
+	>(null);
 	const { userAuthId } = useInstantAuth();
 	const [completedMessageIds, setCompletedMessageIds] = useState(
 		new Set<string>(),
@@ -46,6 +49,11 @@ export function ChatComponent({
 				toast.error(error.message);
 			}
 		},
+		onResponse: async (response) => {
+			// Access headers
+			const customId = response.headers.get("X-Custom-Id");
+			setLastStreamingClientId(customId);
+		},
 		onFinish: ({ id }: { id: string }) => {
 			setCompletedMessageIds((c) => {
 				const newSet = new Set(c);
@@ -73,28 +81,64 @@ export function ChatComponent({
 		null,
 	) as React.RefObject<HTMLDivElement>;
 
+	// // biome-ignore lint/correctness/useExhaustiveDependencies: <explanation>
+	// const activeStreamingMessages = useMemo(() => {
+	// 	if (!messages || messages?.length === 0) return undefined;
+	// 	const lastMessage = messages[messages.length - 1];
+
+	// 	if (
+	// 		!completedMessageIds.has(lastMessage.id) &&
+	// 		lastMessage.role !== "user"
+	// 	) {
+	// 		return lastMessage;
+	// 	}
+
+	// 	return undefined;
+	// }, [messages, completedMessageIds]);
+
+	// biome-ignore lint/correctness/useExhaustiveDependencies: <explanation>
 	const activeStreamingMessages = useMemo(() => {
 		if (!messages || messages?.length === 0) return undefined;
 
 		const lastMessage = messages[messages.length - 1];
+		const lastDbMessage =
+			dbMessages?.threads[0]?.messages[
+				dbMessages?.threads[0]?.messages.length - 1
+			];
 
 		if (
-			!completedMessageIds.has(lastMessage.id) &&
-			lastMessage.role !== "user"
-		) {
-			return lastMessage;
-		}
+			!lastStreamingClientId ||
+			lastMessage.role === "user" ||
+			lastDbMessage?.id === lastStreamingClientId
+		)
+			return undefined;
 
-		return undefined;
-	}, [messages, completedMessageIds]);
-
-	// biome-ignore lint/correctness/useExhaustiveDependencies: <explanation>
-	useEffect(() => {
 		messagesEndRef?.current?.scrollIntoView({ behavior: "smooth" });
-	}, [messages]);
+		return lastMessage;
+	}, [messages, completedMessageIds, isLoading, dbMessages, lastStreamingClientId]);
+
+	// useEffect(() => {
+	// 	messagesEndRef?.current?.scrollIntoView({ behavior: "smooth" });
+	// }, [messages]);
+
+	const thread = dbMessages?.threads[0];
+
+	const onBranching = useCallback(
+		async (messageId: string) => {
+			if (!thread) return;
+			const newThreadId = await createNewBranch(
+				thread,
+				thread.messages,
+				userAuthId,
+				messageId,
+			);
+			navigate(`/chat/${newThreadId}`);
+		},
+		[thread, userAuthId, navigate],
+	);
 
 	if (!dbMessages?.threads[0]?.messages) {
-		if (!shouldCreateThread) return <div>No thread found</div>;
+		if (!shouldCreateThread) return null;
 		return (
 			<div className="flex flex-col h-full relative w-full">
 				<div className="flex-1 mx-auto flex w-full max-w-3xl flex-col space-y-12 h-[calc(100dvh-120px)]">
@@ -103,16 +147,14 @@ export function ChatComponent({
 						ref={messagesEndRef}
 						shouldCreateThread={shouldCreateThread}
 						threadId={threadId}
-						useChat={
-							{
-								messages,
-								input,
-								handleSubmit,
-								handleInputChange,
-								status,
-								stop,
-							} as UseChatHelpers
-						}
+						useChat={{
+							messages,
+							input,
+							handleSubmit,
+							handleInputChange,
+							status,
+							stop,
+						} as UseChatHelpers}
 					/>
 				</div>
 			</div>
@@ -122,40 +164,23 @@ export function ChatComponent({
 	if (!dbMessages?.threads[0]?.messages) {
 		return null;
 	}
-	const thread = dbMessages?.threads[0];
 	return (
 		<div className="flex flex-col h-full relative w-full">
 			<div className="flex-1 mx-auto flex w-full max-w-3xl flex-col space-y-12 h-[calc(100dvh-120px)]">
 				<div className="flex-1 mb-4">
 					{dbMessages.threads[0].messages
 						.map((m) => ({ ...m, content: m.text }))
-						.map((m) => (
+						.map((message) => (
 							<ChatUiMessageWithImageSupport
-								onBranching={async (messageId: string) => {
-									const newThreadId = await createNewBranch(
-										thread,
-										thread.messages,
-										userAuthId,
-										messageId,
-									);
-									navigate(`/chat/${newThreadId}`);
-								}}
-								key={m.id}
-								message={m as unknown as UIMessage}
+								onBranching={onBranching}
+								key={message.id}
+								message={message as unknown as UIMessage}
 							/>
 						))}
 					{activeStreamingMessages?.content.length && (
 						<ChatUiMessageWithImageSupport
 							isStreaming={true}
-							onBranching={async (messageId: string) => {
-								const newThreadId = await createNewBranch(
-									thread,
-									thread.messages,
-									userAuthId,
-									messageId,
-								);
-								navigate(`/chat/${newThreadId}`);
-							}}
+							onBranching={onBranching}
 							message={activeStreamingMessages}
 						/>
 					)}

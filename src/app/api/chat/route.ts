@@ -125,7 +125,7 @@ export async function POST(req: Request) {
 		return result.toDataStreamResponse({
 			status: errorMessageKey === "default_error" ? 200 : 500,
 			headers: {
-				'X-Custom-Id': messageId,
+				"X-Custom-Id": messageId,
 			},
 			getErrorMessage(error) {
 				return errorToMsg[errorMessageKey].error;

@@ -11,12 +11,11 @@ import {
 } from "@/components/ui/sidebar";
 import { db } from "@/db/instant";
 import { UserButton, useUser } from "@clerk/nextjs";
-import { NavLink } from "react-router";
-import { ThreadLink } from "./t3-chat";
 import { memo } from "react";
+import { NavLink, useLocation, useNavigate } from "react-router";
+import { ThreadLink } from "./t3-chat";
 
-export const PrefetchThread = memo(({threadId }: { threadId: string }) => { 
-	console.log("prefetchThread", threadId);
+export const PrefetchThread = memo(({ threadId }: { threadId: string }) => {
 	db.useQuery({
 		threads: {
 			$: {
@@ -27,9 +26,11 @@ export const PrefetchThread = memo(({threadId }: { threadId: string }) => {
 			},
 		},
 	});
-	return null
+	return null;
 });
 export function AppSidebar() {
+	const { pathname } = useLocation();
+	const navigate = useNavigate();
 	const { data: threadData } = db.useQuery({
 		threads: {
 			$: {
@@ -40,6 +41,10 @@ export function AppSidebar() {
 		},
 	});
 
+	const onDelete = async function onDelete(threadId: string) {
+		if (pathname.includes(threadId)) navigate("/chat");
+		await db.transact(db.tx.threads[threadId].delete());
+	};
 	return (
 		<Sidebar>
 			{/* // TODO: change border radius default in shadcn */}
@@ -66,18 +71,19 @@ export function AppSidebar() {
 						<SidebarMenu>
 							{(threadData?.threads ?? []).map((item, i, arr) => {
 								const ranking = arr.length - i;
-								return ((
+								return (
 									<SidebarMenuItem key={item.id}>
 										<ThreadLink
 											isBranch={item.isBranch}
 											threadId={item.id}
 											title={item.title}
+											onDelete={onDelete}
 										/>
-										{
-											ranking > arr.length -5 && <PrefetchThread threadId={item.title} />
-										}
+										{ranking > arr.length - 5 && (
+											<PrefetchThread threadId={item.title} />
+										)}
 									</SidebarMenuItem>
-								))
+								);
 							})}
 						</SidebarMenu>
 					</SidebarGroupContent>
