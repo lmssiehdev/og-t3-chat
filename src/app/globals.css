@@ -128,3 +128,7 @@ body {
 ::-webkit-scrollbar-thumb:hover {
 	background: hsl(25 5.3% 44.7% / 0.5);
 }
+
+pre {
+	padding: 0 !important;
+}
