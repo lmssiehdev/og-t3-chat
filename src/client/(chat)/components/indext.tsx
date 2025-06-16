@@ -90,6 +90,7 @@ export function ChatComponent({
 				<div className="flex-1 mx-auto flex w-full max-w-3xl flex-col space-y-12 h-[calc(100dvh-120px)]">
 					<div className="flex-1 mb-4" />
 					<FileUploadChatInputDemo
+						shouldCreateThread={shouldCreateThread}
 						threadId={threadId}
 						useChat={
 							{
@@ -154,6 +155,7 @@ export function ChatComponent({
 				</div>
 			</div>
 			<FileUploadChatInputDemo
+				shouldCreateThread={shouldCreateThread}
 				threadId={threadId}
 				useChat={
 					{

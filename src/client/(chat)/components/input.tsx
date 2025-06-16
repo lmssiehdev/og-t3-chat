@@ -20,7 +20,7 @@ import {
 	SUPPORTED_MODELS,
 	modelsInfo,
 } from "@/constants";
-import { createMessage } from "@/db/mutators";
+import { createMessage, createThread } from "@/db/mutators";
 import { randomItemFromArray } from "@/lib/utils";
 import { useInstantAuth } from "@/providers/instant-auth";
 import type { UseChatHelpers } from "@ai-sdk/react";
@@ -32,6 +32,7 @@ import { useLocalStorage } from "usehooks-ts";
 
 type FileUploadChatInputProps = {
 	threadId: string;
+	shouldCreateThread?: boolean;
 } & {
 	useChat: UseChatHelpers;
 };
@@ -39,8 +40,8 @@ type FileUploadChatInputProps = {
 export function FileUploadChatInputDemo({
 	threadId,
 	useChat,
+	shouldCreateThread = false
 }: FileUploadChatInputProps) {
-	const { pathname } = useLocation();
 	const navigate = useNavigate();
 	const { userAuthId } = useInstantAuth();
 	const { input, handleSubmit, handleInputChange, status } = useChat;
@@ -112,7 +113,7 @@ export function FileUploadChatInputDemo({
 			const message = formData.get("message") as string;
 
 			if (!message.trim()) {
-				console.error("No message provided");
+				toast.error("No message provided");
 				return;
 			}
 
@@ -135,7 +136,10 @@ export function FileUploadChatInputDemo({
 							}),
 						)
 					: undefined;
-
+			
+			if ( shouldCreateThread) {
+				await createThread(threadId, userAuthId!, "New thread from the client");
+			}
 			// create message locally
 			await createMessage(threadId, userAuthId!, message, "user");
 
@@ -151,8 +155,12 @@ export function FileUploadChatInputDemo({
 			});
 			// Clear files after submission
 			setFiles([]);
+
+			if (shouldCreateThread) {
+				navigate(`/chat/${threadId}`);
+			}
 		},
-		[files, handleSubmit, selectedModel, userAuthId, threadId],
+		[files, handleSubmit, selectedModel, userAuthId, threadId, shouldCreateThread],
 	);
 
 	const onInput = React.useCallback(

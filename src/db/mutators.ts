@@ -16,6 +16,7 @@ export const createThread = async (
 			updatedAt: Date.now(),
 			metadata: {},
 			userAuthId,
+			isBranch: false,
 		}),
 		// Link the thread to the user
 		db.tx.$users[userAuthId].link({ threads: threadId }),

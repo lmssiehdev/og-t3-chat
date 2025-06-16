@@ -138,15 +138,15 @@ export async function POST(req: Request) {
 			updatedAt: timestamp,
 		};
 
-		if (shouldCreateThread) {
-			payload.title = "New Chat!";
-			payload.userAuthId = userAuthId;
-			payload.metadata = {};
-			payload.isBranch = false;
-			db.tx.$users[userAuthId].link({ threads: threadId });
-		}
+		// if (shouldCreateThread) {
+		// 	payload.title = "New Chat!";
+		// 	payload.userAuthId = userAuthId;
+		// 	payload.metadata = {};
+		// 	payload.isBranch = false;
+		// 	db.tx.$users[userAuthId].link({ threads: threadId });
+		// }
 
-		await db.transact([db.tx.threads[threadId].update(payload)]);
+		// await db.transact([db.tx.threads[threadId].update(payload)]);
 
 		let errorMessageKey: keyof typeof errorToMsg = "default_error";
 		const apiKey = clientApiKey?.trim() ?? process.env.OPENROUTER_API_KEY;
@@ -192,6 +192,11 @@ export async function POST(req: Request) {
 		if (shouldCreateThread) {
 			db.transact([
 				db.tx.threads[threadId].update({
+					createdAt: timestamp,
+					updatedAt: timestamp,
+					metadata: {},
+					userAuthId,
+					isBranch: false,
 					title: "Updating...",
 				}),
 			]);
