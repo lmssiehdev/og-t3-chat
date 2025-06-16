@@ -12,7 +12,7 @@ import {
 import { db } from "@/db/instant";
 import { UserButton, useUser } from "@clerk/nextjs";
 import { memo } from "react";
-import { NavLink, useLocation, useNavigate } from "react-router";
+import { NavLink} from "react-router";
 import { ThreadLink } from "./t3-chat";
 
 export const PrefetchThread = memo(({ threadId }: { threadId: string }) => {
@@ -29,8 +29,6 @@ export const PrefetchThread = memo(({ threadId }: { threadId: string }) => {
 	return null;
 });
 export function AppSidebar() {
-	const { pathname } = useLocation();
-	const navigate = useNavigate();
 	const { data: threadData } = db.useQuery({
 		threads: {
 			$: {
@@ -40,11 +38,6 @@ export function AppSidebar() {
 			},
 		},
 	});
-
-	const onDelete = async function onDelete(threadId: string) {
-		if (pathname.includes(threadId)) navigate("/chat");
-		await db.transact(db.tx.threads[threadId].delete());
-	};
 	return (
 		<Sidebar>
 			{/* // TODO: change border radius default in shadcn */}
@@ -76,9 +69,7 @@ export function AppSidebar() {
 										<ThreadLink
 											isBranch={item.isBranch}
 											threadId={item.id}
-											title={item.title}
-											onDelete={onDelete}
-										/>
+											title={item.title}										/>
 										{ranking > arr.length - 5 && (
 											<PrefetchThread threadId={item.title} />
 										)}

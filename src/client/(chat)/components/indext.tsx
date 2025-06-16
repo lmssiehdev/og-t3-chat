@@ -20,9 +20,6 @@ export function ChatComponent({
 		string | null
 	>(null);
 	const { userAuthId } = useInstantAuth();
-	const [completedMessageIds, setCompletedMessageIds] = useState(
-		new Set<string>(),
-	);
 	const { pathname } = useLocation();
 	const navigate = useNavigate();
 
@@ -50,16 +47,10 @@ export function ChatComponent({
 			}
 		},
 		onResponse: async (response) => {
-			// Access headers
 			const customId = response.headers.get("X-Custom-Id");
 			setLastStreamingClientId(customId);
 		},
-		onFinish: ({ id }: { id: string }) => {
-			setCompletedMessageIds((c) => {
-				const newSet = new Set(c);
-				newSet.add(id);
-				return newSet;
-			});
+		onFinish: () => {
 			if (!shouldCreateThread) return;
 			if (!pathname.includes(threadId)) navigate(`/chat/${threadId}`);
 		},
@@ -81,50 +72,32 @@ export function ChatComponent({
 		null,
 	) as React.RefObject<HTMLDivElement>;
 
-	// // biome-ignore lint/correctness/useExhaustiveDependencies: <explanation>
-	// const activeStreamingMessages = useMemo(() => {
-	// 	if (!messages || messages?.length === 0) return undefined;
-	// 	const lastMessage = messages[messages.length - 1];
-
-	// 	if (
-	// 		!completedMessageIds.has(lastMessage.id) &&
-	// 		lastMessage.role !== "user"
-	// 	) {
-	// 		return lastMessage;
-	// 	}
-
-	// 	return undefined;
-	// }, [messages, completedMessageIds]);
-
-	// biome-ignore lint/correctness/useExhaustiveDependencies: <explanation>
 	const activeStreamingMessages = useMemo(() => {
-		if (!messages || messages?.length === 0) return undefined;
-
+		if (!messages || messages?.length === 0 || !lastStreamingClientId) return undefined;
 		const lastMessage = messages[messages.length - 1];
-		const lastDbMessage =
-			dbMessages?.threads[0]?.messages[
-				dbMessages?.threads[0]?.messages.length - 1
-			];
+
+		const dbMessageIds = new Set(dbMessages?.threads[0]?.messages.map((m) => m.id));
+		
+		if ( dbMessageIds.has(lastStreamingClientId!) ) {
+			setLastStreamingClientId(null)
+			return undefined
+		}
 
 		if (
-			!lastStreamingClientId ||
-			lastMessage.role === "user" ||
-			lastDbMessage?.id === lastStreamingClientId
-		)
-			return undefined;
+			!dbMessageIds.has(lastStreamingClientId) &&
+			lastMessage.role !== "user"
+		) {
 
-		messagesEndRef?.current?.scrollIntoView({ behavior: "smooth" });
-		return lastMessage;
-	}, [messages, completedMessageIds, isLoading, dbMessages, lastStreamingClientId]);
+			return lastMessage;
+		}
 
-	// useEffect(() => {
-	// 	messagesEndRef?.current?.scrollIntoView({ behavior: "smooth" });
-	// }, [messages]);
+		return undefined;
+	}, [messages, lastStreamingClientId, dbMessages]);
 
-	const thread = dbMessages?.threads[0];
 
 	const onBranching = useCallback(
 		async (messageId: string) => {
+			const thread = dbMessages?.threads[0];
 			if (!thread) return;
 			const newThreadId = await createNewBranch(
 				thread,
@@ -134,7 +107,7 @@ export function ChatComponent({
 			);
 			navigate(`/chat/${newThreadId}`);
 		},
-		[thread, userAuthId, navigate],
+		[dbMessages, userAuthId, navigate],
 	);
 
 	if (!dbMessages?.threads[0]?.messages) {
@@ -147,14 +120,16 @@ export function ChatComponent({
 						ref={messagesEndRef}
 						shouldCreateThread={shouldCreateThread}
 						threadId={threadId}
-						useChat={{
-							messages,
-							input,
-							handleSubmit,
-							handleInputChange,
-							status,
-							stop,
-						} as UseChatHelpers}
+						useChat={
+							{
+								messages,
+								input,
+								handleSubmit,
+								handleInputChange,
+								status,
+								stop,
+							} as UseChatHelpers
+						}
 					/>
 				</div>
 			</div>
@@ -168,9 +143,9 @@ export function ChatComponent({
 		<div className="flex flex-col h-full relative w-full">
 			<div className="flex-1 mx-auto flex w-full max-w-3xl flex-col space-y-12 h-[calc(100dvh-120px)]">
 				<div className="flex-1 mb-4">
-					{dbMessages.threads[0].messages
-						.map((m) => ({ ...m, content: m.text }))
-						.map((message) => (
+
+					{dbMessages.threads[0].messages.map((m) => ({ ...m, content: m.text }))
+						.map((message, i) => (
 							<ChatUiMessageWithImageSupport
 								onBranching={onBranching}
 								key={message.id}
@@ -190,6 +165,7 @@ export function ChatComponent({
 							<span className="animate-pulse">▊</span>
 						</div>
 					)}
+										<pre className="max-w-lg overflow-auto">{JSON.stringify(activeStreamingMessages, null, 2)}</pre>
 				</div>
 			</div>
 			<FileUploadChatInputDemo

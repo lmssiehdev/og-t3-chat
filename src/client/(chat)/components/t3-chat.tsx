@@ -4,7 +4,7 @@ import type { UIMessage } from "ai";
 import { GitBranch } from "lucide-react";
 import { memo, useMemo, useRef } from "react";
 import ReactMarkdown from "react-markdown";
-import { NavLink } from "react-router";
+import { NavLink, useLocation, useNavigate } from "react-router";
 import rehypeHighlight from "rehype-highlight";
 import remarkGfm from "remark-gfm";
 import { toast } from "sonner";
@@ -12,6 +12,7 @@ import { useDebounce } from "use-debounce";
 import { useCopyToClipboard } from "usehooks-ts";
 import "highlight.js/styles/github-dark.css";
 import { marked } from "marked";
+import { db } from "@/db/instant";
 
 const MemoizedMarkdownBlock = memo(({ content }: { content: string }) => (
 	<ReactMarkdown
@@ -80,6 +81,7 @@ export const ChatUiMessageWithImageSupport = memo(
 		const hasImages = message.experimental_attachments?.filter((attachment) =>
 			attachment.contentType?.startsWith("image/"),
 		);
+
 		return (
 			<div
 				className={`mb-4 ${message.role === "user" ? "text-right" : "text-left"}`}
@@ -149,13 +151,13 @@ export const ThreadLink = memo(
 		threadId,
 		title,
 		isBranch,
-		onDelete,
 	}: {
-		onDelete: (threadId: string) => void;
 		threadId: string;
 		title: string;
 		isBranch?: boolean;
 	}) => {
+		const { pathname } = useLocation();
+		const navigate = useNavigate();
 		return (
 			<NavLink
 				prefetch="intent"
@@ -189,10 +191,12 @@ export const ThreadLink = memo(
 					</div>
 				</div>
 				<button
-					onClick={(e) => {
+					onClick={async (e) => {
 						e.stopPropagation();
 						e.preventDefault();
-						onDelete(threadId);
+
+							if (pathname.includes(threadId)) navigate("/chat");
+							await db.transact(db.tx.threads[threadId].delete());
 					}}
 					className="absolute right-2 top-1/2 -translate-y-1/2 opacity-0 hover:text-red-500 group-hover/item:opacity-100"
 				>
