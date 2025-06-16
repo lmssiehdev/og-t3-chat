@@ -38,6 +38,7 @@ export function AppSidebar() {
 			},
 		},
 	});
+
 	return (
 		<Sidebar>
 			{/* // TODO: change border radius default in shadcn */}
@@ -67,6 +68,7 @@ export function AppSidebar() {
 								return (
 									<SidebarMenuItem key={item.id}>
 										<ThreadLink
+											key={item.title}
 											isBranch={item.isBranch}
 											threadId={item.id}
 											title={item.title}										/>

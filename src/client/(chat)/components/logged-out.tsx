@@ -1,6 +1,6 @@
 import type { UseChatHelpers } from "@ai-sdk/react";
 import { MessageSquarePlus } from "lucide-react";
-import { FileUploadChatInputDemo } from "./input";
+import { FileUploadChatInputDemo } from "./chat-input";
 
 import {
 	Sidebar,
@@ -88,7 +88,6 @@ export function LoggedoutAppSidebar() {
 							{items.map((item) => (
 								<SidebarMenuItem key={item.url}>
 									<ThreadLink
-										onDelete={() => {}}
 										isBranch={false}
 										threadId={item.url}
 										title={item.title}

@@ -1,7 +1,7 @@
 "use client";
 
 import type { RouteParams } from "@/app/api/utils";
-import { DropdownMenuRadioGroupDemo } from "@/component/model-selector";
+import { DropdownMenuRadioGroupDemo } from "@/components/model-selector";
 import { Button } from "@/components/ui/button";
 import {
 	FileUpload,
@@ -141,7 +141,7 @@ export function FileUploadChatInputDemo({
 					: undefined;
 
 			if (shouldCreateThread) {
-				await createThread(threadId, userAuthId!, "New thread from the client");
+				await createThread(threadId, userAuthId!, "New Chat");
 			}
 			// create message locally
 			await createMessage(threadId, userAuthId!, message, "user", {
@@ -193,7 +193,6 @@ export function FileUploadChatInputDemo({
 	);
 
 	const onStop = React.useCallback(async () => {
-		console.log({ messages });
 		stop();
 		if (messages.length === 0) return;
 		const lastMessage = messages.pop();

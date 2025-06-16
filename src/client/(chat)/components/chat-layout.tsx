@@ -3,7 +3,7 @@ import { SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar";
 import { InstantAuthProvider } from "@/providers/instant-auth";
 import { SignedIn, SignedOut } from "@clerk/nextjs";
 import { LoggedoutAppSidebar } from "./logged-out";
-import { AppSidebar } from "./sidebar";
+import { AppSidebar } from "./chat-sidebar";
 
 export function ChatLayout({
 	children,

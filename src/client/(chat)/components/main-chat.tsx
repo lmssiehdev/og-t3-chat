@@ -6,7 +6,7 @@ import type { UIMessage } from "ai";
 import { Fragment, useCallback, useMemo, useRef, useState } from "react";
 import { useLocation, useNavigate } from "react-router";
 import { toast } from "sonner";
-import { FileUploadChatInputDemo } from "./input";
+import { FileUploadChatInputDemo } from "./chat-input";
 import { ChatUiMessageWithImageSupport } from "./t3-chat";
 
 export function ChatComponent({
@@ -156,7 +156,6 @@ export function ChatComponent({
 						))}
 					{activeStreamingMessages?.content.length && (
 						<ChatUiMessageWithImageSupport
-							isStreaming={true}
 							onBranching={onBranching}
 							message={activeStreamingMessages}
 						/>

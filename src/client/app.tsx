@@ -1,6 +1,6 @@
 import { BrowserRouter, Navigate, Route, Routes } from "react-router";
 import { ChatPageWithId } from "./(chat)/[id]";
-import { ChatLayout } from "./(chat)/components/layout";
+import { ChatLayout } from "./(chat)/components/chat-layout";
 
 export default function App() {
 	return (

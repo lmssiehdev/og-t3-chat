@@ -1,6 +1,10 @@
 "use client";
+import { MemoizedMarkdownBlock } from "@/components/memoized-markdown";
+import { db } from "@/db/instant";
+import type { Message } from "@/db/mutators";
 import { cn } from "@/lib/utils";
 import type { UIMessage } from "ai";
+import "highlight.js/styles/github-dark.css";
 import {
 	FileArchiveIcon,
 	FileAudioIcon,
@@ -11,68 +15,11 @@ import {
 	FileVideoIcon,
 	GitBranch,
 } from "lucide-react";
-import { memo, useMemo, useRef } from "react";
-import ReactMarkdown from "react-markdown";
+import { memo } from "react";
 import { NavLink, useLocation, useNavigate } from "react-router";
-import rehypeHighlight from "rehype-highlight";
-import remarkGfm from "remark-gfm";
 import { toast } from "sonner";
 import { useDebounce } from "use-debounce";
 import { useCopyToClipboard } from "usehooks-ts";
-import "highlight.js/styles/github-dark.css";
-import { marked } from "marked";
-import { db } from "@/db/instant";
-import type { Message } from "@/db/mutators";
-
-const MemoizedMarkdownBlock = memo(({ content }: { content: string }) => (
-	<ReactMarkdown
-		className="prose prose-invert [&>pre]:!bg-transparent"
-		remarkPlugins={[remarkGfm]}
-		rehypePlugins={[rehypeHighlight]}
-		// biome-ignore lint/correctness/noChildrenProp: uhhh
-		children={content}
-	/>
-));
-
-function parseMarkdownIntoBlocks(markdown: string): string[] {
-	try {
-		const tokens = marked.lexer(markdown);
-		return tokens.map((token) => token.raw);
-	} catch (error) {
-		// Fallback: split by double newlines if parsing fails
-		return markdown.split("\n\n").filter((block) => block.trim());
-	}
-}
-
-const StreamingMarkdownComponent = memo(({ content }: { content: string }) => {
-	const previousContentRef = useRef<string>("");
-	const blocksRef = useRef<string[]>([]);
-
-	const blocks = useMemo(() => {
-		// Only re-parse if content actually changed
-		if (content !== previousContentRef.current) {
-			const newBlocks = parseMarkdownIntoBlocks(content);
-			previousContentRef.current = content;
-			blocksRef.current = newBlocks;
-			return newBlocks;
-		}
-		return blocksRef.current;
-	}, [content]);
-
-	return (
-		<div>
-			{blocks.map((block, index) => (
-				<MemoizedMarkdownBlock
-					key={`block-${
-						// biome-ignore lint/suspicious/noArrayIndexKey: <explanation>
-						index
-					}`}
-					content={block}
-				/>
-			))}
-		</div>
-	);
-});
 
 // in their raw html form aka their purest
 export const ChatUiMessageWithImageSupport = memo(
@@ -80,11 +27,9 @@ export const ChatUiMessageWithImageSupport = memo(
 		message,
 		onBranching,
 		showChatButtons = true,
-		isStreaming = false,
 	}: {
 		showChatButtons?: boolean;
-		message: UIMessage & { metadata?:  Message["metadata"] };
-		isStreaming?: boolean;
+		message: UIMessage & { metadata?: Message["metadata"] };
 		onBranching?: (messageId: string) => void;
 	}) {
 		const [debouncedContent] = useDebounce(message.content, 50);
@@ -104,23 +49,20 @@ export const ChatUiMessageWithImageSupport = memo(
 					)}
 				>
 					<div key={message.id} className="space-y-2">
-						{isStreaming ? (
-							<StreamingMarkdownComponent content={debouncedContent} />
-						) : (
-							<MemoizedMarkdownBlock content={debouncedContent} />
-						)}
-						{isUser && message.metadata &&
+						<MemoizedMarkdownBlock content={debouncedContent} />
+						{isUser &&
+							message.metadata &&
 							message.metadata?.attachments?.length > 0 &&
 							message.metadata?.attachments.map((attachment) => (
 								<div
 									key={attachment.name}
 									className="truncate font-normal text-[13px] leading-snug flex items-center gap-1 bg-accent p-2 rounded w-full max-w-30"
-								>	
+								>
 									<div className="[&>svg]:size-4">
 										<AttachementFileIcon
 											contentType={attachment.contentType}
 											name={attachment.name}
-											/>
+										/>
 									</div>
 									{attachment.name}
 								</div>
@@ -263,7 +205,6 @@ export function CopyThreadButton({ content }: { content: string }) {
 	return (
 		<button
 			onClick={() => {
-				console.log("content", content);
 				handleCopy(content);
 			}}
 			className="inline-flex items-center justify-center gap-2 whitespace-nowrap font-medium focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50 [&amp;_svg]:pointer-events-none [&amp;_svg]:size-4 [&amp;_svg]:shrink-0 bg-secondary text-secondary-foreground shadow-sm hover:bg-secondary/80 h-8 rounded-md px-3 text-xs transition-opacity group-hover:opacity-100 mt-4 z-10"
