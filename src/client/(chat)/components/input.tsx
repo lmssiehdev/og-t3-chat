@@ -33,6 +33,7 @@ import { useLocalStorage } from "usehooks-ts";
 type FileUploadChatInputProps = {
 	threadId: string;
 	shouldCreateThread?: boolean;
+	ref: React.RefObject<HTMLDivElement>;
 } & {
 	useChat: UseChatHelpers;
 };
@@ -41,6 +42,7 @@ export function FileUploadChatInputDemo({
 	threadId,
 	useChat,
 	shouldCreateThread = false,
+	ref
 }: FileUploadChatInputProps) {
 	const navigate = useNavigate();
 	const { userAuthId } = useInstantAuth();
@@ -197,7 +199,7 @@ export function FileUploadChatInputDemo({
 	return (
 		<div className="sticky bottom-0 left-0 w-full bg-background z-20">
 			<CheekyPhrases />
-			<div className="flex flex-col gap-4 mt-auto">
+			<div className="flex flex-col gap-4 mt-auto" ref={ref}>
 				{/* Messages Display */}
 				{/* File Upload Chat Input */}
 				<FileUpload

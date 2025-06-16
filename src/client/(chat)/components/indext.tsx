@@ -3,7 +3,7 @@ import { createNewBranch } from "@/db/mutators";
 import { useInstantAuth } from "@/providers/instant-auth";
 import { type UseChatHelpers, useChat } from "@ai-sdk/react";
 import type { UIMessage } from "ai";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { useLocation, useNavigate } from "react-router";
 import { toast } from "sonner";
 import { FileUploadChatInputDemo } from "./input";
@@ -69,6 +69,8 @@ export function ChatComponent({
 		},
 	});
 
+	const messagesEndRef = useRef<HTMLDivElement>(null) as React.RefObject<HTMLDivElement>;
+
 	const activeStreamingMessages = useMemo(() => {
 		if (!messages || messages?.length === 0) return undefined;
 
@@ -84,6 +86,12 @@ export function ChatComponent({
 		return undefined;
 	}, [messages, completedMessageIds]);
 
+
+	// biome-ignore lint/correctness/useExhaustiveDependencies: <explanation>
+	useEffect(() => {
+		messagesEndRef?.current?.scrollIntoView({ behavior: "smooth" });
+	}, [messages]);
+
 	if (!dbMessages?.threads[0]?.messages) {
 		if (!shouldCreateThread) return <div>No thread found</div>;
 		return (
@@ -91,6 +99,7 @@ export function ChatComponent({
 				<div className="flex-1 mx-auto flex w-full max-w-3xl flex-col space-y-12 h-[calc(100dvh-120px)]">
 					<div className="flex-1 mb-4" />
 					<FileUploadChatInputDemo
+						ref={messagesEndRef}
 						shouldCreateThread={shouldCreateThread}
 						threadId={threadId}
 						useChat={
@@ -108,6 +117,7 @@ export function ChatComponent({
 			</div>
 		);
 	}
+
 
 	if (!dbMessages?.threads[0]?.messages) {
 		return null;
@@ -158,6 +168,7 @@ export function ChatComponent({
 				</div>
 			</div>
 			<FileUploadChatInputDemo
+				ref={messagesEndRef}
 				shouldCreateThread={shouldCreateThread}
 				threadId={threadId}
 				useChat={
