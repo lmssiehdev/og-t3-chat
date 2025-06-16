@@ -66,6 +66,7 @@ export async function POST(req: Request) {
 
 		const openRouterModel: LanguageModelV1 = openrouter.chat(model);
 
+		const messageId = id();
 		const processedMessages = await processMessages(messages);
 		const result = streamText({
 			model: openRouterModel,
@@ -80,7 +81,6 @@ export async function POST(req: Request) {
 				}
 			},
 			onFinish: async ({ text }) => {
-				const messageId = id();
 				await db.transact([
 					db.tx.messages[messageId].update({
 						createdAt: timestamp,
@@ -124,6 +124,9 @@ export async function POST(req: Request) {
 
 		return result.toDataStreamResponse({
 			status: errorMessageKey === "default_error" ? 200 : 500,
+			headers: {
+				'X-Custom-Id': messageId,
+			},
 			getErrorMessage(error) {
 				return errorToMsg[errorMessageKey].error;
 			},

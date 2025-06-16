@@ -158,6 +158,7 @@ export function ThreadLink({
 
 	return (
 		<NavLink
+			prefetch="intent"
 			to={`/chat/${threadId}`}
 			className={`group/item relative flex items-start rounded-sm hover:bg-[#2D2D2D]/40 ${isActive ? "bg-[#2D2D2D]/60" : ""}`}
 		>

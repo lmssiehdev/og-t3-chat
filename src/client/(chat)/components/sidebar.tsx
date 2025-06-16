@@ -13,7 +13,22 @@ import { db } from "@/db/instant";
 import { UserButton, useUser } from "@clerk/nextjs";
 import { NavLink } from "react-router";
 import { ThreadLink } from "./t3-chat";
+import { memo } from "react";
 
+export const PrefetchThread = memo(({threadId }: { threadId: string }) => { 
+	console.log("prefetchThread", threadId);
+	db.useQuery({
+		threads: {
+			$: {
+				where: {
+					id: threadId,
+				},
+				limit: 1,
+			},
+		},
+	});
+	return null
+});
 export function AppSidebar() {
 	const { data: threadData } = db.useQuery({
 		threads: {
@@ -49,15 +64,21 @@ export function AppSidebar() {
 					<h2 className="font-semibold text-neutral-400 ">Recent Threads</h2>
 					<SidebarGroupContent>
 						<SidebarMenu>
-							{(threadData?.threads ?? []).map((item) => (
-								<SidebarMenuItem key={item.id}>
-									<ThreadLink
-										isBranch={item.isBranch}
-										threadId={item.id}
-										title={item.title}
-									/>
-								</SidebarMenuItem>
-							))}
+							{(threadData?.threads ?? []).map((item, i, arr) => {
+								const ranking = arr.length - i;
+								return ((
+									<SidebarMenuItem key={item.id}>
+										<ThreadLink
+											isBranch={item.isBranch}
+											threadId={item.id}
+											title={item.title}
+										/>
+										{
+											ranking > arr.length -5 && <PrefetchThread threadId={item.title} />
+										}
+									</SidebarMenuItem>
+								))
+							})}
 						</SidebarMenu>
 					</SidebarGroupContent>
 				</SidebarGroup>

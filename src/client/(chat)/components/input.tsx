@@ -1,6 +1,6 @@
 "use client";
 
-import type { RouteParams } from "@/app/api/chat/route";
+import type { RouteParams } from "@/app/api/utils";
 import { DropdownMenuRadioGroupDemo } from "@/component/model-selector";
 import { Button } from "@/components/ui/button";
 import {
@@ -188,7 +188,6 @@ export function FileUploadChatInputDemo({
 	);
 
 	const onStop = React.useCallback(async () => {
-		stop();
 		console.log({ messages });
 		stop();
 		if (messages.length === 0) return;
@@ -197,7 +196,7 @@ export function FileUploadChatInputDemo({
 		await createMessage(threadId, userAuthId!, lastMessage?.content, "ai");
 	}, [stop, userAuthId, threadId, messages]);
 	return (
-		<div className="sticky bottom-0 left-0 w-full bg-background z-20">
+		<div ref={ref} className="sticky bottom-0 left-0 w-full bg-background z-20">
 			<CheekyPhrases />
 			<div className="flex flex-col gap-4 mt-auto" ref={ref}>
 				{/* Messages Display */}
