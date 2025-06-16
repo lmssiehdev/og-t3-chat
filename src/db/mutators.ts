@@ -29,6 +29,7 @@ export async function createMessage(
 	userAuthId: string,
 	text: string,
 	role: "user" | "ai",
+	metadata = {}
 ) {
 	const messageId = id();
 	await db.transact([
@@ -36,7 +37,8 @@ export async function createMessage(
 			createdAt: Date.now(),
 			text,
 			role,
-			metadata: {},
+			// @ts-expect-error
+			metadata,
 			userAuthId,
 		}),
 		//  Linking, there is one extra, remove it

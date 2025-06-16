@@ -1,7 +1,16 @@
 "use client";
 import { cn } from "@/lib/utils";
 import type { UIMessage } from "ai";
-import { GitBranch } from "lucide-react";
+import {
+	FileArchiveIcon,
+	FileAudioIcon,
+	FileCodeIcon,
+	FileCogIcon,
+	FileIcon,
+	FileTextIcon,
+	FileVideoIcon,
+	GitBranch,
+} from "lucide-react";
 import { memo, useMemo, useRef } from "react";
 import ReactMarkdown from "react-markdown";
 import { NavLink, useLocation, useNavigate } from "react-router";
@@ -13,6 +22,7 @@ import { useCopyToClipboard } from "usehooks-ts";
 import "highlight.js/styles/github-dark.css";
 import { marked } from "marked";
 import { db } from "@/db/instant";
+import type { Message } from "@/db/mutators";
 
 const MemoizedMarkdownBlock = memo(({ content }: { content: string }) => (
 	<ReactMarkdown
@@ -73,7 +83,7 @@ export const ChatUiMessageWithImageSupport = memo(
 		isStreaming = false,
 	}: {
 		showChatButtons?: boolean;
-		message: UIMessage;
+		message: UIMessage & { metadata?:  Message["metadata"] };
 		isStreaming?: boolean;
 		onBranching?: (messageId: string) => void;
 	}) {
@@ -81,15 +91,14 @@ export const ChatUiMessageWithImageSupport = memo(
 		const hasImages = message.experimental_attachments?.filter((attachment) =>
 			attachment.contentType?.startsWith("image/"),
 		);
+		const isUser = message.role === "user";
 
 		return (
-			<div
-				className={`mb-4 ${message.role === "user" ? "text-right" : "text-left"}`}
-			>
+			<div className={`mb-4 ${isUser ? "text-right" : "text-left"}`}>
 				<div
 					className={cn(
 						{
-							"bg-[#2D2D2D]": message.role === "user",
+							"bg-[#2D2D2D]": isUser,
 						},
 						"group relative rounded-2xl p-4 inline-block text-left max-w-[80%] mb-8 break-words",
 					)}
@@ -100,7 +109,22 @@ export const ChatUiMessageWithImageSupport = memo(
 						) : (
 							<MemoizedMarkdownBlock content={debouncedContent} />
 						)}
-
+						{isUser && message.metadata &&
+							message.metadata?.attachments?.length > 0 &&
+							message.metadata?.attachments.map((attachment) => (
+								<div
+									key={attachment.name}
+									className="truncate font-normal text-[13px] leading-snug flex items-center gap-1 bg-accent p-2 rounded w-full max-w-30"
+								>	
+									<div className="[&>svg]:size-4">
+										<AttachementFileIcon
+											contentType={attachment.contentType}
+											name={attachment.name}
+											/>
+									</div>
+									{attachment.name}
+								</div>
+							))}
 						{/* Display image attachments */}
 						{hasImages && (
 							<div className="flex flex-wrap gap-2">
@@ -195,8 +219,8 @@ export const ThreadLink = memo(
 						e.stopPropagation();
 						e.preventDefault();
 
-							if (pathname.includes(threadId)) navigate("/chat");
-							await db.transact(db.tx.threads[threadId].delete());
+						if (pathname.includes(threadId)) navigate("/chat");
+						await db.transact(db.tx.threads[threadId].delete());
 					}}
 					className="absolute right-2 top-1/2 -translate-y-1/2 opacity-0 hover:text-red-500 group-hover/item:opacity-100"
 				>
@@ -262,4 +286,62 @@ export function CopyThreadButton({ content }: { content: string }) {
 			Copy response
 		</button>
 	);
+}
+
+function AttachementFileIcon({
+	contentType,
+	name,
+}: { contentType: string; name: string }) {
+	const type = contentType;
+	const extension = name.split(".").pop()?.toLowerCase() ?? "";
+
+	if (type.startsWith("video/")) {
+		return <FileVideoIcon />;
+	}
+
+	if (type.startsWith("audio/")) {
+		return <FileAudioIcon />;
+	}
+
+	if (
+		type.startsWith("text/") ||
+		["txt", "md", "rtf", "pdf"].includes(extension)
+	) {
+		return <FileTextIcon />;
+	}
+
+	if (
+		[
+			"html",
+			"css",
+			"js",
+			"jsx",
+			"ts",
+			"tsx",
+			"json",
+			"xml",
+			"php",
+			"py",
+			"rb",
+			"java",
+			"c",
+			"cpp",
+			"cs",
+		].includes(extension)
+	) {
+		return <FileCodeIcon />;
+	}
+
+	if (["zip", "rar", "7z", "tar", "gz", "bz2"].includes(extension)) {
+		return <FileArchiveIcon />;
+	}
+
+	if (
+		["exe", "msi", "app", "apk", "deb", "rpm"].includes(extension) ||
+		type.startsWith("application/")
+	) {
+		return <FileCogIcon />;
+	}
+
+	return <FileIcon />;
 }

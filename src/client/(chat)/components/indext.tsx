@@ -3,7 +3,7 @@ import { createNewBranch } from "@/db/mutators";
 import { useInstantAuth } from "@/providers/instant-auth";
 import { type UseChatHelpers, useChat } from "@ai-sdk/react";
 import type { UIMessage } from "ai";
-import { useCallback, useMemo, useRef, useState } from "react";
+import { Fragment, useCallback, useMemo, useRef, useState } from "react";
 import { useLocation, useNavigate } from "react-router";
 import { toast } from "sonner";
 import { FileUploadChatInputDemo } from "./input";
@@ -146,11 +146,13 @@ export function ChatComponent({
 
 					{dbMessages.threads[0].messages.map((m) => ({ ...m, content: m.text }))
 						.map((message, i) => (
+							<Fragment key={message.id}>
 							<ChatUiMessageWithImageSupport
 								onBranching={onBranching}
-								key={message.id}
+								
 								message={message as unknown as UIMessage}
-							/>
+								/>
+							</Fragment>
 						))}
 					{activeStreamingMessages?.content.length && (
 						<ChatUiMessageWithImageSupport
@@ -159,13 +161,11 @@ export function ChatComponent({
 							message={activeStreamingMessages}
 						/>
 					)}
-
 					{isLoading && (
 						<div className="text-left">
 							<span className="animate-pulse">▊</span>
 						</div>
 					)}
-										<pre className="max-w-lg overflow-auto">{JSON.stringify(activeStreamingMessages, null, 2)}</pre>
 				</div>
 			</div>
 			<FileUploadChatInputDemo

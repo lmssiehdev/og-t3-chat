@@ -144,7 +144,12 @@ export function FileUploadChatInputDemo({
 				await createThread(threadId, userAuthId!, "New thread from the client");
 			}
 			// create message locally
-			await createMessage(threadId, userAuthId!, message, "user");
+			await createMessage(threadId, userAuthId!, message, "user", {
+				attachments: attachments?.map((attachment) => ({
+					contentType: attachment.contentType,
+					name: attachment.name,
+				})),
+			});
 
 			handleSubmit(event, {
 				body: {
