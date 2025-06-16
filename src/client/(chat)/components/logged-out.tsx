@@ -23,7 +23,6 @@ export function LoggedoutChatComponent() {
 
 	const { component, input } = PageData[id as keyof typeof PageData];
 
-	console.log({ component });
 	return (
 		<>
 			{component()}
@@ -89,6 +88,7 @@ export function LoggedoutAppSidebar() {
 							{items.map((item) => (
 								<SidebarMenuItem key={item.url}>
 									<ThreadLink
+										onDelete={() => {}}
 										isBranch={false}
 										threadId={item.url}
 										title={item.title}
@@ -99,8 +99,8 @@ export function LoggedoutAppSidebar() {
 					</SidebarGroupContent>
 				</SidebarGroup>
 			</SidebarContent>
-			<div>
-				<a>Login</a>
+			<div className="flex flex-row items-center border-t-2 p-4">
+				<a href="/login">Login</a>
 			</div>
 		</Sidebar>
 	);

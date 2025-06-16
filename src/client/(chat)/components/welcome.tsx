@@ -4,12 +4,12 @@ export const PageData = {
 		input: "No auth wasn't one off the requirements 💅🏻",
 	},
 	"why-ot-t3-chat": {
-		component: WelcomePage,
+		component: WhyT3ChatPage,
 		input:
 			"GitHub or any email works (no validation), what are you waiting for?",
 	},
 	faq: {
-		component: WelcomePage,
+		component: FAQPage,
 		input: "Just... please? The app is actually cool 😭",
 	},
 };
