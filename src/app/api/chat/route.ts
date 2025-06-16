@@ -118,6 +118,10 @@ export async function POST(req: Request) {
 			});
 		}
 
+		// consume the stream to ensure it runs to completion & triggers onFinish
+		// even when the client response is aborted;
+		result.consumeStream();
+
 		return result.toDataStreamResponse({
 			status: errorMessageKey === "default_error" ? 200 : 500,
 			getErrorMessage(error) {
