@@ -12,7 +12,7 @@ import { toast } from "sonner";
 import { useDebounce } from "use-debounce";
 import { useCopyToClipboard } from "usehooks-ts";
 import "highlight.js/styles/github-dark.css";
-import { marked } from 'marked';
+import { marked } from "marked";
 
 const MemoizedMarkdownBlock = memo(({ content }: { content: string }) => (
 	<ReactMarkdown
@@ -26,40 +26,36 @@ const MemoizedMarkdownBlock = memo(({ content }: { content: string }) => (
 
 function parseMarkdownIntoBlocks(markdown: string): string[] {
 	try {
-	  const tokens = marked.lexer(markdown);
-	  return tokens.map(token => token.raw);
+		const tokens = marked.lexer(markdown);
+		return tokens.map((token) => token.raw);
 	} catch (error) {
-	  // Fallback: split by double newlines if parsing fails
-	  return markdown.split('\n\n').filter(block => block.trim());
+		// Fallback: split by double newlines if parsing fails
+		return markdown.split("\n\n").filter((block) => block.trim());
 	}
-  }
-  
+}
 
 const StreamingMarkdownComponent = memo(({ content }: { content: string }) => {
-const previousContentRef = useRef<string>('');
-const blocksRef = useRef<string[]>([]);
+	const previousContentRef = useRef<string>("");
+	const blocksRef = useRef<string[]>([]);
 
-const blocks = useMemo(() => {
-	// Only re-parse if content actually changed
-	if (content !== previousContentRef.current) {
-	const newBlocks = parseMarkdownIntoBlocks(content);
-	previousContentRef.current = content;
-	blocksRef.current = newBlocks;
-	return newBlocks;
-	}
-	return blocksRef.current;
-}, [content]);
+	const blocks = useMemo(() => {
+		// Only re-parse if content actually changed
+		if (content !== previousContentRef.current) {
+			const newBlocks = parseMarkdownIntoBlocks(content);
+			previousContentRef.current = content;
+			blocksRef.current = newBlocks;
+			return newBlocks;
+		}
+		return blocksRef.current;
+	}, [content]);
 
-return (
-	<div>
-	{blocks.map((block, index) => (
-		<MemoizedMarkdownBlock 
-		key={`block-${index}`}
-		content={block}
-		/>
-	))}
-	</div>
-);
+	return (
+		<div>
+			{blocks.map((block, index) => (
+				<MemoizedMarkdownBlock key={`block-${index}`} content={block} />
+			))}
+		</div>
+	);
 });
 
 // in their raw html form aka their purest
@@ -92,10 +88,12 @@ export const ChatUiMessageWithImageSupport = memo(
 					)}
 				>
 					<div key={message.id} className="space-y-2">
-						{
-							isStreaming ? <StreamingMarkdownComponent content={debouncedContent} /> : <MemoizedMarkdownBlock content={debouncedContent} />
-						}
-						
+						{isStreaming ? (
+							<StreamingMarkdownComponent content={debouncedContent} />
+						) : (
+							<MemoizedMarkdownBlock content={debouncedContent} />
+						)}
+
 						{/* Display image attachments */}
 						{hasImages && (
 							<div className="flex flex-wrap gap-2">

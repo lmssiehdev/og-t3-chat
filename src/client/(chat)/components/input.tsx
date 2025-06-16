@@ -192,13 +192,8 @@ export function FileUploadChatInputDemo({
 		if (messages.length === 0) return;
 		const lastMessage = messages.pop();
 		if (!lastMessage?.content) return;
-		await createMessage(
-			threadId,
-			userAuthId!,
-			lastMessage?.content,
-			"ai",
-		);
-	}, [stop,userAuthId, threadId, messages]);
+		await createMessage(threadId, userAuthId!, lastMessage?.content, "ai");
+	}, [stop, userAuthId, threadId, messages]);
 	return (
 		<div className="sticky bottom-0 left-0 w-full bg-background z-20">
 			<CheekyPhrases />
