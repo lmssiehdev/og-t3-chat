@@ -42,7 +42,7 @@ export function FileUploadChatInputDemo({
 	threadId,
 	useChat,
 	shouldCreateThread = false,
-	ref
+	ref,
 }: FileUploadChatInputProps) {
 	const navigate = useNavigate();
 	const { userAuthId } = useInstantAuth();

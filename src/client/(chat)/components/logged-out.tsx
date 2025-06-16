@@ -17,13 +17,13 @@ import { PageData } from "./welcome";
 
 export function LoggedoutChatComponent() {
 	const { id } = useParams<{ id: string }>();
-	if (!id || !Object.keys(PageData).includes(id) ){
-		return null
-	};
-	
+	if (!id || !Object.keys(PageData).includes(id)) {
+		return null;
+	}
+
 	const { component, input } = PageData[id as keyof typeof PageData];
 
-	console.log({ component})
+	console.log({ component });
 	return (
 		<>
 			{component()}

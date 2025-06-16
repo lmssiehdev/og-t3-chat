@@ -69,7 +69,9 @@ export function ChatComponent({
 		},
 	});
 
-	const messagesEndRef = useRef<HTMLDivElement>(null) as React.RefObject<HTMLDivElement>;
+	const messagesEndRef = useRef<HTMLDivElement>(
+		null,
+	) as React.RefObject<HTMLDivElement>;
 
 	const activeStreamingMessages = useMemo(() => {
 		if (!messages || messages?.length === 0) return undefined;
@@ -85,7 +87,6 @@ export function ChatComponent({
 
 		return undefined;
 	}, [messages, completedMessageIds]);
-
 
 	// biome-ignore lint/correctness/useExhaustiveDependencies: <explanation>
 	useEffect(() => {
@@ -117,7 +118,6 @@ export function ChatComponent({
 			</div>
 		);
 	}
-
 
 	if (!dbMessages?.threads[0]?.messages) {
 		return null;
