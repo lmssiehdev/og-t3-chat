@@ -2,7 +2,7 @@
 
 import { Slot } from "@radix-ui/react-slot";
 import { type VariantProps, cva } from "class-variance-authority";
-import { ChevronLeft } from "lucide-react";
+import { ChevronLeft, ChevronRight } from "lucide-react";
 import * as React from "react";
 
 import { Button } from "@/components/ui/button";
@@ -89,7 +89,8 @@ function SidebarProvider({
 	);
 
 	// Helper to toggle the sidebar.
-	const toggleSidebar = React.useCallback(() => {
+	// biome-ignore lint/correctness/useExhaustiveDependencies: <explanation>
+		const toggleSidebar = React.useCallback(() => {
 		return isMobile ? setOpenMobile((open) => !open) : setOpen((open) => !open);
 	}, [isMobile, setOpen, setOpenMobile]);
 
@@ -113,6 +114,7 @@ function SidebarProvider({
 	// This makes it easier to style the sidebar with Tailwind classes.
 	const state = open ? "expanded" : "collapsed";
 
+	// biome-ignore lint/correctness/useExhaustiveDependencies: <explanation>
 	const contextValue = React.useMemo<SidebarContextProps>(
 		() => ({
 			state,
@@ -258,7 +260,7 @@ function SidebarTrigger({
 	onClick,
 	...props
 }: React.ComponentProps<typeof Button>) {
-	const { toggleSidebar } = useSidebar();
+	const { toggleSidebar, open } = useSidebar();
 
 	return (
 		<Button
@@ -273,7 +275,10 @@ function SidebarTrigger({
 			}}
 			{...props}
 		>
-			<ChevronLeft />
+			{
+
+open ? <ChevronLeft /> : <ChevronRight />
+			}
 			<span className="sr-only">Toggle Sidebar</span>
 		</Button>
 	);
