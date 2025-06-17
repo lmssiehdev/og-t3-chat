@@ -1,6 +1,7 @@
 "use client";
 import { MessageSquarePlus } from "lucide-react";
 
+import { SearchThreads } from "@/components/search";
 import {
 	Sidebar,
 	SidebarContent,
@@ -14,7 +15,6 @@ import { UserButton, useUser } from "@clerk/nextjs";
 import { memo, useEffect } from "react";
 import { NavLink } from "react-router";
 import { ThreadLink } from "./t3-chat";
-import { SearchThreads } from "@/components/search";
 
 export const PrefetchThread = memo(
 	({ threadId, onFetched }: { threadId: string; onFetched?: () => void }) => {
@@ -98,24 +98,23 @@ export function AppSidebar() {
 				<div className="flex flex-col gap-2 p-2 border-t-2">
 					<p className="font-semibold">Keyboard shortcuts</p>
 					<p className="flex justify-between items-center text-muted-foreground text-sm">
-					Search{" "}
+						Search{" "}
 						<kbd className="bg-muted text-muted-foreground pointer-events-none inline-flex h-5 items-center gap-1 rounded border px-1.5 font-mono text-[10px] font-medium opacity-100 select-none">
 							<span className="text-xs">ctrl +</span>K
 						</kbd>
 					</p>
 					<p className="flex justify-between items-center text-muted-foreground text-sm">
-					Toggle sidebar{" "}
+						Toggle sidebar{" "}
 						<kbd className="bg-muted text-muted-foreground pointer-events-none inline-flex h-5 items-center gap-1 rounded border px-1.5 font-mono text-[10px] font-medium opacity-100 select-none">
 							<span className="text-xs">ctrl +</span>B
 						</kbd>
 					</p>
 					<p className="flex justify-between items-center text-muted-foreground text-sm">
-					New Chat{" "}
+						New Chat{" "}
 						<kbd className="bg-muted text-muted-foreground pointer-events-none inline-flex h-5 items-center gap-1 rounded border px-1.5 font-mono text-[10px] font-medium opacity-100 select-none">
 							<span className="text-xs">ctrl +</span>O
 						</kbd>
 					</p>
-					
 				</div>
 				<SideBarUserArea />
 			</Sidebar>

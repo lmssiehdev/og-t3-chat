@@ -1,5 +1,5 @@
 // Menu items.
-export const sidebarLoggedoutThreads = [ 
+export const sidebarLoggedoutThreads = [
 	{
 		title: "Welcome to NOT OG T3 Chat",
 		url: "welcome",

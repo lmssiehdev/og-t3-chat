@@ -1,38 +1,39 @@
-import { useState, useEffect } from 'react';
+import { useEffect, useState } from "react";
 
 const useScrollToBottom = (threshold = 200) => {
-  const [showScrollButton, setShowScrollButton] = useState(false);
+	const [showScrollButton, setShowScrollButton] = useState(false);
 
-  useEffect(() => {
-    const checkScrollPosition = () => {
-      const windowHeight = window.innerHeight;
-      const documentHeight = document.documentElement.scrollHeight;
-      const scrollTop = window.pageYOffset || document.documentElement.scrollTop;
-      
-      const distanceFromBottom = documentHeight - (scrollTop + windowHeight);
-      console.log({ distanceFromBottom });
-      setShowScrollButton(distanceFromBottom > threshold);
-    };
+	useEffect(() => {
+		const checkScrollPosition = () => {
+			const windowHeight = window.innerHeight;
+			const documentHeight = document.documentElement.scrollHeight;
+			const scrollTop =
+				window.pageYOffset || document.documentElement.scrollTop;
 
-    checkScrollPosition();
+			const distanceFromBottom = documentHeight - (scrollTop + windowHeight);
+			console.log({ distanceFromBottom });
+			setShowScrollButton(distanceFromBottom > threshold);
+		};
 
-    window.addEventListener('scroll', checkScrollPosition);
-    window.addEventListener('resize', checkScrollPosition);
+		checkScrollPosition();
 
-    return () => {
-      window.removeEventListener('scroll', checkScrollPosition);
-      window.removeEventListener('resize', checkScrollPosition);
-    };
-  }, [threshold]);
+		window.addEventListener("scroll", checkScrollPosition);
+		window.addEventListener("resize", checkScrollPosition);
 
-  const scrollToBottom = () => {
-    window.scrollTo({
-      top: document.documentElement.scrollHeight,
-      behavior: 'smooth'
-    });
-  };
+		return () => {
+			window.removeEventListener("scroll", checkScrollPosition);
+			window.removeEventListener("resize", checkScrollPosition);
+		};
+	}, [threshold]);
 
-  return { showScrollButton, scrollToBottom };
+	const scrollToBottom = () => {
+		window.scrollTo({
+			top: document.documentElement.scrollHeight,
+			behavior: "smooth",
+		});
+	};
+
+	return { showScrollButton, scrollToBottom };
 };
 
 export default useScrollToBottom;

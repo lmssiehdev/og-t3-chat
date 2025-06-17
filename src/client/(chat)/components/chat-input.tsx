@@ -25,7 +25,14 @@ import { randomItemFromArray } from "@/lib/utils";
 import { useInstantAuth } from "@/providers/instant-auth";
 import type { UseChatHelpers } from "@ai-sdk/react";
 import { SignedIn } from "@clerk/nextjs";
-import { ArrowDown, ArrowUp, LoaderCircle, Paperclip, Upload, X } from "lucide-react";
+import {
+	ArrowDown,
+	ArrowUp,
+	LoaderCircle,
+	Paperclip,
+	Upload,
+	X,
+} from "lucide-react";
 import * as React from "react";
 import { useNavigate } from "react-router";
 import { toast } from "sonner";
@@ -203,29 +210,25 @@ export function FileUploadChatInputDemo({
 		await createMessage(threadId, userAuthId!, lastMessage?.content, "ai");
 	}, [stop, userAuthId, threadId, messages]);
 	return (
-		<div
-			className="mt-auto sticky bottom-0 left-0 w-full z-20"
-		>	
+		<div className="mt-auto sticky bottom-0 left-0 w-full z-20">
 			<div>
-			{
-				showScrollButton &&
-				<div className=" w-full">
-					<button
-						className="mb-2.5 mx-auto bg-[#2D2D2D] shadow-xl border inset-shadow-2xs text-xs flex items-center rounded-xl bg-forground tex-xs  font-semibold p-1.5 text-fore transition-colors" 
-						onClick={scrollToBottom}
-					>
-						Scroll to bottom
-						<ArrowDown className="size-4" />
-					</button>
-				</div>
-			}
+				{showScrollButton && (
+					<div className=" w-full">
+						<button
+							className="mb-2.5 mx-auto bg-[#2D2D2D] shadow-xl border inset-shadow-2xs text-xs flex items-center rounded-xl bg-forground tex-xs  font-semibold p-1.5 text-fore transition-colors"
+							onClick={scrollToBottom}
+						>
+							Scroll to bottom
+							<ArrowDown className="size-4" />
+						</button>
+					</div>
+				)}
 			</div>
 
 			<div className="bg-background p-1">
-
-			<CheekyPhrases />
+				<CheekyPhrases />
 			</div>
-			<div className="  bg-background flex flex-col gap-4 mt-auto" >
+			<div className="  bg-background flex flex-col gap-4 mt-auto">
 				{/* Messages Display */}
 				{/* File Upload Chat Input */}
 				<FileUpload
@@ -383,9 +386,9 @@ const CheekyPhrases = React.memo(function CheekyPhrases() {
 
 	return (
 		<SignedIn>
-		<div className="mt-1 text-sm text-center text-neutral-400">
-			{randomItemFromArray(cheekyPhrases)}
-		</div>
+			<div className="mt-1 text-sm text-center text-neutral-400">
+				{randomItemFromArray(cheekyPhrases)}
+			</div>
 		</SignedIn>
 	);
 });

@@ -1,15 +1,15 @@
 import { db } from "@/db/instant";
 import { createNewBranch } from "@/db/mutators";
+import useScrollToBottom from "@/hooks/use-scroll-to-bottom";
 import { useInstantAuth } from "@/providers/instant-auth";
 import { type UseChatHelpers, useChat } from "@ai-sdk/react";
 import { id } from "@instantdb/react";
 import type { UIMessage } from "ai";
-import { Fragment, useCallback,  useMemo,  useState } from "react";
+import { Fragment, useCallback, useMemo, useState } from "react";
 import { useLocation, useNavigate } from "react-router";
 import { toast } from "sonner";
 import { FileUploadChatInputDemo } from "./chat-input";
 import { ChatUiMessageWithImageSupport } from "./t3-chat";
-import useScrollToBottom from "@/hooks/use-scroll-to-bottom";
 
 //! TODO: split this bad boy
 export function ChatComponent({

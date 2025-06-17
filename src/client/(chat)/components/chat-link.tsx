@@ -92,7 +92,7 @@ export const Link: typeof NavLink = (({ children, ...props }) => {
 		[pathname],
 	);
 
-	const c= children as React.ReactElement;
+	const c = children as React.ReactElement;
 
 	return (
 		<NavLink
@@ -133,7 +133,7 @@ export const Link: typeof NavLink = (({ children, ...props }) => {
 			}}
 			{...props}
 		>
-			  {c}
+			{c}
 			{shouldRenderPrefetch && (
 				<PrefetchThread
 					threadId={threadId}

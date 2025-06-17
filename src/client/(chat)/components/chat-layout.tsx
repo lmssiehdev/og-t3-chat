@@ -1,15 +1,15 @@
 "use client";
+import { Button } from "@/components/ui/button";
 import { SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar";
 import { InstantAuthProvider } from "@/providers/instant-auth";
 import { SignedIn, SignedOut } from "@clerk/nextjs";
-import { AppSidebar } from "./chat-sidebar";
-import { LoggedoutAppSidebar } from "./logged-out";
+import { ShareIcon } from "lucide-react";
 import { useEffect } from "react";
 import { useNavigate } from "react-router";
-import { Button } from "@/components/ui/button";
-import { ShareIcon } from "lucide-react";
 import { toast } from "sonner";
 import { useCopyToClipboard } from "usehooks-ts";
+import { AppSidebar } from "./chat-sidebar";
+import { LoggedoutAppSidebar } from "./logged-out";
 
 export function ChatLayout({
 	children,
@@ -29,7 +29,7 @@ export function ChatLayout({
 		document.addEventListener("keydown", down);
 		return () => document.removeEventListener("keydown", down);
 	}, []);
-	
+
 	return (
 		<>
 			<SignedOut>
@@ -61,21 +61,27 @@ export function ChatLayout({
 	);
 }
 
-
 function ShareButton() {
 	const [_, copy] = useCopyToClipboard();
 
 	return (
-		<Button onClick={() => {
-			const sharableLink = window.location.href.replace("/chat", "/share");
-			copy(sharableLink).then(() => {
-				console.log("Copied!");
-				toast.success("Copied!");
-			}).catch((error) => {
-				window.open(sharableLink, "_blank");
-			});
-		}} variant={"ghost"} size={"icon"} className="rounded-sm size-10 cursor-pointer ml-1">
+		<Button
+			onClick={() => {
+				const sharableLink = window.location.href.replace("/chat", "/share");
+				copy(sharableLink)
+					.then(() => {
+						console.log("Copied!");
+						toast.success("Copied!");
+					})
+					.catch((error) => {
+						window.open(sharableLink, "_blank");
+					});
+			}}
+			variant={"ghost"}
+			size={"icon"}
+			className="rounded-sm size-10 cursor-pointer ml-1"
+		>
 			<ShareIcon className="size-5" />
 		</Button>
-	)
+	);
 }

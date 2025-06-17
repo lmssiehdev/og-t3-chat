@@ -21,8 +21,8 @@ import { NavLink, useLocation, useNavigate } from "react-router";
 import { toast } from "sonner";
 import { useDebounce } from "use-debounce";
 
-import { Link } from "./chat-link";
 import { useCopyToClipboard } from "usehooks-ts";
+import { Link } from "./chat-link";
 // in their raw html form aka their purest
 export const ChatUiMessageWithImageSupport = memo(
 	function ChatUiMessageWithImageSupport({
@@ -35,7 +35,10 @@ export const ChatUiMessageWithImageSupport = memo(
 		onBranching?: (messageId: string) => void;
 	}) {
 		const [editable, setEditable] = useState(false);
-		const [debouncedContent, setDebouncedContent] = useDebounce(message.content, 50);
+		const [debouncedContent, setDebouncedContent] = useDebounce(
+			message.content,
+			50,
+		);
 		const [inputValue, setInputValue] = useState(debouncedContent);
 		const hasImages = message.experimental_attachments?.filter((attachment) =>
 			attachment.contentType?.startsWith("image/"),
@@ -144,7 +147,7 @@ export const ThreadLink = memo(
 		const { pathname } = useLocation();
 		const navigate = useNavigate();
 
-		const CustomLink = useCustomLink ? Link : NavLink
+		const CustomLink = useCustomLink ? Link : NavLink;
 		return (
 			<CustomLink
 				to={`/chat/${threadId}`}

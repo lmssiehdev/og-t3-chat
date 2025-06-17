@@ -25,7 +25,7 @@ export function LoggedoutChatComponent() {
 
 	return (
 		<>
-			{ component }
+			{component}
 			<FileUploadChatInputDemo
 				scrollToBottom={() => {}}
 				showScrollButton={false}
@@ -43,7 +43,6 @@ export function LoggedoutChatComponent() {
 		</>
 	);
 }
-
 
 export function LoggedoutAppSidebar() {
 	return (

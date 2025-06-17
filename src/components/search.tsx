@@ -50,7 +50,7 @@ export function SearchThreads() {
 							<CommandItem
 								key={thread.id}
 								// @hack: this is a hack to make the title unique
-								value={`${thread.title}-${i}`} 
+								value={`${thread.title}-${i}`}
 								onSelect={() => {
 									naviate(`/chat/${thread.id}`);
 									setOpen(false);
