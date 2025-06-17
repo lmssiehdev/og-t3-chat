@@ -21,7 +21,6 @@ export async function POST(req: Request) {
 
 		if (!parsedBody.success) {
 			const error = parsedBody.error.message;
-			console.log({ error });
 			return new Response(JSON.stringify({ error }), {
 				status: 400,
 			});

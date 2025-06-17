@@ -15,19 +15,22 @@ import { memo } from "react";
 import { NavLink } from "react-router";
 import { ThreadLink } from "./t3-chat";
 
-export const PrefetchThread = memo(({ threadId }: { threadId: string }) => {
-	db.useQuery({
-		threads: {
-			$: {
-				where: {
-					id: threadId,
+export const PrefetchThread = memo(
+	({ threadId, onFetched }: { threadId: string; onFetched?: () => void }) => {
+		db.useQuery({
+			threads: {
+				$: {
+					where: {
+						id: threadId,
+					},
+					limit: 1,
 				},
-				limit: 1,
 			},
-		},
-	});
-	return null;
-});
+		});
+		onFetched?.();
+		return null;
+	},
+);
 export function AppSidebar() {
 	const { data: threadData } = db.useQuery({
 		threads: {
@@ -73,9 +76,9 @@ export function AppSidebar() {
 											threadId={item.id}
 											title={item.title}
 										/>
-										{ranking > arr.length - 5 && (
+										{/* {ranking > arr.length - 5 && (
 											<PrefetchThread threadId={item.title} />
-										)}
+										)} */}
 									</SidebarMenuItem>
 								);
 							})}

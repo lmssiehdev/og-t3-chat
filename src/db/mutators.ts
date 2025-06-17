@@ -57,12 +57,12 @@ export type Thread = InstaQLResult<AppSchema, { threads: {} }>["threads"][0];
 export type Message = InstaQLResult<AppSchema, { messages: {} }>["messages"][0];
 const batchSize = 100;
 export async function createNewBranch(
+	newThreadId: string,
 	data: Thread,
 	messages: Message[],
 	userAuthId: string,
 	messageId: string,
 ) {
-	const newThreadId = id();
 	const baseTimestamp = Date.now();
 
 	// create new thread

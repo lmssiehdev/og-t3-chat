@@ -21,7 +21,9 @@ const _schema = i.schema({
 			role: i.string<"user" | "ai">().optional(),
 			createdAt: i.number().indexed(),
 			text: i.string(),
-			metadata: i.json(),
+			metadata: i.json<{
+				attachments: { name: string; contentType: string }[];
+			}>(),
 			userAuthId: i.string().indexed(),
 			isBranch: i.boolean().optional(),
 			originalId: i.string().optional(),

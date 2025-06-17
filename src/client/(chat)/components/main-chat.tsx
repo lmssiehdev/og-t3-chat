@@ -2,6 +2,7 @@ import { db } from "@/db/instant";
 import { createNewBranch } from "@/db/mutators";
 import { useInstantAuth } from "@/providers/instant-auth";
 import { type UseChatHelpers, useChat } from "@ai-sdk/react";
+import { id } from "@instantdb/react";
 import type { UIMessage } from "ai";
 import { Fragment, useCallback, useMemo, useRef, useState } from "react";
 import { useLocation, useNavigate } from "react-router";
@@ -23,6 +24,32 @@ export function ChatComponent({
 	const { pathname } = useLocation();
 	const navigate = useNavigate();
 
+	const { data: dbMessages, isLoading: isDbMessagesLoading } = db.useQuery({
+		threads: {
+			$: { where: { id: threadId } },
+			messages: {
+				$: {
+					order: {
+						createdAt: "asc",
+					},
+				},
+			},
+		},
+	});
+
+	const initialMessages = useMemo(() => {
+		if (!dbMessages?.threads[0]?.messages) return [];
+		return dbMessages.threads[0].messages.map(
+			({ id, text, createdAt, role }) =>
+				({
+					id,
+					content: text,
+					createdAt: new Date(createdAt),
+					role: role === "user" ? "user" : "assistant",
+				}) as const,
+		);
+	}, [dbMessages]);
+
 	const {
 		messages,
 		input,
@@ -33,6 +60,8 @@ export function ChatComponent({
 		stop,
 	} = useChat({
 		api: "/api/chat",
+		id: threadId,
+		initialMessages,
 		body: {
 			threadId,
 			userAuthId,
@@ -53,18 +82,6 @@ export function ChatComponent({
 		onFinish: () => {
 			if (!shouldCreateThread) return;
 			if (!pathname.includes(threadId)) navigate(`/chat/${threadId}`);
-		},
-	});
-	const { data: dbMessages, isLoading: isDbMessagesLoading } = db.useQuery({
-		threads: {
-			$: { where: { id: threadId } },
-			messages: {
-				$: {
-					order: {
-						createdAt: "asc",
-					},
-				},
-			},
 		},
 	});
 
@@ -100,13 +117,15 @@ export function ChatComponent({
 		async (messageId: string) => {
 			const thread = dbMessages?.threads[0];
 			if (!thread) return;
-			const newThreadId = await createNewBranch(
+			const newThreadId = id();
+			navigate(`/chat/${newThreadId}`);
+			await createNewBranch(
+				newThreadId,
 				thread,
 				thread.messages,
 				userAuthId,
 				messageId,
 			);
-			navigate(`/chat/${newThreadId}`);
 		},
 		[dbMessages, userAuthId, navigate],
 	);

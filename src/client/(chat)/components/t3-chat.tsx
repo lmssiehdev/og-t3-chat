@@ -14,14 +14,15 @@ import {
 	FileTextIcon,
 	FileVideoIcon,
 	GitBranch,
+	LucideCopy,
 } from "lucide-react";
-import { memo, useCallback } from "react";
+import { memo, useState } from "react";
 import { useLocation, useNavigate } from "react-router";
 import { toast } from "sonner";
 import { useDebounce } from "use-debounce";
-import { useCopyToClipboard } from "usehooks-ts";
-import { PrefetchThread } from "./chat-sidebar";
 
+import { Link } from "./chat-link";
+import { useCopyToClipboard } from "usehooks-ts";
 // in their raw html form aka their purest
 export const ChatUiMessageWithImageSupport = memo(
 	function ChatUiMessageWithImageSupport({
@@ -33,7 +34,9 @@ export const ChatUiMessageWithImageSupport = memo(
 		message: UIMessage & { metadata?: Message["metadata"] };
 		onBranching?: (messageId: string) => void;
 	}) {
-		const [debouncedContent] = useDebounce(message.content, 50);
+		const [editable, setEditable] = useState(false);
+		const [debouncedContent, setDebouncedContent] = useDebounce(message.content, 50);
+		const [inputValue, setInputValue] = useState(debouncedContent);
 		const hasImages = message.experimental_attachments?.filter((attachment) =>
 			attachment.contentType?.startsWith("image/"),
 		);
@@ -44,44 +47,58 @@ export const ChatUiMessageWithImageSupport = memo(
 				<div
 					className={cn(
 						{
+							"bg-[#1D1D1D]! border inset-shadow-2xs": editable,
 							"bg-[#2D2D2D]": isUser,
 						},
 						"group relative rounded-2xl p-4 inline-block text-left max-w-[80%] mb-8 break-words",
 					)}
 				>
-					<div key={message.id} className="space-y-2">
-						<MemoizedMarkdownBlock content={debouncedContent} />
-						{isUser &&
-							message.metadata &&
-							message.metadata?.attachments?.length > 0 &&
-							message.metadata?.attachments.map((attachment) => (
-								<div
-									key={attachment.name}
-									className="truncate font-normal text-[13px] leading-snug flex items-center gap-1 bg-accent p-2 rounded w-full max-w-30"
-								>
-									<div className="[&>svg]:size-4">
-										<AttachementFileIcon
-											contentType={attachment.contentType}
-											name={attachment.name}
-										/>
+					{editable ? (
+						<div>
+							<input
+								autoFocus
+								className="outline-none"
+								value={inputValue}
+								onChange={(e) => {
+									setInputValue(e.target.value);
+								}}
+							/>
+						</div>
+					) : (
+						<div key={message.id} className="space-y-2">
+							<MemoizedMarkdownBlock content={debouncedContent} />
+							{isUser &&
+								message.metadata &&
+								message.metadata?.attachments?.length > 0 &&
+								message.metadata?.attachments.map((attachment) => (
+									<div
+										key={attachment.name}
+										className="truncate font-normal text-[13px] leading-snug flex items-center gap-1 bg-accent p-2 rounded w-full max-w-30"
+									>
+										<div className="[&>svg]:size-4">
+											<AttachementFileIcon
+												contentType={attachment.contentType}
+												name={attachment.name}
+											/>
+										</div>
+										{attachment.name}
 									</div>
-									{attachment.name}
-								</div>
-							))}
-						{/* Display image attachments */}
-						{hasImages && (
-							<div className="flex flex-wrap gap-2">
-								{hasImages.map((attachment, index) => (
-									<img
-										key={`${message.id}-${index}`}
-										src={attachment.url}
-										alt={attachment.name || "Attachment"}
-										className="max-w-xs rounded-lg"
-									/>
 								))}
-							</div>
-						)}
-					</div>
+							{/* Display image attachments */}
+							{hasImages && (
+								<div className="flex flex-wrap gap-2">
+									{hasImages.map((attachment, index) => (
+										<img
+											key={`${message.id}-${index}`}
+											src={attachment.url}
+											alt={attachment.name || "Attachment"}
+											className="max-w-xs rounded-lg"
+										/>
+									))}
+								</div>
+							)}
+						</div>
+					)}
 					{showChatButtons && (
 						<div className="inline-flex items-center justify-center gap-2 whitespace-nowrap font-medium focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50 [&amp;_svg]:pointer-events-none [&amp;_svg]:size-4 [&amp;_svg]:shrink-0 text-secondary-foreground shadow-sm h-8 rounded-md px-3 text-xs absolute -bottom-8 right-2 opacity-0 transition-opacity group-hover:opacity-100 mt-4 z-10 bg-transparent">
 							{message.role !== "user" && (
@@ -112,39 +129,6 @@ function CreateBranchButton({ onBranching }: { onBranching?: () => void }) {
 		</button>
 	);
 }
-
-import { create } from "zustand";
-import { Link } from "./chat-link";
-
-interface PrefetchStore {
-	hoveredThreads: Set<string>;
-	prefetchedThreads: Set<string>;
-	setAsFetched: (threadId: string) => void;
-	triggerPrefetch: (threadId: string) => void;
-	shouldPrefetch: (threadId: string) => boolean;
-}
-
-const usePrefetchStore = create<PrefetchStore>((set, get) => ({
-	hoveredThreads: new Set(),
-	prefetchedThreads: new Set(),
-	triggerPrefetch: (threadId: string) => {
-		const { prefetchedThreads } = get();
-		console.log({ trigger: true, state: get() });
-		if (!prefetchedThreads.has(threadId)) {
-			set({ hoveredThreads: new Set([...get().hoveredThreads, threadId]) });
-		}
-	},
-	setAsFetched: (threadId: string) => {
-		const { prefetchedThreads } = get();
-		set({ prefetchedThreads: new Set([...prefetchedThreads, threadId]) });
-	},
-	shouldPrefetch: (threadId: string) => {
-		return (
-			!get().prefetchedThreads.has(threadId) &&
-			get().hoveredThreads.has(threadId)
-		);
-	},
-}));
 export const ThreadLink = memo(
 	({
 		threadId,
@@ -155,16 +139,8 @@ export const ThreadLink = memo(
 		title: string;
 		isBranch?: boolean;
 	}) => {
-		const { triggerPrefetch, shouldPrefetch, setAsFetched } =
-			usePrefetchStore();
 		const { pathname } = useLocation();
 		const navigate = useNavigate();
-
-		const shouldfetch = shouldPrefetch(threadId);
-		// biome-ignore lint/correctness/useExhaustiveDependencies: <explanation>
-		const handleMouseEnter = useCallback(() => {
-			triggerPrefetch(threadId);
-		}, [threadId]);
 
 		return (
 			<Link
@@ -173,12 +149,6 @@ export const ThreadLink = memo(
 					`group/item relative flex items-start rounded-sm hover:bg-[#2D2D2D]/40 ${isActive ? "bg-[#2D2D2D]/60" : ""}`
 				}
 			>
-				{shouldfetch && (
-					<PrefetchThread
-						threadId={threadId}
-						onFetched={() => setAsFetched(threadId)}
-					/>
-				)}
 				<div className="flex flex-row gap-2 rounded-sm px-2 py-1 pr-8">
 					{isBranch ? (
 						<GitBranch className="mt-1.5 size-3 shrink-0 text-neutral-400" />
@@ -204,6 +174,9 @@ export const ThreadLink = memo(
 					</div>
 				</div>
 				<button
+					onMouseDown={(e) => {
+						e.stopPropagation();
+					}}
 					onClick={async (e) => {
 						e.stopPropagation();
 						e.preventDefault();
@@ -235,6 +208,7 @@ export const ThreadLink = memo(
 		return prev.threadId === next.threadId;
 	},
 );
+
 export function CopyThreadButton({ content }: { content: string }) {
 	const [_, copy] = useCopyToClipboard();
 
@@ -256,22 +230,8 @@ export function CopyThreadButton({ content }: { content: string }) {
 			}}
 			className="inline-flex items-center justify-center gap-2 whitespace-nowrap font-medium focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50 [&amp;_svg]:pointer-events-none [&amp;_svg]:size-4 [&amp;_svg]:shrink-0 bg-secondary text-secondary-foreground shadow-sm hover:bg-secondary/80 h-8 rounded-md px-3 text-xs transition-opacity group-hover:opacity-100 mt-4 z-10"
 		>
-			<svg
-				xmlns="http://www.w3.org/2000/svg"
-				width="24"
-				height="24"
-				viewBox="0 0 24 24"
-				fill="none"
-				stroke="currentColor"
-				strokeWidth="2"
-				strokeLinecap="round"
-				strokeLinejoin="round"
-				className="lucide lucide-copy mr-2 h-4 w-4"
-			>
-				<rect width="14" height="14" x="8" y="8" rx="2" ry="2" />
-				<path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2" />
-			</svg>
-			Copy response
+			<LucideCopy className=" mr-2 h-4 w-4 text-xs" />
+			Copy
 		</button>
 	);
 }
