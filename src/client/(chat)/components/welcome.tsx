@@ -1,15 +1,32 @@
+// Menu items.
+export const sidebarLoggedoutThreads = [ 
+	{
+		title: "Welcome to NOT OG T3 Chat",
+		url: "welcome",
+	},
+	{
+		title: "Why NOT OG T3 Chat?",
+		url: "why-not-og-t3-chat",
+	},
+
+	{
+		title: "FAQ",
+		url: "faq",
+	},
+];
+
 export const PageData = {
 	welcome: {
-		component: WelcomePage,
+		component: <WelcomePage />,
 		input: "No auth wasn't one off the requirements 💅🏻",
 	},
 	"why-ot-t3-chat": {
-		component: WhyT3ChatPage,
+		component: <WhyT3ChatPage />,
 		input:
 			"GitHub or any email works (no validation), what are you waiting for?",
 	},
 	faq: {
-		component: FAQPage,
+		component: <FAQPage />,
 		input: "Just... please? The app is actually cool 😭",
 	},
 };
@@ -20,27 +37,34 @@ function WelcomePage() {
 				<div className="flex justify-end">
 					<div className="group relative bg-[#2D2D2D] rounded-2xl p-4 inline-block text-left max-w-[80%] break-words">
 						<div className="prose prose-neutral prose-invert max-w-none prose-pre:m-0 prose-pre:bg-transparent prose-pre:p-0">
-							<p>What is T3 Chat?</p>
+							<p>What is NOT OG T3 Chat?</p>
 						</div>
 					</div>
 				</div>
 				<div className="flex justify-start">
 					<div className="group relative max-w-full w-full break-words">
 						<div className="prose prose-neutral prose-invert max-w-none prose-pre:m-0 prose-pre:bg-transparent prose-pre:p-0">
-							<h2>T3 Chat is the best AI Chat ever made.</h2>
-							<h3>LLMs have gotten great. Their apps have not.</h3>
+							<h2>
+								NOT OG T3 Chat is the recreation of what was once the best AI
+								Chat ever made.
+							</h2>
+							<h3>
+								LLMs have gotten great. Their apps have not. Some even
+								regressed.
+							</h3>
 							<p>
 								It's hard to overstate how powerful large language models have
 								become. Sadly, the apps we use to talk to them keep getting
 								worse.
 							</p>
-							<p>That's why we built T3 Chat.</p>
+							<p>That's why I built NOT OG T3 Chat.</p>
 							<h3>
 								Every AI chat app felt like Slack. This one feels like Linear.
 							</h3>
 							<p>
-								You've never used a faster, more reliable chat app than T3 Chat.
-								Want proof? Click that "Why T3 Chat?" thread on the left.
+								You've never used a faster, more reliable chat app than NOT OG
+								T3 Chat. Want proof? Click that "Why NOT OG T3 Chat?" thread on
+								the left.
 							</p>
 						</div>
 						<button className="inline-flex items-center justify-center gap-2 whitespace-nowrap font-medium focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0 bg-secondary text-secondary-foreground shadow-sm hover:bg-secondary/80 h-8 rounded-md px-3 text-xs absolute -bottom-8 right-2 opacity-0 transition-opacity group-hover:opacity-100">
@@ -84,27 +108,23 @@ function WhyT3ChatPage() {
 						<div className="prose prose-neutral prose-invert max-w-none prose-pre:m-0 prose-pre:bg-transparent prose-pre:p-0">
 							<h2>Did you notice how fast that was?</h2>
 							<p>
-								Sorry - had to brag for a second. We poured a lot of time into
-								making T3 Chat as fast as possible.
+								SICKE, You got trolled. This is just a static page. To actually
+								try the good stuff you need to log in first :)
+							</p>
+							<p>the chats load so fast you won't be able to tell the diff</p>
+							<p>
+								But seriously... no loading spinners. No weird delays. No
+								waiting on a server. Everything you do should feel{" "}
+								<em>instant</em>.
+							</p>
+
+							<p>
+								We actually did more on top, like hotkeys ✅, branching chats
+								✅, model selection ✅, and more. We're basically done 😊
 							</p>
 							<p>
-								No loading spinners. No weird delays. No waiting on a server.
-								Everything you do should feel <em>instant</em>. If it doesn't,{" "}
-								<a href="#">annoy Theo about it</a>.
-							</p>
-							<p>
-								<strong>
-									We wanted an AI chat app that keeps up with power users.
-								</strong>{" "}
-								It wasn't easy. We ended up building a lot of bespoke tech to
-								make this possible.
-							</p>
-							<p>
-								There's still more we want to do, like hotkeys, branching chats,
-								model selection, and more. We're just getting started 😊
-							</p>
-							<p>
-								If you want to know more, click the "FAQ" thread on the left.
+								If you want to know more, click the "FAQ" thread on the left. No
+								more tricks, promise
 							</p>
 						</div>
 						<button className="inline-flex items-center justify-center gap-2 whitespace-nowrap font-medium focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0 bg-secondary text-secondary-foreground shadow-sm hover:bg-secondary/80 h-8 rounded-md px-3 text-xs absolute -bottom-8 right-2 opacity-0 transition-opacity group-hover:opacity-100">
@@ -139,7 +159,7 @@ function FAQPage() {
 				<div className="flex justify-end">
 					<div className="group relative bg-[#2D2D2D] rounded-2xl p-4 inline-block text-left max-w-[80%] break-words">
 						<div className="prose prose-neutral prose-invert max-w-none prose-pre:m-0 prose-pre:bg-transparent prose-pre:p-0">
-							<p>What else should we know about T3 Chat?</p>
+							<p>What else should we know about NOT OG T3 Chat?</p>
 						</div>
 					</div>
 				</div>
@@ -148,60 +168,49 @@ function FAQPage() {
 						<div className="prose prose-neutral prose-invert max-w-none prose-pre:m-0 prose-pre:bg-transparent prose-pre:p-0">
 							<h3>Who made T3 Chat?</h3>
 							<p>
-								T3 Chat is made by Ping Labs, a Y Combinator backed startup run
-								by{" "}
-								<a href="https://web.archive.org/web/20250111123021mp_/https://x.com/theo">
-									Theo
-								</a>{" "}
-								and{" "}
-								<a href="https://web.archive.org/web/20250111123021mp_/https://x.com/r_marked">
-									Mark
-								</a>
-								.
+								NOT OG T3 Chat is made by{" "}
+								<a href="https://github.com/lmssiehdev/">lmssiehdev</a>. I'm
+								mostly known for holding controversial opinions like that thoe
+								is a good designer.
+								<br />
+								I'm also the dev behind popular projects like{" "}
+								<a>AMONG SUS LINK LENGTHENER</a>—that's right, it's me in the
+								flesh.
 							</p>
+
+							<h3>What optional features did you implement?</h3>
+							<div>
+								<p>
+									<span className="block">✅ Chat Sharing</span>
+									to get a shareable link just replace /chat/:id to /share/:id
+								</p>
+								<p>
+									<span className="block">✅ Bring Your Own Key</span>
+									models requiring keys will prompt you to enter it, I provided
+									a key in the submission for your convenience
+								</p>
+								<p>
+									<span className="block">✅ Attachment Support</span>
+									tested with a txt file and an image
+								</p>
+								<p>
+									<span className="block">✅ Web Search</span>
+									tested with various queries
+								</p>
+							</div>
+
+							<h3>How did you make NOT OG T3 Chat so fast???</h3>
 							<p>
-								We're also the devs behind{" "}
-								<a href="https://web.archive.org/web/20250111123021mp_/https://uploadthing.com">
-									UploadThing
-								</a>
-								,{" "}
-								<a href="https://web.archive.org/web/20250111123021mp_/https://pic.ping.gg">
-									PicThing
-								</a>
-								, the{" "}
-								<a href="https://web.archive.org/web/20250111123021mp_/https://t3.gg">
-									T3 Stack
-								</a>
-								, and the best video call app ever,{" "}
-								<a href="https://web.archive.org/web/20250111123021mp_/https://ping.gg">
-									Ping.gg
-								</a>
-								.
+								I shamelessly relied on a lot of bespoke tech to make this
+								possible. The big difference between NOT OG T3 Chat and other AI
+								chat apps is that we keep all of your data on your device.
 							</p>
-							<h3>What models does T3 Chat use?</h3>
+
+							<h3>What's next for NOT OG T3 Chat?</h3>
 							<p>
-								We're experimenting between a few models, primarily{" "}
-								<strong>DeepSeek v3</strong> and <strong>GPT-4o Mini</strong>.
-								We plan to introduce model selection in the near future (we love
-								Claude!).
+								Nothing.. I'm waiting for your opinion. What are you waiting
+								for? Sign up!
 							</p>
-							<h3>How did you make T3 Chat so fast???</h3>
-							<p>
-								We built a lot of bespoke tech to make this possible. The big
-								difference between T3 Chat and other AI chat apps is that we
-								keep all of your data on your device.
-							</p>
-							<h3>What's next for T3 Chat?</h3>
-							<p>
-								Great question. Theo has a long list of wishes that he's hoping
-								to get added soon, like...
-							</p>
-							<ul>
-								<li>Hotkey support</li>
-								<li>Local search</li>
-								<li>Branching chats</li>
-								<li>Desktop app</li>
-							</ul>
 						</div>
 						<button className="inline-flex items-center justify-center gap-2 whitespace-nowrap font-medium focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0 bg-secondary text-secondary-foreground shadow-sm hover:bg-secondary/80 h-8 rounded-md px-3 text-xs absolute -bottom-8 right-2 opacity-0 transition-opacity group-hover:opacity-100">
 							<svg
