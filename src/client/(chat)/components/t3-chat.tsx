@@ -4,7 +4,7 @@ import { db } from "@/db/instant";
 import type { Message } from "@/db/mutators";
 import { cn } from "@/lib/utils";
 import type { UIMessage } from "ai";
-import "highlight.js/styles/github-dark.css";
+import "highlight.js/styles/vs2015.css";
 import {
 	FileArchiveIcon,
 	FileAudioIcon,

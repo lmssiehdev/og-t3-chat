@@ -15,7 +15,7 @@ export function ChatLayout({
 			<SignedOut>
 				<SidebarProvider>
 					<LoggedoutAppSidebar />
-					<main className="flex flex-col w-full">
+					<main className="flex flex-col w-full px-2	">
 						<div className="pt-2">
 							<SidebarTrigger className="rounded-sm size-10 cursor-pointer ml-1" />
 						</div>
@@ -27,7 +27,7 @@ export function ChatLayout({
 				<SidebarProvider>
 					<AppSidebar />
 					<InstantAuthProvider>
-						<main className="flex flex-col w-full">
+						<main className="flex flex-col w-full px-2	">
 							<div className="pt-2">
 								<SidebarTrigger className="rounded-sm size-10 cursor-pointer ml-1" />
 							</div>

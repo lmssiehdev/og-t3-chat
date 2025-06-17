@@ -41,7 +41,6 @@ export function AppSidebar() {
 			},
 		},
 	});
-
 	return (
 		<Sidebar>
 			{/* // TODO: change border radius default in shadcn */}
