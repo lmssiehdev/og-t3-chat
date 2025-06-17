@@ -4,12 +4,14 @@ import { useInstantAuth } from "@/providers/instant-auth";
 import { type UseChatHelpers, useChat } from "@ai-sdk/react";
 import { id } from "@instantdb/react";
 import type { UIMessage } from "ai";
-import { Fragment, useCallback, useMemo, useRef, useState } from "react";
+import { Fragment, useCallback,  useMemo,  useState } from "react";
 import { useLocation, useNavigate } from "react-router";
 import { toast } from "sonner";
 import { FileUploadChatInputDemo } from "./chat-input";
 import { ChatUiMessageWithImageSupport } from "./t3-chat";
+import useScrollToBottom from "@/hooks/use-scroll-to-bottom";
 
+//! TODO: split this bad boy
 export function ChatComponent({
 	threadId,
 	shouldCreateThread = false,
@@ -17,6 +19,7 @@ export function ChatComponent({
 	threadId: string;
 	shouldCreateThread?: boolean;
 }) {
+	const { showScrollButton, scrollToBottom } = useScrollToBottom();
 	const [lastStreamingClientId, setLastStreamingClientId] = useState<
 		string | null
 	>(null);
@@ -85,10 +88,6 @@ export function ChatComponent({
 		},
 	});
 
-	const messagesEndRef = useRef<HTMLDivElement>(
-		null,
-	) as React.RefObject<HTMLDivElement>;
-
 	const activeStreamingMessages = useMemo(() => {
 		if (!messages || messages?.length === 0 || !lastStreamingClientId)
 			return undefined;
@@ -130,14 +129,15 @@ export function ChatComponent({
 		[dbMessages, userAuthId, navigate],
 	);
 
-	if (!dbMessages?.threads[0]?.messages) {
+	if (!dbMessages?.threads[0]?.messages || pathname === "/chat") {
 		if (!shouldCreateThread) return null;
 		return (
 			<div className="flex flex-col h-full relative w-full">
 				<div className="flex-1 mx-auto flex w-full max-w-3xl flex-col space-y-12 h-[calc(100dvh-120px)]">
 					<div className="flex-1 mb-4" />
 					<FileUploadChatInputDemo
-						ref={messagesEndRef}
+						showScrollButton={showScrollButton}
+						scrollToBottom={scrollToBottom}
 						shouldCreateThread={shouldCreateThread}
 						threadId={threadId}
 						useChat={
@@ -187,7 +187,8 @@ export function ChatComponent({
 				</div>
 			</div>
 			<FileUploadChatInputDemo
-				ref={messagesEndRef}
+				showScrollButton={showScrollButton}
+				scrollToBottom={scrollToBottom}
 				shouldCreateThread={shouldCreateThread}
 				threadId={threadId}
 				useChat={

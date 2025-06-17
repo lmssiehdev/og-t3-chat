@@ -17,7 +17,7 @@ import {
 	LucideCopy,
 } from "lucide-react";
 import { memo, useState } from "react";
-import { useLocation, useNavigate } from "react-router";
+import { NavLink, useLocation, useNavigate } from "react-router";
 import { toast } from "sonner";
 import { useDebounce } from "use-debounce";
 
@@ -134,7 +134,9 @@ export const ThreadLink = memo(
 		threadId,
 		title,
 		isBranch,
+		useCustomLink = true,
 	}: {
+		useCustomLink?: boolean;
 		threadId: string;
 		title: string;
 		isBranch?: boolean;
@@ -142,8 +144,9 @@ export const ThreadLink = memo(
 		const { pathname } = useLocation();
 		const navigate = useNavigate();
 
+		const CustomLink = useCustomLink ? Link : NavLink
 		return (
-			<Link
+			<CustomLink
 				to={`/chat/${threadId}`}
 				className={({ isActive }) =>
 					`group/item relative flex items-start rounded-sm hover:bg-[#2D2D2D]/40 ${isActive ? "bg-[#2D2D2D]/60" : ""}`
@@ -201,7 +204,7 @@ export const ThreadLink = memo(
 						<path d="m6 6 12 12" />
 					</svg>
 				</button>
-			</Link>
+			</CustomLink>
 		);
 	},
 	(prev, next) => {
