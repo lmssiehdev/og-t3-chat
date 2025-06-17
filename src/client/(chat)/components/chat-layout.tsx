@@ -4,12 +4,30 @@ import { InstantAuthProvider } from "@/providers/instant-auth";
 import { SignedIn, SignedOut } from "@clerk/nextjs";
 import { AppSidebar } from "./chat-sidebar";
 import { LoggedoutAppSidebar } from "./logged-out";
+import { useEffect } from "react";
+import { useNavigate } from "react-router";
 
 export function ChatLayout({
 	children,
 }: Readonly<{
 	children: React.ReactNode;
 }>) {
+	const navigate = useNavigate();
+
+
+	// biome-ignore lint/correctness/useExhaustiveDependencies: <explanation>
+	useEffect(() => {
+		const down = (e: KeyboardEvent) => {
+			if (e.key === "o" && (e.metaKey || e.ctrlKey)) {
+				e.preventDefault();
+				navigate("/chat");
+			}
+		};
+
+		document.addEventListener("keydown", down);
+		return () => document.removeEventListener("keydown", down);
+	}, []);
+	
 	return (
 		<>
 			<SignedOut>

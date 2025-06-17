@@ -19,7 +19,7 @@ export function SearchThreads() {
 	const naviate = useNavigate();
 	React.useEffect(() => {
 		const down = (e: KeyboardEvent) => {
-			if (e.key === "y" && (e.metaKey || e.ctrlKey)) {
+			if (e.key === "k" && (e.metaKey || e.ctrlKey)) {
 				e.preventDefault();
 				setOpen((open) => !open);
 			}
@@ -49,9 +49,11 @@ export function SearchThreads() {
 						{threads?.threads.map((thread, i) => (
 							<CommandItem
 								key={thread.id}
-								value={thread.id}
+								// @hack: this is a hack to make the title unique
+								value={`${thread.title}-${i}`} 
 								onSelect={() => {
 									naviate(`/chat/${thread.id}`);
+									setOpen(false);
 								}}
 							>
 								{thread.isBranch ? <GitBranch /> : <MessageSquare />}
