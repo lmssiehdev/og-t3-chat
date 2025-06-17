@@ -96,6 +96,8 @@ export const Link: typeof NavLink = (({ children, ...props }) => {
 
 	return (
 		<NavLink
+			key={props.to as string}
+			preventScrollReset={true}
 			ref={props.ref}
 			prefetch={"none"}
 			onMouseEnter={handleMouseEnter}

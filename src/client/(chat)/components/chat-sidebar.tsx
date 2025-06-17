@@ -11,7 +11,7 @@ import {
 } from "@/components/ui/sidebar";
 import { db } from "@/db/instant";
 import { UserButton, useUser } from "@clerk/nextjs";
-import { memo } from "react";
+import { memo, useEffect } from "react";
 import { NavLink } from "react-router";
 import { ThreadLink } from "./t3-chat";
 
@@ -27,7 +27,9 @@ export const PrefetchThread = memo(
 				},
 			},
 		});
-		onFetched?.();
+		useEffect(() => {
+			onFetched?.();
+		}, [onFetched]) 
 		return null;
 	},
 );

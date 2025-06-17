@@ -24,7 +24,8 @@ import { createMessage, createThread } from "@/db/mutators";
 import { randomItemFromArray } from "@/lib/utils";
 import { useInstantAuth } from "@/providers/instant-auth";
 import type { UseChatHelpers } from "@ai-sdk/react";
-import { ArrowUp, LoaderCircle, Paperclip, Upload, X } from "lucide-react";
+import { SignedIn } from "@clerk/nextjs";
+import { ArrowDown, ArrowUp, LoaderCircle, Paperclip, Upload, X } from "lucide-react";
 import * as React from "react";
 import { useNavigate } from "react-router";
 import { toast } from "sonner";
@@ -33,7 +34,8 @@ import { useLocalStorage } from "usehooks-ts";
 type FileUploadChatInputProps = {
 	threadId: string;
 	shouldCreateThread?: boolean;
-	ref: React.RefObject<HTMLDivElement>;
+	showScrollButton: boolean;
+	scrollToBottom: () => void;
 } & {
 	useChat: UseChatHelpers;
 };
@@ -42,7 +44,8 @@ export function FileUploadChatInputDemo({
 	threadId,
 	useChat,
 	shouldCreateThread = false,
-	ref,
+	showScrollButton,
+	scrollToBottom,
 }: FileUploadChatInputProps) {
 	const navigate = useNavigate();
 	const { userAuthId } = useInstantAuth();
@@ -201,11 +204,28 @@ export function FileUploadChatInputDemo({
 	}, [stop, userAuthId, threadId, messages]);
 	return (
 		<div
-			ref={ref}
-			className="mt-auto sticky bottom-0 left-0 w-full bg-background z-20"
-		>
+			className="mt-auto sticky bottom-0 left-0 w-full z-20"
+		>	
+			<div>
+			{
+				showScrollButton &&
+				<div className=" w-full">
+					<button
+						className="mb-2.5 mx-auto bg-[#2D2D2D] shadow-xl border inset-shadow-2xs text-xs flex items-center rounded-xl bg-forground tex-xs  font-semibold p-1.5 text-fore transition-colors" 
+						onClick={scrollToBottom}
+					>
+						Scroll to bottom
+						<ArrowDown className="size-4" />
+					</button>
+				</div>
+			}
+			</div>
+
+			<div className="bg-background p-1">
+
 			<CheekyPhrases />
-			<div className="flex flex-col gap-4 mt-auto" ref={ref}>
+			</div>
+			<div className="  bg-background flex flex-col gap-4 mt-auto" >
 				{/* Messages Display */}
 				{/* File Upload Chat Input */}
 				<FileUpload
@@ -362,8 +382,10 @@ const CheekyPhrases = React.memo(function CheekyPhrases() {
 	];
 
 	return (
+		<SignedIn>
 		<div className="mt-1 text-sm text-center text-neutral-400">
 			{randomItemFromArray(cheekyPhrases)}
 		</div>
+		</SignedIn>
 	);
 });

@@ -13,7 +13,7 @@ import {
 import { NavLink } from "react-router";
 import { useParams } from "react-router";
 import { ThreadLink } from "./t3-chat";
-import { PageData } from "./welcome";
+import { PageData, sidebarLoggedoutThreads } from "./welcome";
 
 export function LoggedoutChatComponent() {
 	const { id } = useParams<{ id: string }>();
@@ -25,10 +25,10 @@ export function LoggedoutChatComponent() {
 
 	return (
 		<>
-			{component()}
+			{ component }
 			<FileUploadChatInputDemo
-				// @ts-expect-error
-				ref={undefined}
+				scrollToBottom={() => {}}
+				showScrollButton={false}
 				threadId={""}
 				useChat={
 					{
@@ -44,22 +44,7 @@ export function LoggedoutChatComponent() {
 	);
 }
 
-// Menu items.
-const items = [
-	{
-		title: "Welcome to OG T3 Chat",
-		url: "welcome",
-	},
-	{
-		title: "Why OG T3 Chat?",
-		url: "why-ot-t3-chat",
-	},
 
-	{
-		title: "FAQ",
-		url: "faq",
-	},
-];
 export function LoggedoutAppSidebar() {
 	return (
 		<Sidebar>
@@ -85,9 +70,10 @@ export function LoggedoutAppSidebar() {
 					<h2 className="font-semibold text-neutral-400 ">Recent Threads</h2>
 					<SidebarGroupContent>
 						<SidebarMenu>
-							{items.map((item) => (
+							{sidebarLoggedoutThreads.map((item) => (
 								<SidebarMenuItem key={item.url}>
 									<ThreadLink
+										useCustomLink={false}
 										isBranch={false}
 										threadId={item.url}
 										title={item.title}
