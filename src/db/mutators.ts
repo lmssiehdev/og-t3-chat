@@ -29,7 +29,7 @@ export async function createMessage(
 	userAuthId: string,
 	text: string,
 	role: "user" | "ai",
-	metadata = {}
+	metadata = {},
 ) {
 	const messageId = id();
 	await db.transact([

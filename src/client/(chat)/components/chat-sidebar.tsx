@@ -12,7 +12,7 @@ import {
 import { db } from "@/db/instant";
 import { UserButton, useUser } from "@clerk/nextjs";
 import { memo } from "react";
-import { NavLink} from "react-router";
+import { NavLink } from "react-router";
 import { ThreadLink } from "./t3-chat";
 
 export const PrefetchThread = memo(({ threadId }: { threadId: string }) => {
@@ -71,7 +71,8 @@ export function AppSidebar() {
 											key={item.title}
 											isBranch={item.isBranch}
 											threadId={item.id}
-											title={item.title}										/>
+											title={item.title}
+										/>
 										{ranking > arr.length - 5 && (
 											<PrefetchThread threadId={item.title} />
 										)}

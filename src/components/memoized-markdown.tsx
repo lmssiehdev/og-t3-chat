@@ -13,7 +13,7 @@ export const MemoizedMarkdownBlock = memo(
 	({ content }: { content: string }) => {
 		return (
 			<ReactMarkdown
-                className={"prose prose-invert"}
+				className={"prose prose-invert"}
 				remarkPlugins={[remarkGfm]}
 				rehypePlugins={[rehypeHighlight]}
 			>

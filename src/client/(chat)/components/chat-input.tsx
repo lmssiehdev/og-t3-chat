@@ -200,7 +200,10 @@ export function FileUploadChatInputDemo({
 		await createMessage(threadId, userAuthId!, lastMessage?.content, "ai");
 	}, [stop, userAuthId, threadId, messages]);
 	return (
-		<div ref={ref} className="mt-auto sticky bottom-0 left-0 w-full bg-background z-20">
+		<div
+			ref={ref}
+			className="mt-auto sticky bottom-0 left-0 w-full bg-background z-20"
+		>
 			<CheekyPhrases />
 			<div className="flex flex-col gap-4 mt-auto" ref={ref}>
 				{/* Messages Display */}

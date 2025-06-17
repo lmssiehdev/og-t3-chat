@@ -1,8 +1,8 @@
 import { SignedIn, SignedOut } from "@clerk/nextjs";
 import { id } from "@instantdb/react";
 import { useParams } from "react-router";
-import { ChatComponent } from "./components/main-chat";
 import { LoggedoutChatComponent } from "./components/logged-out";
+import { ChatComponent } from "./components/main-chat";
 
 export function ChatPageWithId() {
 	const params = useParams<{ id: string }>();

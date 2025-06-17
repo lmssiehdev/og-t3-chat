@@ -73,27 +73,28 @@ export function ChatComponent({
 	) as React.RefObject<HTMLDivElement>;
 
 	const activeStreamingMessages = useMemo(() => {
-		if (!messages || messages?.length === 0 || !lastStreamingClientId) return undefined;
+		if (!messages || messages?.length === 0 || !lastStreamingClientId)
+			return undefined;
 		const lastMessage = messages[messages.length - 1];
 
-		const dbMessageIds = new Set(dbMessages?.threads[0]?.messages.map((m) => m.id));
-		
-		if ( dbMessageIds.has(lastStreamingClientId!) ) {
-			setLastStreamingClientId(null)
-			return undefined
+		const dbMessageIds = new Set(
+			dbMessages?.threads[0]?.messages.map((m) => m.id),
+		);
+
+		if (dbMessageIds.has(lastStreamingClientId!)) {
+			setLastStreamingClientId(null);
+			return undefined;
 		}
 
 		if (
 			!dbMessageIds.has(lastStreamingClientId) &&
 			lastMessage.role !== "user"
 		) {
-
 			return lastMessage;
 		}
 
 		return undefined;
 	}, [messages, lastStreamingClientId, dbMessages]);
-
 
 	const onBranching = useCallback(
 		async (messageId: string) => {
@@ -143,14 +144,13 @@ export function ChatComponent({
 		<div className="flex flex-col h-full relative w-full">
 			<div className="flex-1 mx-auto flex w-full max-w-3xl flex-col space-y-12 h-[calc(100dvh-120px)]">
 				<div className="flex-1 mb-4">
-
-					{dbMessages.threads[0].messages.map((m) => ({ ...m, content: m.text }))
+					{dbMessages.threads[0].messages
+						.map((m) => ({ ...m, content: m.text }))
 						.map((message, i) => (
 							<Fragment key={message.id}>
-							<ChatUiMessageWithImageSupport
-								onBranching={onBranching}
-								
-								message={message as unknown as UIMessage}
+								<ChatUiMessageWithImageSupport
+									onBranching={onBranching}
+									message={message as unknown as UIMessage}
 								/>
 							</Fragment>
 						))}

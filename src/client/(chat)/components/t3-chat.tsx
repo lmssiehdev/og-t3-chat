@@ -16,7 +16,7 @@ import {
 	GitBranch,
 } from "lucide-react";
 import { memo, useCallback } from "react";
-import { NavLink, useLocation, useNavigate } from "react-router";
+import { useLocation, useNavigate } from "react-router";
 import { toast } from "sonner";
 import { useDebounce } from "use-debounce";
 import { useCopyToClipboard } from "usehooks-ts";
@@ -129,9 +129,9 @@ const usePrefetchStore = create<PrefetchStore>((set, get) => ({
 	prefetchedThreads: new Set(),
 	triggerPrefetch: (threadId: string) => {
 		const { prefetchedThreads } = get();
-		console.log({ trigger: true, state: get()})
+		console.log({ trigger: true, state: get() });
 		if (!prefetchedThreads.has(threadId)) {
-			set({  hoveredThreads: new Set([...get().hoveredThreads, threadId]) });
+			set({ hoveredThreads: new Set([...get().hoveredThreads, threadId]) });
 		}
 	},
 	setAsFetched: (threadId: string) => {
@@ -139,7 +139,10 @@ const usePrefetchStore = create<PrefetchStore>((set, get) => ({
 		set({ prefetchedThreads: new Set([...prefetchedThreads, threadId]) });
 	},
 	shouldPrefetch: (threadId: string) => {
-		return !get().prefetchedThreads.has(threadId) && get().hoveredThreads.has(threadId);
+		return (
+			!get().prefetchedThreads.has(threadId) &&
+			get().hoveredThreads.has(threadId)
+		);
 	},
 }));
 export const ThreadLink = memo(
@@ -152,7 +155,8 @@ export const ThreadLink = memo(
 		title: string;
 		isBranch?: boolean;
 	}) => {
-		const { triggerPrefetch, shouldPrefetch, setAsFetched } = usePrefetchStore();
+		const { triggerPrefetch, shouldPrefetch, setAsFetched } =
+			usePrefetchStore();
 		const { pathname } = useLocation();
 		const navigate = useNavigate();
 
@@ -169,7 +173,12 @@ export const ThreadLink = memo(
 					`group/item relative flex items-start rounded-sm hover:bg-[#2D2D2D]/40 ${isActive ? "bg-[#2D2D2D]/60" : ""}`
 				}
 			>
-				{shouldfetch && <PrefetchThread threadId={threadId} onFetched={() => setAsFetched(threadId)} />}
+				{shouldfetch && (
+					<PrefetchThread
+						threadId={threadId}
+						onFetched={() => setAsFetched(threadId)}
+					/>
+				)}
 				<div className="flex flex-row gap-2 rounded-sm px-2 py-1 pr-8">
 					{isBranch ? (
 						<GitBranch className="mt-1.5 size-3 shrink-0 text-neutral-400" />
