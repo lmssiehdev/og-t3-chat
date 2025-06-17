@@ -90,7 +90,7 @@ function SidebarProvider({
 
 	// Helper to toggle the sidebar.
 	// biome-ignore lint/correctness/useExhaustiveDependencies: <explanation>
-		const toggleSidebar = React.useCallback(() => {
+	const toggleSidebar = React.useCallback(() => {
 		return isMobile ? setOpenMobile((open) => !open) : setOpen((open) => !open);
 	}, [isMobile, setOpen, setOpenMobile]);
 
@@ -275,10 +275,7 @@ function SidebarTrigger({
 			}}
 			{...props}
 		>
-			{
-
-open ? <ChevronLeft /> : <ChevronRight />
-			}
+			{open ? <ChevronLeft /> : <ChevronRight />}
 			<span className="sr-only">Toggle Sidebar</span>
 		</Button>
 	);
