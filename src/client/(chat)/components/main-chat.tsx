@@ -1,5 +1,5 @@
 import { db } from "@/db/instant";
-import { createNewBranch } from "@/db/mutators";
+import { createMessage, createNewBranch } from "@/db/mutators";
 import useScrollToBottom from "@/hooks/use-scroll-to-bottom";
 import { useInstantAuth } from "@/providers/instant-auth";
 import { type UseChatHelpers, useChat } from "@ai-sdk/react";
@@ -150,9 +150,12 @@ export function ChatComponent({
 
 	// biome-ignore lint/correctness/useExhaustiveDependencies: <explanation>
 	const onStop = useCallback(async () => {
-		if (!activeStreamingMessage) return;
+		if (!activeStreamingMessage 
+			|| !activeStreamingMessage.content.length
+		) return;
 		stop();
-	}, [activeStreamingMessage]);
+		createMessage(threadId, userAuthId!, activeStreamingMessage.content, "ai")
+	}, [activeStreamingMessage, userAuthId, threadId]);
 
 	if (!dbMessages?.threads[0]?.messages || pathname === "/chat") {
 		if (!shouldCreateThread) return null;
