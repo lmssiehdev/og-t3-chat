@@ -1,5 +1,5 @@
 import { db } from "@/db/instant";
-import { createNewBranch } from "@/db/mutators";
+import { createMessage, createNewBranch } from "@/db/mutators";
 import useScrollToBottom from "@/hooks/use-scroll-to-bottom";
 import { useInstantAuth } from "@/providers/instant-auth";
 import { type UseChatHelpers, useChat } from "@ai-sdk/react";
@@ -93,7 +93,7 @@ export function ChatComponent({
 		setMessages(initialMessages);
 	}, [initialMessages, setMessages]);
 
-	const activeStreamingMessages = useMemo(() => {
+	const activeStreamingMessage = useMemo(() => {
 		if (
 			!messages ||
 			messages?.length === 0 ||
@@ -143,6 +143,11 @@ export function ChatComponent({
 		[dbMessages, userAuthId, navigate],
 	);
 
+	const onStop = useCallback(async () => {
+		if ( !activeStreamingMessage ) return 
+		stop();
+	}, [activeStreamingMessage, stop, userAuthId, threadId, messages, ]);
+
 	if (!dbMessages?.threads[0]?.messages || pathname === "/chat") {
 		if (!shouldCreateThread) return null;
 
@@ -155,6 +160,7 @@ export function ChatComponent({
 						scrollToBottom={scrollToBottom}
 						shouldCreateThread={shouldCreateThread}
 						threadId={threadId}
+						onStop={onStop}
 						useChat={
 							{
 								messages,
@@ -188,10 +194,10 @@ export function ChatComponent({
 								/>
 							</Fragment>
 						))}
-					{activeStreamingMessages?.content.length && (
+					{activeStreamingMessage?.content.length && (
 						<ChatUiMessageWithImageSupport
 							onBranching={onBranching}
-							message={activeStreamingMessages}
+							message={activeStreamingMessage}
 						/>
 					)}
 					{isLoading && (
@@ -206,6 +212,7 @@ export function ChatComponent({
 				scrollToBottom={scrollToBottom}
 				shouldCreateThread={shouldCreateThread}
 				threadId={threadId}
+				onStop={onStop}
 				useChat={
 					{
 						messages,

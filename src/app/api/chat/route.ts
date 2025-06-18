@@ -79,7 +79,7 @@ export async function POST(req: Request) {
 					errorMessageKey = "invalid_api_key";
 				}
 			},
-			onFinish: async ({ text }) => {
+			onFinish: async ({ text, finishReason }) => {
 				await db.transact([
 					db.tx.messages[messageId].update({
 						createdAt: timestamp,
@@ -87,6 +87,7 @@ export async function POST(req: Request) {
 						role: "ai",
 						metadata: {},
 						userAuthId,
+						
 					}),
 					db.tx.$users[userAuthId].link({ messages: messageId }),
 					db.tx.messages[messageId].link({ thread: threadId }),

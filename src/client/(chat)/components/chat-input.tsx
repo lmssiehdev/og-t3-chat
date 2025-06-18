@@ -43,6 +43,7 @@ type FileUploadChatInputProps = {
 	shouldCreateThread?: boolean;
 	showScrollButton: boolean;
 	scrollToBottom: () => void;
+	onStop: () => void;
 } & {
 	useChat: UseChatHelpers;
 };
@@ -53,6 +54,7 @@ export function FileUploadChatInputDemo({
 	shouldCreateThread = false,
 	showScrollButton,
 	scrollToBottom,
+	onStop
 }: FileUploadChatInputProps) {
 	const navigate = useNavigate();
 	const { userAuthId } = useInstantAuth();
@@ -217,14 +219,6 @@ export function FileUploadChatInputDemo({
 		},
 		[handleInputChange],
 	);
-
-	const onStop = React.useCallback(async () => {
-		stop();
-		if (messages.length === 0 || isLoading) return;
-		const lastMessage = messages.pop();
-		if (!lastMessage?.content || lastMessage?.role === "user") return;
-		await createMessage(threadId, userAuthId!, lastMessage?.content, "ai");
-	}, [stop, userAuthId, threadId, messages]);
 	return (
 		<div className="mt-auto sticky bottom-0 left-0 w-full z-20">
 			<div>
