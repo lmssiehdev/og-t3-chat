@@ -1,8 +1,9 @@
 import { useEffect, useState } from "react";
+import { useLocation } from "react-router";
 
 const useScrollToBottom = (threshold = 200) => {
 	const [showScrollButton, setShowScrollButton] = useState(false);
-
+	const { pathname } = useLocation()
 	useEffect(() => {
 		const checkScrollPosition = () => {
 			const windowHeight = window.innerHeight;
@@ -24,7 +25,7 @@ const useScrollToBottom = (threshold = 200) => {
 			window.removeEventListener("scroll", checkScrollPosition);
 			window.removeEventListener("resize", checkScrollPosition);
 		};
-	}, [threshold]);
+	}, [threshold, pathname]);
 
 	const scrollToBottom = () => {
 		window.scrollTo({

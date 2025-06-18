@@ -70,8 +70,7 @@ function ShareButton() {
 				const sharableLink = window.location.href.replace("/chat", "/share");
 				copy(sharableLink)
 					.then(() => {
-						console.log("Copied!");
-						toast.success("Copied!");
+						toast.success("Copied! You can now share this link.");
 					})
 					.catch((error) => {
 						window.open(sharableLink, "_blank");

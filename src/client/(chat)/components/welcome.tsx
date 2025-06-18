@@ -18,7 +18,7 @@ export const sidebarLoggedoutThreads = [
 export const PageData = {
 	welcome: {
 		component: <WelcomePage />,
-		input: "No auth wasn't one off the requirements 💅🏻",
+		input: "Login to test, No auth wasn't one of the requirements 💅🏻",
 	},
 	"why-og-t3-chat": {
 		component: <WhyT3ChatPage />,
@@ -174,7 +174,9 @@ function FAQPage() {
 								thoe is actually a good designer.
 								<br />
 								I'm also the dev behind other popular projects like{" "}
-								<a href="https://github.com/lmssieh/SUS-link-lengthener">AMONG SUS LINK LENGTHENER</a>
+								<a href="https://github.com/lmssieh/SUS-link-lengthener">
+									AMONG SUS LINK LENGTHENER
+								</a>
 							</p>
 
 							<h3>What optional features did you implement?</h3>

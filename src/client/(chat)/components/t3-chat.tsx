@@ -37,7 +37,7 @@ export const ChatUiMessageWithImageSupport = memo(
 		const [editable, setEditable] = useState(false);
 		const [debouncedContent, setDebouncedContent] = useDebounce(
 			message.content,
-			50,
+			25,
 		);
 		const [inputValue, setInputValue] = useState("");
 		const hasImages = message.experimental_attachments?.filter((attachment) =>
@@ -221,7 +221,6 @@ export function CopyThreadButton({ content }: { content: string }) {
 	const handleCopy = (text: string) => {
 		copy(text)
 			.then(() => {
-				console.log("Copied!");
 				toast.success("Copied!");
 			})
 			.catch((error) => {
