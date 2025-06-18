@@ -338,7 +338,7 @@ export function FileUploadChatInputDemo({
 											const model = v as AvailableModels;
 											if (modelsInfo[model].requireApiKey) {
 												const data = prompt(
-													"This model requires an API key",
+													"This model requires an openrouter API key",
 													apiKeyInLocalStorage,
 												);
 												if (!data?.trim()) return;

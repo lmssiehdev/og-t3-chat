@@ -20,9 +20,10 @@ export function ChatComponent({
 	shouldCreateThread?: boolean;
 }) {
 	const { showScrollButton, scrollToBottom } = useScrollToBottom();
-	const [lastStreamingClientId, setLastStreamingClientId] = useState<
-		string | null
-	>(null);
+	const [lastStreamingClientId, setLastStreamingClientId] = useState<{
+		messageId: string;
+		threadId: string;
+	}>({ messageId: "", threadId: "" });
 	const { userAuthId } = useInstantAuth();
 	const { pathname } = useLocation();
 	const navigate = useNavigate();
@@ -63,7 +64,6 @@ export function ChatComponent({
 		stop,
 	} = useChat({
 		api: "/api/chat",
-		id: threadId,
 		initialMessages,
 		body: {
 			threadId,
@@ -79,8 +79,9 @@ export function ChatComponent({
 			}
 		},
 		onResponse: async (response) => {
-			const customId = response.headers.get("X-Custom-Id");
-			setLastStreamingClientId(customId);
+			const messageId = response.headers.get("X-Message-Id")!;
+			const threadId = response.headers.get("X-Thread-Id")!;
+			setLastStreamingClientId({ messageId, threadId });
 		},
 		onFinish: () => {
 			if (!shouldCreateThread) return;
@@ -89,7 +90,12 @@ export function ChatComponent({
 	});
 
 	const activeStreamingMessages = useMemo(() => {
-		if (!messages || messages?.length === 0 || !lastStreamingClientId)
+		if (
+			!messages ||
+			messages?.length === 0 ||
+			!lastStreamingClientId.messageId ||
+			!lastStreamingClientId.threadId
+		)
 			return undefined;
 		const lastMessage = messages[messages.length - 1];
 
@@ -97,20 +103,24 @@ export function ChatComponent({
 			dbMessages?.threads[0]?.messages.map((m) => m.id),
 		);
 
-		if (dbMessageIds.has(lastStreamingClientId!)) {
-			setLastStreamingClientId(null);
+		const { messageId, threadId: streamingMessageThreadId } =
+			lastStreamingClientId;
+
+		if (dbMessageIds.has(messageId!)) {
+			setLastStreamingClientId({ messageId: "", threadId: "" });
 			return undefined;
 		}
 
-		if (
-			!dbMessageIds.has(lastStreamingClientId) &&
-			lastMessage.role !== "user"
-		) {
+		if (threadId !== streamingMessageThreadId) {
+			return undefined;
+		}
+
+		if (!dbMessageIds.has(messageId) && lastMessage.role !== "user") {
 			return lastMessage;
 		}
 
 		return undefined;
-	}, [messages, lastStreamingClientId, dbMessages]);
+	}, [messages, lastStreamingClientId, dbMessages, threadId]);
 
 	const onBranching = useCallback(
 		async (messageId: string) => {
@@ -174,15 +184,15 @@ export function ChatComponent({
 							</Fragment>
 						))}
 					{activeStreamingMessages?.content.length && (
-						<ChatUiMessageWithImageSupport
-							onBranching={onBranching}
-							message={activeStreamingMessages}
-						/>
-					)}
-					{isLoading && (
-						<div className="text-left">
-							<span className="animate-pulse">▊</span>
-						</div>
+						<>
+							<ChatUiMessageWithImageSupport
+								onBranching={onBranching}
+								message={activeStreamingMessages}
+							/>
+							<div className="text-left">
+								<span className="animate-pulse">▊</span>
+							</div>
+						</>
 					)}
 				</div>
 			</div>
