@@ -11,7 +11,7 @@ import {
 	DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { SUPPORTED_MODELS, modelsInfo } from "@/constants";
-import { ChevronDown, EyeIcon, KeyIcon } from "lucide-react";
+import { ChevronDown } from "lucide-react";
 
 export function DropdownMenuRadioGroupDemo({
 	position,
@@ -32,27 +32,25 @@ export function DropdownMenuRadioGroupDemo({
 					<ChevronDown className="size-4" />
 				</Button>
 			</DropdownMenuTrigger>
-			<DropdownMenuContent className="w-fit bg-background">
-				<DropdownMenuLabel>Pick Model</DropdownMenuLabel>
+			<DropdownMenuContent className="w-fit ">
+				<DropdownMenuLabel>Select Model</DropdownMenuLabel>
 				<DropdownMenuSeparator />
 				<DropdownMenuRadioGroup value={position} onValueChange={setPosition}>
-					{SUPPORTED_MODELS.map((m, i) => (
+					{SUPPORTED_MODELS.toReversed().map((m, i) => (
 						<DropdownMenuRadioItem key={m} value={m} defaultChecked={i === 0}>
-							<>
+							<div className="w-full flex justify-between items-center gap-2">
 								{modelsInfo[m].name}
 								<div className="flex gap-2">
 									{modelsInfo[m]?.requireApiKey && (
-										<div className=" text-pink-400 text-xs">
-											<KeyIcon className="text-pink-400 text-xs" />
-										</div>
+										<div className=" text-xs font-bold">Pro</div>
 									)}
-									{modelsInfo[m]?.supportVision && (
+									{/* {modelsInfo[m]?.supportVision && (
 										<div className=" text-pink-400 text-xs">
 											<EyeIcon className="text-pink-400 text-xs" />
 										</div>
-									)}
+									)} */}
 								</div>
-							</>
+							</div>
 						</DropdownMenuRadioItem>
 					))}
 				</DropdownMenuRadioGroup>

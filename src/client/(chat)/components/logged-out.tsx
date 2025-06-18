@@ -50,7 +50,11 @@ export function LoggedoutAppSidebar() {
 			{/* // TODO: change border radius default in shadcn */}
 			<SidebarContent className="p-4 clas">
 				<h2 className="text-lg font-semibold">
-					<NavLink className="flex items-center gap-2" href="/chat/welcome" data-discover="true">
+					<NavLink
+						className="flex items-center gap-2"
+						href="/chat/welcome"
+						data-discover="true"
+					>
 						<span className="text-xl font-light text-neutral-200">
 							OG T3 Chat
 						</span>
