@@ -13,7 +13,9 @@ export const MemoizedMarkdownBlock = memo(
 	({ content }: { content: string }) => {
 		return (
 			<ReactMarkdown
-				className={"prose prose-neutral prose-invert max-w-none prose-pre:m-0 prose-pre:bg-transparent prose-pre:p-0"}
+				className={
+					"prose prose-neutral prose-invert max-w-none prose-pre:m-0 prose-pre:bg-transparent prose-pre:p-0"
+				}
 				remarkPlugins={[remarkGfm]}
 				rehypePlugins={[rehypeHighlight]}
 			>
