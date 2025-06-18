@@ -52,7 +52,7 @@ export function LoggedoutAppSidebar() {
 				<h2 className="text-lg font-semibold">
 					<NavLink
 						className="flex items-center gap-2"
-						href="/chat/welcome"
+						to="/chat/welcome"
 						data-discover="true"
 					>
 						<span className="text-xl font-light text-neutral-200">
