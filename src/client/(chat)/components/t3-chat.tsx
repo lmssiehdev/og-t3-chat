@@ -35,10 +35,6 @@ export const ChatUiMessageWithImageSupport = memo(
 		onBranching?: (messageId: string) => void;
 	}) {
 		const [editable, setEditable] = useState(false);
-		const [debouncedContent, setDebouncedContent] = useDebounce(
-			message.content,
-			25,
-		);
 		const [inputValue, setInputValue] = useState("");
 		const hasImages = message.experimental_attachments?.filter((attachment) =>
 			attachment.contentType?.startsWith("image/"),

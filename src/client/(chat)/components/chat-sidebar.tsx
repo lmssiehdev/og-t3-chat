@@ -134,7 +134,6 @@ export function AppSidebar() {
 }
 function SideBarUserArea() {
 	const { isSignedIn, user } = useUser();
-	console.log(user);
 	return (
 		<div className="p-4 flex gap-3 h-20 border-t-2">
 			<UserButton

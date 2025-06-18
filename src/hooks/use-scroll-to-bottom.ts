@@ -14,7 +14,6 @@ const useScrollToBottom = (threshold = 200) => {
 				window.pageYOffset || document.documentElement.scrollTop;
 
 			const distanceFromBottom = documentHeight - (scrollTop + windowHeight);
-			console.log({ distanceFromBottom });
 			setShowScrollButton(distanceFromBottom > threshold);
 		};
 
