@@ -18,7 +18,7 @@ export const sidebarLoggedoutThreads = [
 export const PageData = {
 	welcome: {
 		component: <WelcomePage />,
-		input: "Login to test, No auth wasn't one of the requirements 💅🏻",
+		input: "Login to try, testing without auth wasn't one of the requirements 💅🏻",
 	},
 	"why-og-t3-chat": {
 		component: <WhyT3ChatPage />,

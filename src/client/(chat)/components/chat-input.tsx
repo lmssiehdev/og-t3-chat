@@ -220,9 +220,9 @@ export function FileUploadChatInputDemo({
 
 	const onStop = React.useCallback(async () => {
 		stop();
-		if (messages.length === 0) return;
+		if (messages.length === 0 || isLoading) return;
 		const lastMessage = messages.pop();
-		if (!lastMessage?.content) return;
+		if (!lastMessage?.content || lastMessage?.role === "user") return;
 		await createMessage(threadId, userAuthId!, lastMessage?.content, "ai");
 	}, [stop, userAuthId, threadId, messages]);
 	return (
