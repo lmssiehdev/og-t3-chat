@@ -180,7 +180,7 @@ export function FileUploadChatInputDemo({
 						: undefined,
 					timestamp: Date.now(),
 				} satisfies Partial<RouteParams>,
-				experimental_attachments: attachments, // Now in correct format
+				experimental_attachments: attachments,
 			});
 			// Clear files after submission
 			setFiles([]);
@@ -319,6 +319,12 @@ export function FileUploadChatInputDemo({
 							name="message"
 							value={input}
 							onChange={onInput}
+							onKeyDown={(e) => {
+								if (e.key === 'Enter' && !e.shiftKey) {
+								  e.preventDefault();
+								  e.target.form.requestSubmit();
+								}
+							  }}
 							placeholder="Type your message here..."
 							className="w-full resize-none bg-transparent mb-8 text-base leading-6 text-neutral-100 outline-none "
 							disabled={isUploading || status !== "ready"}
