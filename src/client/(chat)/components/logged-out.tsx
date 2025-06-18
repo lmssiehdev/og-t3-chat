@@ -62,7 +62,7 @@ export function LoggedoutAppSidebar() {
 				</h2>
 				<div className="pb-2 pt-4">
 					<NavLink
-						to="/chat"
+						to="/chat/welcome"
 						className="group flex flex-row items-center gap-2 text-pink-400 hover:opacity-80"
 					>
 						<MessageSquarePlus className="size-4" />
