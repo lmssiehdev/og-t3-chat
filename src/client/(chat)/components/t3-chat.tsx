@@ -39,7 +39,7 @@ export const ChatUiMessageWithImageSupport = memo(
 			message.content,
 			50,
 		);
-		const [inputValue, setInputValue] = useState(debouncedContent);
+		const [inputValue, setInputValue] = useState("");
 		const hasImages = message.experimental_attachments?.filter((attachment) =>
 			attachment.contentType?.startsWith("image/"),
 		);
@@ -69,7 +69,7 @@ export const ChatUiMessageWithImageSupport = memo(
 						</div>
 					) : (
 						<div key={message.id} className="space-y-2">
-							<MemoizedMarkdownBlock content={debouncedContent} />
+							<MemoizedMarkdownBlock content={message.content} />
 							{isUser &&
 								message.metadata &&
 								message.metadata?.attachments?.length > 0 &&

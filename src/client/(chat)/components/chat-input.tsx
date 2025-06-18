@@ -56,7 +56,7 @@ export function FileUploadChatInputDemo({
 }: FileUploadChatInputProps) {
 	const navigate = useNavigate();
 	const { userAuthId } = useInstantAuth();
-	const { input, handleSubmit, handleInputChange, status, stop, messages } =
+	const { isLoading, input, handleSubmit, handleInputChange, status, stop, messages } =
 		useChat;
 	const [files, setFiles] = React.useState<File[]>([]);
 	const [isUploading, setIsUploading] = React.useState(false);
@@ -121,6 +121,7 @@ export function FileUploadChatInputDemo({
 	const onSubmit = React.useCallback(
 		async (event: React.FormEvent<HTMLFormElement>) => {
 			event.preventDefault();
+			if ( isLoading ) return;
 
 			const formData = new FormData(event.target as HTMLFormElement);
 			const message = formData.get("message") as string;

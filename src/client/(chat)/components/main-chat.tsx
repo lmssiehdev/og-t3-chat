@@ -5,7 +5,7 @@ import { useInstantAuth } from "@/providers/instant-auth";
 import { type UseChatHelpers, useChat } from "@ai-sdk/react";
 import { id } from "@instantdb/react";
 import type { UIMessage } from "ai";
-import { Fragment, useCallback, useMemo, useState } from "react";
+import { Fragment, useCallback, useEffect, useMemo, useState } from "react";
 import { useLocation, useNavigate } from "react-router";
 import { toast } from "sonner";
 import { FileUploadChatInputDemo } from "./chat-input";
@@ -52,7 +52,7 @@ export function ChatComponent({
 					role: role === "user" ? "user" : "assistant",
 				}) as const,
 		);
-	}, [dbMessages, pathname]);
+	}, [dbMessages]);
 
 	const {
 		messages,
@@ -65,7 +65,6 @@ export function ChatComponent({
 		setMessages,
 	} = useChat({
 		api: "/api/chat",
-		initialMessages, 
 		body: {
 			threadId,
 			userAuthId,
@@ -89,6 +88,10 @@ export function ChatComponent({
 			if (!pathname.includes(threadId)) navigate(`/chat/${threadId}`);
 		},
 	});
+
+	useEffect(() => {
+		setMessages(initialMessages);
+	}, [initialMessages, setMessages]);
 
 	const activeStreamingMessages = useMemo(() => {
 		if (
