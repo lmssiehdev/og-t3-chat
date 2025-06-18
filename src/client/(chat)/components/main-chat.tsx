@@ -143,6 +143,7 @@ export function ChatComponent({
 		[dbMessages, userAuthId, navigate],
 	);
 
+	// biome-ignore lint/correctness/useExhaustiveDependencies: <explanation>
 	const onStop = useCallback(async () => {
 		if (!activeStreamingMessage) return;
 		stop();
