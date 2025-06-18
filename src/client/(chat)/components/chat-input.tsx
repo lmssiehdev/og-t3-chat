@@ -299,69 +299,70 @@ export function FileUploadChatInputDemo({
 							className="w-full resize-none bg-transparent mb-8 text-base leading-6 text-neutral-100 outline-none "
 							disabled={isUploading || status !== "ready"}
 						/>
-
-						<div className="absolute justify-between w-full right-[8px] bottom-[7px] flex flex-row-reverse items-center gap-1.5 pl-2">
-							<div>
-								{status !== "ready" ? (
-									<>
+						<SignedIn>
+							<div className="absolute justify-between w-full right-[8px] bottom-[7px] flex flex-row-reverse items-center gap-1.5 pl-2">
+								<div>
+									{status !== "ready" ? (
+										<>
+											<Button
+												onClick={async (e) => {
+													e.preventDefault();
+													e.stopPropagation();
+													onStop();
+												}}
+												size="icon"
+												className="size-10 rounded-sm"
+											>
+												<LoaderCircle className="size-3.5 animate-spin" />
+												<span className="sr-only">Stop message</span>
+											</Button>
+										</>
+									) : (
 										<Button
-											onClick={async (e) => {
-												e.preventDefault();
-												e.stopPropagation();
-												onStop();
-											}}
 											size="icon"
 											className="size-10 rounded-sm"
+											disabled={
+												!input.trim() || isUploading || status !== "ready"
+											}
+											type="submit"
 										>
-											<LoaderCircle className="size-3.5 animate-spin" />
-											<span className="sr-only">Stop message</span>
+											<ArrowUp className="size-3.5" />
+											<span className="sr-only">Send message</span>
 										</Button>
-									</>
-								) : (
-									<Button
-										size="icon"
-										className="size-10 rounded-sm"
-										disabled={
-											!input.trim() || isUploading || status !== "ready"
-										}
-										type="submit"
-									>
-										<ArrowUp className="size-3.5" />
-										<span className="sr-only">Send message</span>
-									</Button>
-								)}
+									)}
+								</div>
+								<div className="flex items-center gap-1.5 w-full justify-between">
+									<DropdownMenuRadioGroupDemo
+										position={selectedModel}
+										setPosition={(v) => {
+											const model = v as AvailableModels;
+											if (modelsInfo[model].requireApiKey) {
+												const data = prompt(
+													"This model requires an API key",
+													apiKeyInLocalStorage,
+												);
+												if (!data?.trim()) return;
+												setApiKeyInLocalStorage(data);
+											}
+											setSelectedModel(model);
+											setModelInStorage(model);
+										}}
+									/>
+									<FileUploadTrigger asChild>
+										<Button
+											type="button"
+											size="icon"
+											variant="ghost"
+											className="size-7 rounded-sm"
+											disabled={isUploading || status !== "ready"}
+										>
+											<Paperclip className="size-3.5" />
+											<span className="sr-only">Attach file</span>
+										</Button>
+									</FileUploadTrigger>
+								</div>
 							</div>
-							<div className="flex items-center gap-1.5 w-full justify-between">
-								<DropdownMenuRadioGroupDemo
-									position={selectedModel}
-									setPosition={(v) => {
-										const model = v as AvailableModels;
-										if (modelsInfo[model].requireApiKey) {
-											const data = prompt(
-												"This model requires an API key",
-												apiKeyInLocalStorage,
-											);
-											if (!data?.trim()) return;
-											setApiKeyInLocalStorage(data);
-										}
-										setSelectedModel(model);
-										setModelInStorage(model);
-									}}
-								/>
-								<FileUploadTrigger asChild>
-									<Button
-										type="button"
-										size="icon"
-										variant="ghost"
-										className="size-7 rounded-sm"
-										disabled={isUploading || status !== "ready"}
-									>
-										<Paperclip className="size-3.5" />
-										<span className="sr-only">Attach file</span>
-									</Button>
-								</FileUploadTrigger>
-							</div>
-						</div>
+						</SignedIn>
 					</form>
 				</FileUpload>
 			</div>

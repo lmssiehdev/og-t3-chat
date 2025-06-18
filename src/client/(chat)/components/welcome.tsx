@@ -1,12 +1,12 @@
 // Menu items.
 export const sidebarLoggedoutThreads = [
 	{
-		title: "Welcome to NOT OG T3 Chat",
+		title: "Welcome to OG T3 Chat",
 		url: "welcome",
 	},
 	{
-		title: "Why NOT OG T3 Chat?",
-		url: "why-not-og-t3-chat",
+		title: "Why OG T3 Chat?",
+		url: "why-og-t3-chat",
 	},
 
 	{
@@ -20,7 +20,7 @@ export const PageData = {
 		component: <WelcomePage />,
 		input: "No auth wasn't one off the requirements 💅🏻",
 	},
-	"why-ot-t3-chat": {
+	"why-og-t3-chat": {
 		component: <WhyT3ChatPage />,
 		input:
 			"GitHub or any email works (no validation), what are you waiting for?",
@@ -37,7 +37,7 @@ function WelcomePage() {
 				<div className="flex justify-end">
 					<div className="group relative bg-[#2D2D2D] rounded-2xl p-4 inline-block text-left max-w-[80%] break-words">
 						<div className="prose prose-neutral prose-invert max-w-none prose-pre:m-0 prose-pre:bg-transparent prose-pre:p-0">
-							<p>What is NOT OG T3 Chat?</p>
+							<p>What is OG T3 Chat?</p>
 						</div>
 					</div>
 				</div>
@@ -45,8 +45,8 @@ function WelcomePage() {
 					<div className="group relative max-w-full w-full break-words">
 						<div className="prose prose-neutral prose-invert max-w-none prose-pre:m-0 prose-pre:bg-transparent prose-pre:p-0">
 							<h2>
-								NOT OG T3 Chat is the recreation of what was once the best AI
-								Chat ever made.
+								OG T3 Chat is the recreation of what was once the best AI Chat
+								ever made.
 							</h2>
 							<h3>
 								LLMs have gotten great. Their apps have not. Some even
@@ -57,14 +57,14 @@ function WelcomePage() {
 								become. Sadly, the apps we use to talk to them keep getting
 								worse.
 							</p>
-							<p>That's why I built NOT OG T3 Chat.</p>
+							<p>That's why I built OG T3 Chat.</p>
 							<h3>
 								Every AI chat app felt like Slack. This one feels like Linear.
 							</h3>
 							<p>
 								You've never used a faster, more reliable chat app than NOT OG
-								T3 Chat. Want proof? Click that "Why NOT OG T3 Chat?" thread on
-								the left.
+								T3 Chat. Want proof? Click that "Why OG T3 Chat?" thread on the
+								left.
 							</p>
 						</div>
 						<button className="inline-flex items-center justify-center gap-2 whitespace-nowrap font-medium focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0 bg-secondary text-secondary-foreground shadow-sm hover:bg-secondary/80 h-8 rounded-md px-3 text-xs absolute -bottom-8 right-2 opacity-0 transition-opacity group-hover:opacity-100">
@@ -159,23 +159,22 @@ function FAQPage() {
 				<div className="flex justify-end">
 					<div className="group relative bg-[#2D2D2D] rounded-2xl p-4 inline-block text-left max-w-[80%] break-words">
 						<div className="prose prose-neutral prose-invert max-w-none prose-pre:m-0 prose-pre:bg-transparent prose-pre:p-0">
-							<p>What else should we know about NOT OG T3 Chat?</p>
+							<p>What else should we know about OG T3 Chat?</p>
 						</div>
 					</div>
 				</div>
 				<div className="flex justify-start">
 					<div className="group relative max-w-full w-full break-words">
 						<div className="prose prose-neutral prose-invert max-w-none prose-pre:m-0 prose-pre:bg-transparent prose-pre:p-0">
-							<h3>Who made T3 Chat?</h3>
+							<h3>Who made OG T3 Chat?</h3>
 							<p>
-								NOT OG T3 Chat is made by{" "}
+								OG T3 Chat was created by me,{" "}
 								<a href="https://github.com/lmssiehdev/">lmssiehdev</a>. I'm
-								mostly known for holding controversial opinions like that thoe
-								is a good designer.
+								perhaps best known for holding the controversial opinion that
+								thoe is actually a good designer.
 								<br />
-								I'm also the dev behind popular projects like{" "}
-								<a>AMONG SUS LINK LENGTHENER</a>—that's right, it's me in the
-								flesh.
+								I'm also the dev behind other popular projects like{" "}
+								<a>AMONG SUS LINK LENGTHENER</a>
 							</p>
 
 							<h3>What optional features did you implement?</h3>
@@ -199,14 +198,14 @@ function FAQPage() {
 								</p>
 							</div>
 
-							<h3>How did you make NOT OG T3 Chat so fast???</h3>
+							<h3>How did you make OG T3 Chat so fast???</h3>
 							<p>
 								I shamelessly relied on a lot of bespoke tech to make this
-								possible. The big difference between NOT OG T3 Chat and other AI
+								possible. The big difference between OG T3 Chat and other AI
 								chat apps is that we keep all of your data on your device.
 							</p>
 
-							<h3>What's next for NOT OG T3 Chat?</h3>
+							<h3>What's next for OG T3 Chat?</h3>
 							<p>
 								Nothing.. I'm waiting for your opinion. What are you waiting
 								for? Sign up!
