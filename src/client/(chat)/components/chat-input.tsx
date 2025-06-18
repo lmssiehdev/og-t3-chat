@@ -293,6 +293,13 @@ export function FileUploadChatInputDemo({
 						</FileUploadList>
 
 						<textarea
+							key={threadId}
+							autoFocus
+							onFocus={(e) => {
+								const val = e.target.value;
+								e.target.value = '';
+								e.target.value = val;
+							  }}
 							name="message"
 							value={input}
 							onChange={onInput}
