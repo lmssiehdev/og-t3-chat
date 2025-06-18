@@ -42,7 +42,7 @@ export function ChatComponent({
 	});
 
 	useEffect(() => {
-		if ( shouldCreateThread || !dbMessages?.threads[0]?.title ) return;
+		if (shouldCreateThread || !dbMessages?.threads[0]?.title) return;
 		document.title = dbMessages?.threads[0]?.title;
 	}, [dbMessages, shouldCreateThread]);
 
@@ -150,11 +150,10 @@ export function ChatComponent({
 
 	// biome-ignore lint/correctness/useExhaustiveDependencies: <explanation>
 	const onStop = useCallback(async () => {
-		if (!activeStreamingMessage 
-			|| !activeStreamingMessage.content.length
-		) return;
+		if (!activeStreamingMessage || !activeStreamingMessage.content.length)
+			return;
 		stop();
-		createMessage(threadId, userAuthId!, activeStreamingMessage.content, "ai")
+		createMessage(threadId, userAuthId!, activeStreamingMessage.content, "ai");
 	}, [activeStreamingMessage, userAuthId, threadId]);
 
 	if (!dbMessages?.threads[0]?.messages || pathname === "/chat") {

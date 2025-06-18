@@ -196,8 +196,8 @@ function FAQPage() {
 									tested with a txt file and an image
 								</p>
 								<p>
-									<span className="block">✅ Web Search</span>
-									tested with various queries
+									<span className="block">✅ Image Generation</span>
+									using flex :) key provided by me
 								</p>
 							</div>
 
