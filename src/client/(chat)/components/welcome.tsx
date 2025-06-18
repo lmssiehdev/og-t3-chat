@@ -174,7 +174,7 @@ function FAQPage() {
 								thoe is actually a good designer.
 								<br />
 								I'm also the dev behind other popular projects like{" "}
-								<a>AMONG SUS LINK LENGTHENER</a>
+								<a href="https://github.com/lmssieh/SUS-link-lengthener">AMONG SUS LINK LENGTHENER</a>
 							</p>
 
 							<h3>What optional features did you implement?</h3>
