@@ -2,8 +2,8 @@
 import { ClerkProvider } from "@clerk/nextjs";
 import { dark } from "@clerk/themes";
 import "./globals.css";
-import { Toaster } from "sonner";
 import { GeistSans } from "geist/font/sans";
+import { Toaster } from "sonner";
 
 
 export default function RootLayout({

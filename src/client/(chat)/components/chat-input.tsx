@@ -56,8 +56,15 @@ export function FileUploadChatInputDemo({
 }: FileUploadChatInputProps) {
 	const navigate = useNavigate();
 	const { userAuthId } = useInstantAuth();
-	const { isLoading, input, handleSubmit, handleInputChange, status, stop, messages } =
-		useChat;
+	const {
+		isLoading,
+		input,
+		handleSubmit,
+		handleInputChange,
+		status,
+		stop,
+		messages,
+	} = useChat;
 	const [files, setFiles] = React.useState<File[]>([]);
 	const [isUploading, setIsUploading] = React.useState(false);
 	const [apiKeyInLocalStorage, setApiKeyInLocalStorage] =
@@ -118,10 +125,12 @@ export function FileUploadChatInputDemo({
 		});
 	}, []);
 
+	const textareaRef = React.useRef<HTMLTextAreaElement>(null);
+
 	const onSubmit = React.useCallback(
 		async (event: React.FormEvent<HTMLFormElement>) => {
 			event.preventDefault();
-			if ( isLoading ) return;
+			if (isLoading) return;
 
 			const formData = new FormData(event.target as HTMLFormElement);
 			const message = formData.get("message") as string;
@@ -177,6 +186,11 @@ export function FileUploadChatInputDemo({
 
 			if (shouldCreateThread) {
 				navigate(`/chat/${threadId}`);
+			}
+
+			const textarea = textareaRef.current;
+			if (textarea) {
+			  textarea.style.height = "auto";
 			}
 		},
 		[
@@ -293,6 +307,7 @@ export function FileUploadChatInputDemo({
 						</FileUploadList>
 
 						<textarea
+							ref={textareaRef}
 							key={threadId}
 							autoFocus
 							onFocus={(e) => {
@@ -378,25 +393,27 @@ export function FileUploadChatInputDemo({
 	);
 }
 
+const cheekyPhrases = [
+	"what big t3.chat doesn't want you to see",
+	"where the old t3.chat gets to shine",
+	"the t3.chat they tried to bury",
+	"t3.chat for people with taste",
+	"clearly someone has to preserve good taste",
+	"mainstream t3.chat could never",
+	"t3.chat classic edition",
+	"what t3.chat used to look like when it was cool",
+	"the t3.chat they don't want you to remember",
+	"inspired by t3.chat's better days",
+	"what t3.chat wishes it still looked like",
+];
+const phrase = randomItemFromArray(cheekyPhrases)
+
 const CheekyPhrases = React.memo(function CheekyPhrases() {
-	const cheekyPhrases = [
-		"what big t3.chat doesn't want you to see",
-		"where the old t3.chat gets to shine",
-		"the t3.chat they tried to bury",
-		"t3.chat for people with taste",
-		"clearly someone has to preserve good taste",
-		"mainstream t3.chat could never",
-		"t3.chat classic edition",
-		"what t3.chat used to look like when it was cool",
-		"the t3.chat they don't want you to remember",
-		"inspired by t3.chat's better days",
-		"what t3.chat wishes it still looked like",
-	];
 
 	return (
 		<SignedIn>
 			<div className="mt-1 text-sm text-center text-neutral-400">
-				{randomItemFromArray(cheekyPhrases)}
+				{phrase}
 			</div>
 		</SignedIn>
 	);
