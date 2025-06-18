@@ -31,9 +31,9 @@ const _schema = i.schema({
 		threads: i.entity({
 			id: i.string().unique().indexed(),
 			createdAt: i.number().indexed(),
+			updatedAt: i.number().indexed(),
 			title: i.string(),
 			updatedTitle: i.boolean().optional(),
-			updatedAt: i.date(),
 			metadata: i.json(),
 			isBranch: i.boolean(),
 			userAuthId: i.string().indexed(),

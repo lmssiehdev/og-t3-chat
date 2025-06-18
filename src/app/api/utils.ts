@@ -123,6 +123,7 @@ export async function generateTitleFromUserMessage({
 			db.tx.threads[threadId].update({
 				title,
 				updatedTitle: true,
+				updatedAt: Date.now(),
 			}),
 		]);
 	} catch (titleError) {

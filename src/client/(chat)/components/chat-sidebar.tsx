@@ -39,7 +39,7 @@ export function AppSidebar() {
 		threads: {
 			$: {
 				order: {
-					createdAt: "desc",
+					updatedAt: "desc",
 				},
 			},
 		},
@@ -123,7 +123,7 @@ export function AppSidebar() {
 }
 function SideBarUserArea() {
 	const { isSignedIn, user } = useUser();
-
+	console.log(user);
 	return (
 		<div className="p-4 flex gap-3 h-20 border-t-2">
 			<UserButton
@@ -134,7 +134,7 @@ function SideBarUserArea() {
 				}}
 			/>
 			<div className="">
-				<div className="font-semibold">{user?.fullName ?? "No name"}</div>
+				<div className="font-semibold">{user?.fullName ?? user?.username ??  "No name"}</div>
 				<div className="text-gray-400/70 text-sm font-semibold">Noob</div>
 			</div>
 		</div>
