@@ -19,7 +19,6 @@ import {
 import { memo, useState } from "react";
 import { NavLink, useLocation, useNavigate } from "react-router";
 import { toast } from "sonner";
-import { useDebounce } from "use-debounce";
 
 import { useCopyToClipboard } from "usehooks-ts";
 import { Link } from "./chat-link";

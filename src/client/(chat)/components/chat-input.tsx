@@ -54,7 +54,7 @@ export function FileUploadChatInputDemo({
 	shouldCreateThread = false,
 	showScrollButton,
 	scrollToBottom,
-	onStop
+	onStop,
 }: FileUploadChatInputProps) {
 	const navigate = useNavigate();
 	const { userAuthId } = useInstantAuth();
@@ -314,11 +314,11 @@ export function FileUploadChatInputDemo({
 							value={input}
 							onChange={onInput}
 							onKeyDown={(e) => {
-								if (e.key === 'Enter' && !e.shiftKey) {
-								  e.preventDefault();
-								  e.target.form.requestSubmit();
+								if (e.key === "Enter" && !e.shiftKey) {
+									e.preventDefault();
+									e.target.form.requestSubmit();
 								}
-							  }}
+							}}
 							placeholder="Type your message here..."
 							className="w-full resize-none bg-transparent mb-8 text-base leading-6 text-neutral-100 outline-none "
 							disabled={isUploading || status !== "ready"}

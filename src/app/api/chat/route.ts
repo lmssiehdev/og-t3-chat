@@ -87,7 +87,6 @@ export async function POST(req: Request) {
 						role: "ai",
 						metadata: {},
 						userAuthId,
-						
 					}),
 					db.tx.$users[userAuthId].link({ messages: messageId }),
 					db.tx.messages[messageId].link({ thread: threadId }),
