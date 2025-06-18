@@ -316,6 +316,7 @@ export function FileUploadChatInputDemo({
 							onKeyDown={(e) => {
 								if (e.key === "Enter" && !e.shiftKey) {
 									e.preventDefault();
+									// @ts-expect-error
 									e.target.form.requestSubmit();
 								}
 							}}

@@ -27,6 +27,7 @@ export function LoggedoutChatComponent() {
 		<>
 			{component}
 			<FileUploadChatInputDemo
+				onStop={() => {}}
 				scrollToBottom={() => {}}
 				showScrollButton={false}
 				threadId={""}
