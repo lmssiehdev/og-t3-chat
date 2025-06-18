@@ -146,7 +146,7 @@ export function ChatComponent({
 	const onStop = useCallback(async () => {
 		if (!activeStreamingMessage) return;
 		stop();
-	}, [activeStreamingMessage, stop, userAuthId, threadId, messages]);
+	}, [activeStreamingMessage]);
 
 	if (!dbMessages?.threads[0]?.messages || pathname === "/chat") {
 		if (!shouldCreateThread) return null;
