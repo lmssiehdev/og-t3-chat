@@ -11,7 +11,7 @@ import {
 	DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { SUPPORTED_MODELS, modelsInfo } from "@/constants";
-import { ChevronDown } from "lucide-react";
+import { ChevronDown, EyeIcon } from "lucide-react";
 
 export function DropdownMenuRadioGroupDemo({
 	position,
@@ -41,14 +41,16 @@ export function DropdownMenuRadioGroupDemo({
 							<div className="w-full flex justify-between items-center gap-2">
 								{modelsInfo[m].name}
 								<div className="flex gap-2">
-									{modelsInfo[m]?.requireApiKey && (
-										<div className=" text-xs font-bold">Pro</div>
-									)}
-									{/* {modelsInfo[m]?.supportVision && (
+								{modelsInfo[m]?.supportsImageGeneration && (
 										<div className=" text-pink-400 text-xs">
 											<EyeIcon className="text-pink-400 text-xs" />
 										</div>
-									)} */}
+									)}
+									
+									{modelsInfo[m]?.requireApiKey && (
+										<div className=" text-xs font-bold">Pro</div>
+									)}
+	
 								</div>
 							</div>
 						</DropdownMenuRadioItem>

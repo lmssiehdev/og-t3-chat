@@ -23,6 +23,7 @@ const _schema = i.schema({
 			text: i.string(),
 			metadata: i.json<{
 				attachments: { name: string; contentType: string }[];
+				imageUrl: string;
 			}>(),
 			userAuthId: i.string().indexed(),
 			isBranch: i.boolean().optional(),

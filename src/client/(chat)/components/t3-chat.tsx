@@ -35,9 +35,7 @@ export const ChatUiMessageWithImageSupport = memo(
 	}) {
 		const [editable, setEditable] = useState(false);
 		const [inputValue, setInputValue] = useState("");
-		const hasImages = message.experimental_attachments?.filter((attachment) =>
-			attachment.contentType?.startsWith("image/"),
-		);
+		const hasImage = message?.metadata?.imageUrl
 		const isUser = message.role === "user";
 
 		return (
@@ -83,18 +81,7 @@ export const ChatUiMessageWithImageSupport = memo(
 									</div>
 								))}
 							{/* Display image attachments */}
-							{hasImages && (
-								<div className="flex flex-wrap gap-2">
-									{hasImages.map((attachment, index) => (
-										<img
-											key={`${message.id}-${index}`}
-											src={attachment.url}
-											alt={attachment.name || "Attachment"}
-											className="max-w-xs rounded-lg"
-										/>
-									))}
-								</div>
-							)}
+							{hasImage && (<img src={hasImage} alt="Attachment" />)}
 						</div>
 					)}
 					{showChatButtons && (
