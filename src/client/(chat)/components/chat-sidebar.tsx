@@ -21,11 +21,13 @@ export const PrefetchThread = memo(
 	({ threadId, onFetched }: { threadId: string; onFetched?: () => void }) => {
 		db.useQuery({
 			threads: {
-				$: {
-					where: {
-						id: threadId,
+				$: { where: { id: threadId } },
+				messages: {
+					$: {
+						order: {
+							createdAt: "asc",
+						},
 					},
-					limit: 1,
 				},
 			},
 		});
