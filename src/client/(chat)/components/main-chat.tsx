@@ -189,15 +189,15 @@ export function ChatComponent({
 							</Fragment>
 						))}
 					{activeStreamingMessages?.content.length && (
-						<>
-							<ChatUiMessageWithImageSupport
-								onBranching={onBranching}
-								message={activeStreamingMessages}
-							/>
-							<div className="text-left">
-								<span className="animate-pulse">▊</span>
-							</div>
-						</>
+						<ChatUiMessageWithImageSupport
+							onBranching={onBranching}
+							message={activeStreamingMessages}
+						/>
+					)}
+					{isLoading && (
+						<div className="text-left">
+							<span className="animate-pulse">▊</span>
+						</div>
 					)}
 				</div>
 			</div>
