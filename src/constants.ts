@@ -18,9 +18,9 @@ export const modelsInfo = {
 
 // duplicated to please zod
 export const SUPPORTED_MODELS = [
+	"google/gemini-2.5-flash-preview-05-20",
 	"anthropic/claude-sonnet-4",
 	"openai/gpt-4o-mini",
-	"google/gemini-2.5-flash-preview-05-20",
 ] as const;
 
 export type AvailableModels = (typeof SUPPORTED_MODELS)[number];
