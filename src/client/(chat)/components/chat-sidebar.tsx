@@ -1,5 +1,5 @@
 "use client";
-import { MessageSquarePlus } from "lucide-react";
+import { MessageSquarePlus, Search } from "lucide-react";
 
 import { SearchThreads } from "@/components/search";
 import {
@@ -12,9 +12,10 @@ import {
 } from "@/components/ui/sidebar";
 import { db } from "@/db/instant";
 import { UserButton, useUser } from "@clerk/nextjs";
-import { memo, useEffect } from "react";
+import { memo, useEffect, useState } from "react";
 import { NavLink } from "react-router";
 import { ThreadLink } from "./t3-chat";
+import { Button } from "@/components/ui/button";
 
 export const PrefetchThread = memo(
 	({ threadId, onFetched }: { threadId: string; onFetched?: () => void }) => {
@@ -35,6 +36,7 @@ export const PrefetchThread = memo(
 	},
 );
 export function AppSidebar() {
+	const [searchOpen, setSearchOpen] = useState(false);
 	const { data: threadData } = db.useQuery({
 		threads: {
 			$: {
@@ -46,7 +48,7 @@ export function AppSidebar() {
 	});
 	return (
 		<>
-			<SearchThreads />
+			<SearchThreads open={searchOpen} setOpen={setSearchOpen} />
 			<Sidebar>
 				{/* // TODO: change border radius default in shadcn */}
 
@@ -72,7 +74,12 @@ export function AppSidebar() {
 						</NavLink>
 					</div>
 					<SidebarGroup className="p-0 space-y-2">
-						<h2 className="font-semibold text-neutral-400 ">Recent Threads</h2>
+						<h2 className="flex justify-between items-center font-semibold text-neutral-400 ">
+							Recent Threads
+							<Button onClick={() => setSearchOpen(true)} variant={"ghost"} size={"icon"}>
+								<Search className="size-4.5" />
+							</Button>
+						</h2>
 						<SidebarGroupContent>
 							<SidebarMenu>
 								{(threadData?.threads ?? []).map((item, i, arr) => {
@@ -134,7 +141,9 @@ function SideBarUserArea() {
 				}}
 			/>
 			<div className="">
-				<div className="font-semibold">{user?.fullName ?? user?.username ??  "No name"}</div>
+				<div className="font-semibold">
+					{user?.fullName ?? user?.username ?? "No name"}
+				</div>
 				<div className="text-gray-400/70 text-sm font-semibold">Noob</div>
 			</div>
 		</div>

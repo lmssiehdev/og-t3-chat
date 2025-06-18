@@ -14,8 +14,13 @@ import { GitBranch, MessageSquare } from "lucide-react";
 import * as React from "react";
 import { useNavigate } from "react-router";
 
-export function SearchThreads() {
-	const [open, setOpen] = React.useState(false);
+export function SearchThreads({
+	open,
+	setOpen,
+}: {
+	open: boolean;
+	setOpen: React.Dispatch<React.SetStateAction<boolean>>;
+}) {
 	const naviate = useNavigate();
 	React.useEffect(() => {
 		const down = (e: KeyboardEvent) => {
@@ -27,7 +32,7 @@ export function SearchThreads() {
 
 		document.addEventListener("keydown", down);
 		return () => document.removeEventListener("keydown", down);
-	}, []);
+	}, [setOpen]);
 
 	const { data: threads } = db.useQuery({
 		threads: {
