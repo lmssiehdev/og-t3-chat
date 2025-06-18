@@ -97,16 +97,6 @@ export async function POST(req: Request) {
 
 		// after the stream is finished, we generate a title from the first message
 		if (shouldCreateThread) {
-			db.transact([
-				db.tx.threads[threadId].update({
-					createdAt: timestamp,
-					updatedAt: timestamp,
-					metadata: {},
-					userAuthId,
-					isBranch: false,
-					title: "Updating...",
-				}),
-			]);
 			const latestMessage = messages[0];
 			after(async () => {
 				await generateTitleFromUserMessage({

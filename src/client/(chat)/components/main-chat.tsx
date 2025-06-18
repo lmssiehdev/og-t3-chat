@@ -42,7 +42,7 @@ export function ChatComponent({
 	});
 
 	const initialMessages = useMemo(() => {
-		if (!dbMessages?.threads[0]?.messages) return [];
+		if (!dbMessages?.threads[0]?.messages || pathname === "/chat") return [];
 		return dbMessages.threads[0].messages.map(
 			({ id, text, createdAt, role }) =>
 				({
@@ -52,7 +52,7 @@ export function ChatComponent({
 					role: role === "user" ? "user" : "assistant",
 				}) as const,
 		);
-	}, [dbMessages]);
+	}, [dbMessages, pathname]);
 
 	const {
 		messages,
@@ -62,9 +62,10 @@ export function ChatComponent({
 		status,
 		isLoading,
 		stop,
+		setMessages,
 	} = useChat({
 		api: "/api/chat",
-		initialMessages,
+		initialMessages, 
 		body: {
 			threadId,
 			userAuthId,
@@ -141,6 +142,7 @@ export function ChatComponent({
 
 	if (!dbMessages?.threads[0]?.messages || pathname === "/chat") {
 		if (!shouldCreateThread) return null;
+
 		return (
 			<div className="flex flex-col h-full relative w-full">
 				<div className="flex-1 mx-auto flex w-full max-w-3xl flex-col space-y-12 h-[calc(100dvh-120px)]">

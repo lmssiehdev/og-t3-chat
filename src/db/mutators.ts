@@ -45,6 +45,9 @@ export async function createMessage(
 		db.tx.$users[userAuthId].link({ messages: messageId }),
 		db.tx.messages[messageId].link({ thread: threadId }),
 		db.tx.threads[threadId].link({ messages: messageId }),
+		db.tx.threads[threadId].update({
+			updatedAt: Date.now(),
+		}),
 	]);
 
 	return messageId;
