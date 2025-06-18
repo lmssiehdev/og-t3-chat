@@ -41,6 +41,11 @@ export function ChatComponent({
 		},
 	});
 
+	useEffect(() => {
+		if ( shouldCreateThread || !dbMessages?.threads[0]?.title ) return;
+		document.title = dbMessages?.threads[0]?.title;
+	}, [dbMessages, shouldCreateThread]);
+
 	const initialMessages = useMemo(() => {
 		if (!dbMessages?.threads[0]?.messages || pathname === "/chat") return [];
 		return dbMessages.threads[0].messages.map(
