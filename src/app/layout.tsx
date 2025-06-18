@@ -5,7 +5,6 @@ import "./globals.css";
 import { GeistSans } from "geist/font/sans";
 import { Toaster } from "sonner";
 
-
 export default function RootLayout({
 	children,
 }: Readonly<{

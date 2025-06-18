@@ -52,7 +52,7 @@ export function ChatComponent({
 					role: role === "user" ? "user" : "assistant",
 				}) as const,
 		);
-	}, [dbMessages]);
+	}, [dbMessages, pathname]);
 
 	const {
 		messages,

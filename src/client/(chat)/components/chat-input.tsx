@@ -127,6 +127,7 @@ export function FileUploadChatInputDemo({
 
 	const textareaRef = React.useRef<HTMLTextAreaElement>(null);
 
+	// biome-ignore lint/correctness/useExhaustiveDependencies: <explanation>
 	const onSubmit = React.useCallback(
 		async (event: React.FormEvent<HTMLFormElement>) => {
 			event.preventDefault();
@@ -190,7 +191,7 @@ export function FileUploadChatInputDemo({
 
 			const textarea = textareaRef.current;
 			if (textarea) {
-			  textarea.style.height = "auto";
+				textarea.style.height = "auto";
 			}
 		},
 		[
@@ -312,9 +313,9 @@ export function FileUploadChatInputDemo({
 							autoFocus
 							onFocus={(e) => {
 								const val = e.target.value;
-								e.target.value = '';
+								e.target.value = "";
 								e.target.value = val;
-							  }}
+							}}
 							name="message"
 							value={input}
 							onChange={onInput}
@@ -406,15 +407,12 @@ const cheekyPhrases = [
 	"inspired by t3.chat's better days",
 	"what t3.chat wishes it still looked like",
 ];
-const phrase = randomItemFromArray(cheekyPhrases)
+const phrase = randomItemFromArray(cheekyPhrases);
 
 const CheekyPhrases = React.memo(function CheekyPhrases() {
-
 	return (
 		<SignedIn>
-			<div className="mt-1 text-sm text-center text-neutral-400">
-				{phrase}
-			</div>
+			<div className="mt-1 text-sm text-center text-neutral-400">{phrase}</div>
 		</SignedIn>
 	);
 });

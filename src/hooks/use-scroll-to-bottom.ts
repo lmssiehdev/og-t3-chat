@@ -3,7 +3,9 @@ import { useLocation } from "react-router";
 
 const useScrollToBottom = (threshold = 200) => {
 	const [showScrollButton, setShowScrollButton] = useState(false);
-	const { pathname } = useLocation()
+	const { pathname } = useLocation();
+
+	// biome-ignore lint/correctness/useExhaustiveDependencies: <explanation>
 	useEffect(() => {
 		const checkScrollPosition = () => {
 			const windowHeight = window.innerHeight;

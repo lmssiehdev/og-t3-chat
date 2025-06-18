@@ -2,6 +2,7 @@
 import { MessageSquarePlus, Search } from "lucide-react";
 
 import { SearchThreads } from "@/components/search";
+import { Button } from "@/components/ui/button";
 import {
 	Sidebar,
 	SidebarContent,
@@ -15,7 +16,6 @@ import { UserButton, useUser } from "@clerk/nextjs";
 import { memo, useEffect, useState } from "react";
 import { NavLink } from "react-router";
 import { ThreadLink } from "./t3-chat";
-import { Button } from "@/components/ui/button";
 
 export const PrefetchThread = memo(
 	({ threadId, onFetched }: { threadId: string; onFetched?: () => void }) => {
@@ -76,7 +76,11 @@ export function AppSidebar() {
 					<SidebarGroup className="p-0 space-y-2">
 						<h2 className="flex justify-between items-center font-semibold text-neutral-400 ">
 							Recent Threads
-							<Button onClick={() => setSearchOpen(true)} variant={"ghost"} size={"icon"}>
+							<Button
+								onClick={() => setSearchOpen(true)}
+								variant={"ghost"}
+								size={"icon"}
+							>
 								<Search className="size-4.5" />
 							</Button>
 						</h2>

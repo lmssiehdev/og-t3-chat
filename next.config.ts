@@ -25,4 +25,5 @@ const millionConfig = {
 	// auto: true,
 };
 
-export default million.next(nextConfig as any, { log: "info" });
+// @ts-expect-error
+export default million.next(nextConfig, { log: "info" });
