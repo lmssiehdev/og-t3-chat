@@ -35,7 +35,7 @@ export const ChatUiMessageWithImageSupport = memo(
 	}) {
 		const [editable, setEditable] = useState(false);
 		const [inputValue, setInputValue] = useState("");
-		const hasImage = message?.metadata?.imageUrl
+		const hasImage = message?.metadata?.imageUrl;
 		const isUser = message.role === "user";
 
 		return (
@@ -81,7 +81,7 @@ export const ChatUiMessageWithImageSupport = memo(
 									</div>
 								))}
 							{/* Display image attachments */}
-							{hasImage && (<img src={hasImage} alt="Attachment" />)}
+							{hasImage && <img src={hasImage} alt="Attachment" />}
 						</div>
 					)}
 					{showChatButtons && (

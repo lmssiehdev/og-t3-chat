@@ -1,11 +1,12 @@
 export const modelsInfo: Record<
-string, {
-	name: string;
-	requireApiKey: boolean;
-	supportVision?: boolean;
-	supportsImageGeneration?: boolean;
-	hasDefaultApiKey?: string;
-}
+	string,
+	{
+		name: string;
+		requireApiKey: boolean;
+		supportVision?: boolean;
+		supportsImageGeneration?: boolean;
+		hasDefaultApiKey?: string;
+	}
 > = {
 	"fal-ai/flux/dev": {
 		name: "Flux",

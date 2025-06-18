@@ -1,10 +1,12 @@
 import { modelsInfo } from "@/constants";
+import { createFal } from "@ai-sdk/fal";
 import { id } from "@instantdb/admin";
 import {
 	type LanguageModelV1,
 	createOpenRouter,
 } from "@openrouter/ai-sdk-provider";
 import { streamText } from "ai";
+import { experimental_generateImage as generateImage } from "ai";
 import { after } from "next/server";
 import {
 	db,
@@ -13,11 +15,8 @@ import {
 	processMessages,
 	zRouteParams,
 } from "../utils";
-import { createFal, } from "@ai-sdk/fal";
-import { experimental_generateImage as generateImage } from 'ai';
 export async function POST(req: Request) {
 	try {
-
 		const body = await req.json();
 		const parsedBody = zRouteParams.safeParse(body);
 
@@ -69,12 +68,10 @@ export async function POST(req: Request) {
 
 		const openRouterModel: LanguageModelV1 = openrouter.chat(model);
 		const messageId = id();
-		const processedMessages = await processMessages(
-			messages,
-		);
+		const processedMessages = await processMessages(messages);
 		const Fal = createFal({
-			apiKey: process.env.NEXT_PUBLIC_FAL_API_KEY!,
-		})
+			apiKey: process.env.FAL_API_KEY!,
+		});
 		if (generatingAnImage) {
 			try {
 				// Get the latest user message for the prompt

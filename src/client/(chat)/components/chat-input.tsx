@@ -176,14 +176,13 @@ export function FileUploadChatInputDemo({
 
 			const body = {
 				model: selectedModel ?? SUPPORTED_MODELS[0],
-					apiKey: modelsInfo[selectedModel as AvailableModels].requireApiKey
-						? JSON.parse(localStorage.getItem("api-key") || '""')
-						: undefined,
-					timestamp: Date.now(),
-			}satisfies Partial<RouteParams>;
+				apiKey: modelsInfo[selectedModel as AvailableModels].requireApiKey
+					? JSON.parse(localStorage.getItem("api-key") || '""')
+					: undefined,
+				timestamp: Date.now(),
+			} satisfies Partial<RouteParams>;
 
-			
-			handleSubmit(event, {	
+			handleSubmit(event, {
 				body,
 				experimental_attachments: attachments,
 			});

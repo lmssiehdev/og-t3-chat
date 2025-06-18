@@ -188,14 +188,13 @@ export function ChatComponent({
 					{dbMessages.threads[0].messages
 						.map((m) => ({ ...m, content: m.text }))
 						.map((message, i) => (
-							<Fragment key={message.id} >
-
+							<Fragment key={message.id}>
 								<ChatUiMessageWithImageSupport
 									key={message.id}
 									onBranching={onBranching}
 									message={message as unknown as UIMessage}
-									/>
-									</Fragment>
+								/>
+							</Fragment>
 						))}
 					{activeStreamingMessage?.content.length && (
 						<ChatUiMessageWithImageSupport
@@ -230,4 +229,3 @@ export function ChatComponent({
 		</div>
 	);
 }
-
