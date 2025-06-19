@@ -47,7 +47,8 @@ function RedirectToChat() {
 	useEffect(() => {
 		setTimeout(() => {
 			window.location.href = "/chat"
-		}, 100)
+		}, 1000)
 	}, [])
 	return null
 }
+

@@ -166,6 +166,7 @@ export function ChatComponent({
 			return;
 		stop();
 		createMessage(threadId, userAuthId!, activeStreamingMessage.content, "ai");
+		setLastStreamingClientId({ messageId: "", threadId: "" });
 	}, [activeStreamingMessage, userAuthId, threadId]);
 
 	if (!dbMessages?.threads[0]?.messages || pathname === "/chat") {
