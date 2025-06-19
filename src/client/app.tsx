@@ -2,6 +2,7 @@ import { BrowserRouter, Navigate, Route, Routes } from "react-router";
 import { ChatPageWithId } from "./(chat)/[id]";
 import { ChatLayout } from "./(chat)/components/chat-layout";
 import { Gallery } from "./(library)/gallery";
+import { useEffect } from "react";
 
 export default function App() {
 	return (
@@ -32,7 +33,21 @@ export default function App() {
 						</ChatLayout>
 					}
 				/>
+				<Route path="/chat/redirect" element={
+					<ChatLayout>
+						<RedirectToChat />
+					</ChatLayout>
+				} />
 			</Routes>
 		</BrowserRouter>
 	);
+}
+
+function RedirectToChat() {
+	useEffect(() => {
+		setTimeout(() => {
+			window.location.href = "/chat"
+		}, 100)
+	}, [])
+	return null
 }
