@@ -9,8 +9,8 @@ import { Fragment, useCallback, useEffect, useMemo, useState } from "react";
 import { useLocation, useNavigate } from "react-router";
 import { toast } from "sonner";
 import { FileUploadChatInputDemo } from "./chat-input";
-import { ChatUiMessageWithImageSupport } from "./t3-chat";
 import { ChatTopNav } from "./chat-top-nav";
+import { ChatUiMessageWithImageSupport } from "./t3-chat";
 
 //! TODO: split this bad boy
 export function ChatComponent({

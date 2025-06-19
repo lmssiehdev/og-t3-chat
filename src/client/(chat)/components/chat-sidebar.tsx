@@ -12,11 +12,11 @@ import {
 	SidebarMenuItem,
 } from "@/components/ui/sidebar";
 import { db } from "@/db/instant";
+import type { Thread } from "@/db/mutators";
 import { UserButton, useUser } from "@clerk/nextjs";
 import { memo, useEffect, useState } from "react";
 import { NavLink } from "react-router";
 import { ThreadLink } from "./t3-chat";
-import type { Thread } from "@/db/mutators";
 
 export const PrefetchThread = memo(
 	({ threadId, onFetched }: { threadId: string; onFetched?: () => void }) => {
@@ -125,28 +125,26 @@ export function AppSidebar() {
 		</>
 	);
 }
-function ThreadItems ({ threadData }: { threadData: Thread[] }) {
-	const pinnedThreads = threadData.filter(t => t.isPinned);
-	const unpinnedThreads = threadData.filter(t => !t.isPinned);
-	return (
-		[...pinnedThreads, ...unpinnedThreads].map((item, i, arr) => {
-			const ranking = arr.length - i;
-			return (
-				<SidebarMenuItem key={item.id}>
-					<ThreadLink
-						key={item.title}
-						isBranch={item.isBranch}
-						threadId={item.id}
-						title={item.title}
-						isPinned={item.isPinned}
-					/>
-					{/* {ranking > arr.length - 5 && (
+function ThreadItems({ threadData }: { threadData: Thread[] }) {
+	const pinnedThreads = threadData.filter((t) => t.isPinned);
+	const unpinnedThreads = threadData.filter((t) => !t.isPinned);
+	return [...pinnedThreads, ...unpinnedThreads].map((item, i, arr) => {
+		const ranking = arr.length - i;
+		return (
+			<SidebarMenuItem key={item.id}>
+				<ThreadLink
+					key={item.title}
+					isBranch={item.isBranch}
+					threadId={item.id}
+					title={item.title}
+					isPinned={item.isPinned}
+				/>
+				{/* {ranking > arr.length - 5 && (
 					<PrefetchThread threadId={item.title} />
 				)} */}
-				</SidebarMenuItem>
-			);
-		})
-	)
+			</SidebarMenuItem>
+		);
+	});
 }
 function SideBarUserArea() {
 	const { isSignedIn, user } = useUser();

@@ -50,7 +50,7 @@ export const ChatUiMessageWithImageSupport = memo(
 						},
 						"group relative rounded-2xl p-4 inline-block text-left max-w-[80%] mb-8 break-words",
 					)}
-				>	
+				>
 					{editable ? (
 						<div>
 							<input
@@ -142,11 +142,13 @@ export const ThreadLink = memo(
 				}
 			>
 				<div className="flex flex-row gap-2 rounded-sm px-2 py-1 pr-8 overflow-hidden">
-					{isPinned && <PinIcon className="block mt-1.5 size-3 shrink-0 text-neutral-400" />}
+					{isPinned && (
+						<PinIcon className="block mt-1.5 size-3 shrink-0 text-neutral-400" />
+					)}
 					{isBranch ? (
 						<GitBranch className="mt-1.5 size-3 shrink-0 text-neutral-400" />
 					) : (
-						<MessageSquare className="mt-1.5 size-3 shrink-0 text-neutral-400" />	
+						<MessageSquare className="mt-1.5 size-3 shrink-0 text-neutral-400" />
 					)}
 
 					<div className="line-clamp-2 overflow-hidden text-ellipsis">

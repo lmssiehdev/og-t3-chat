@@ -15,6 +15,7 @@ import {
 	type FileUploadProps,
 	FileUploadTrigger,
 } from "@/components/ui/file-upload";
+import { Toggle } from "@/components/ui/toggle";
 import {
 	type AvailableModels,
 	SUPPORTED_MODELS,
@@ -38,7 +39,6 @@ import * as React from "react";
 import { useNavigate } from "react-router";
 import { toast } from "sonner";
 import { useLocalStorage } from "usehooks-ts";
-import { Toggle } from "@/components/ui/toggle";
 type FileUploadChatInputProps = {
 	threadId: string;
 	shouldCreateThread?: boolean;
@@ -382,7 +382,7 @@ export function FileUploadChatInputDemo({
 										{modelsInfo[selectedModel]?.supportsWebSearch && (
 											<Toggle
 												value={searchSelected}
-												onValueChange={() => setSearchSelected(p => !p)}
+												onValueChange={() => setSearchSelected((p) => !p)}
 												aria-label="Toggle italic"
 												className="flex gap-2 items-center"
 											>

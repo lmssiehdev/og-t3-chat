@@ -34,7 +34,7 @@ export async function POST(req: Request) {
 			userAuthId,
 			shouldCreateThread,
 			timestamp,
-			search
+			search,
 		} = parsedBody.data;
 
 		if (modelsInfo[model]?.requireApiKey && !clientApiKey) {
@@ -49,7 +49,6 @@ export async function POST(req: Request) {
 		const generatingAnImage = modelsInfo[model]?.supportsImageGeneration;
 
 		const openrouter = createOpenRouter({
-
 			apiKey: apiKey || process.env.OPENROUTER_API_KEY,
 		});
 
@@ -89,7 +88,6 @@ export async function POST(req: Request) {
 						"X-Thread-Id": threadId,
 					},
 				});
-
 			} catch (imageError) {
 				console.error("Image generation error:", imageError);
 
@@ -128,11 +126,11 @@ export async function POST(req: Request) {
 			},
 			onStepFinish: async (data) => {
 				const { stepType } = data;
-				console.log('Step finished:', stepType, data);
+				console.log("Step finished:", stepType, data);
 			},
 			onFinish: async (data) => {
 				const { text, finishReason, response } = data;
-				console.log('Finish:', data);
+				console.log("Finish:", data);
 				await db.transact([
 					db.tx.messages[messageId].update({
 						hasImage: false,
@@ -193,7 +191,7 @@ async function generateFalImage({
 	prompt,
 	userAuthId,
 	threadId,
-	timestamp
+	timestamp,
 }: {
 	prompt: string;
 	userAuthId: string;

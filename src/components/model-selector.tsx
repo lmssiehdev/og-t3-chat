@@ -21,29 +21,29 @@ export function ModelSelector({
 	setPosition: (position: string) => void;
 }) {
 	return (
-			<DropdownMenu>
-				<DropdownMenuTrigger asChild>
-					<Button
-						type="button"
-						variant="ghost"
-						className="rounded-sm flex items-center justify-center text-xs h-auto p-1"
-					>
-						{modelsInfo[position as (typeof SUPPORTED_MODELS)[number]]?.name}{" "}
-						<ChevronDown className="size-4" />
-					</Button>
-				</DropdownMenuTrigger>
-				<DropdownMenuContent className=" ">
-					<DropdownMenuLabel>Select Model</DropdownMenuLabel>
-					<DropdownMenuSeparator />
-					<DropdownMenuRadioGroup value={position} onValueChange={setPosition}>
-						{SUPPORTED_MODELS.map((model, i) => (
-							<DropdownMenuRadioItem key={model} value={model}>
-								<ModelName message={model} idx={i} />
-							</DropdownMenuRadioItem>
-						))}
-					</DropdownMenuRadioGroup>
-				</DropdownMenuContent>
-			</DropdownMenu>
+		<DropdownMenu>
+			<DropdownMenuTrigger asChild>
+				<Button
+					type="button"
+					variant="ghost"
+					className="rounded-sm flex items-center justify-center text-xs h-auto p-1"
+				>
+					{modelsInfo[position as (typeof SUPPORTED_MODELS)[number]]?.name}{" "}
+					<ChevronDown className="size-4" />
+				</Button>
+			</DropdownMenuTrigger>
+			<DropdownMenuContent className=" ">
+				<DropdownMenuLabel>Select Model</DropdownMenuLabel>
+				<DropdownMenuSeparator />
+				<DropdownMenuRadioGroup value={position} onValueChange={setPosition}>
+					{SUPPORTED_MODELS.map((model, i) => (
+						<DropdownMenuRadioItem key={model} value={model}>
+							<ModelName message={model} idx={i} />
+						</DropdownMenuRadioItem>
+					))}
+				</DropdownMenuRadioGroup>
+			</DropdownMenuContent>
+		</DropdownMenu>
 	);
 }
 

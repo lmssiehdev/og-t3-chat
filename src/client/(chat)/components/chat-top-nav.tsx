@@ -1,27 +1,27 @@
 import { Button } from "@/components/ui/button";
 import {
-    Dialog,
-    DialogContent,
-    DialogDescription,
-    DialogFooter,
-    DialogHeader,
-    DialogTitle,
-    DialogTrigger,
+	Dialog,
+	DialogContent,
+	DialogDescription,
+	DialogFooter,
+	DialogHeader,
+	DialogTitle,
+	DialogTrigger,
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { SidebarTrigger } from "@/components/ui/sidebar";
 import { db } from "@/db/instant";
+import { type Thread, pinThread } from "@/db/mutators";
+import { cn } from "@/lib/utils";
 import { CopyIcon, EditIcon, PinIcon, ShareIcon } from "lucide-react";
 import { useState } from "react";
 import { useLocation } from "react-router";
 import { toast } from "sonner";
 import { useCopyToClipboard } from "usehooks-ts";
-import { pinThread, type Thread } from "@/db/mutators";
-import { cn } from "@/lib/utils";
 
 export function ChatTopNav({ thread }: { thread: Thread }) {
-    const { pathname } = useLocation();
+	const { pathname } = useLocation();
 	return (
 		<div className="p-2 flex justify-between items-center mb-3 bg-background sticky top-0 z-10">
 			<SidebarTrigger className="rounded-sm size-10 cursor-pointer ml-1" />
@@ -41,8 +41,10 @@ export function ChatTopNav({ thread }: { thread: Thread }) {
 	);
 }
 
-
-export function PinThreadButton({ threadId, isPinned }: { threadId: string, isPinned?: boolean }) {
+export function PinThreadButton({
+	threadId,
+	isPinned,
+}: { threadId: string; isPinned?: boolean }) {
 	return (
 		<Button
 			onClick={async () => {
@@ -51,17 +53,18 @@ export function PinThreadButton({ threadId, isPinned }: { threadId: string, isPi
 			}}
 			variant={"ghost"}
 			size={"icon"}
-			className={
-				cn("rounded-sm size-10 cursor-pointer ml-1", {
-					"bg-accent/100": isPinned, 
-				})
-			}
+			className={cn("rounded-sm size-10 cursor-pointer ml-1", {
+				"bg-accent/100": isPinned,
+			})}
 		>
 			<PinIcon className="size-5" />
 		</Button>
 	);
 }
-export function EditThreadButton({ threadId, originalTitle }: { threadId: string, originalTitle: string }) {
+export function EditThreadButton({
+	threadId,
+	originalTitle,
+}: { threadId: string; originalTitle: string }) {
 	const [input, setInput] = useState(originalTitle);
 	const [open, setOpen] = useState(false);
 
@@ -72,7 +75,7 @@ export function EditThreadButton({ threadId, originalTitle }: { threadId: string
 				if (open) {
 					setInput(originalTitle);
 				}
-			  
+
 				setOpen((c) => !c);
 			}}
 		>
@@ -98,13 +101,17 @@ export function EditThreadButton({ threadId, originalTitle }: { threadId: string
 							Link
 						</Label>
 						<div className="flex gap-2 items-center">
-							<Input id="link" value={input} onChange={e => setInput(e.target.value)} />
+							<Input
+								id="link"
+								value={input}
+								onChange={(e) => setInput(e.target.value)}
+							/>
 						</div>
 					</div>
 				</div>
 				<DialogFooter className="sm:justify-start gap-2">
 					<Button
-						onClick={ () => {
+						onClick={() => {
 							setOpen(false);
 						}}
 						type="button"
@@ -119,7 +126,7 @@ export function EditThreadButton({ threadId, originalTitle }: { threadId: string
 								db.tx.threads[threadId].update({
 									title: input,
 								}),
-							])
+							]);
 							toast.success("Title updated!");
 						}}
 						type="button"
