@@ -23,6 +23,14 @@ export default function App() {
 						</ChatLayout>
 					}
 				/>
+				<Route
+					path="/gallery"
+					element={
+						<ChatLayout>
+							<Gallery />
+						</ChatLayout>
+					}
+				/>
 			</Routes>
 		</BrowserRouter>
 	);

@@ -20,6 +20,8 @@ const _schema = i.schema({
 			id: i.string().unique().indexed(),
 			role: i.string<"user" | "ai">().optional(),
 			createdAt: i.number().indexed(),
+			searchableImagePrompt: i.string().indexed().optional(),
+			hasImage: i.boolean().indexed().optional(),
 			text: i.string(),
 			metadata: i.json<{
 				attachments: { name: string; contentType: string }[];
@@ -38,6 +40,7 @@ const _schema = i.schema({
 			metadata: i.json(),
 			isBranch: i.boolean(),
 			userAuthId: i.string().indexed(),
+			isPinned: i.boolean().optional(),
 		}),
 	},
 	links: {

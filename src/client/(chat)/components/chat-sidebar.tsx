@@ -74,6 +74,13 @@ export function AppSidebar() {
 							<MessageSquarePlus className="size-4" />
 							<span className="">New Chat</span>
 						</NavLink>
+						<NavLink
+							to="/gallery"
+							className="group flex flex-row items-center gap-2  hover:opacity-80"
+						>
+							<ImagesIcon className="size-4" />
+							<span className="">Gallery</span>
+						</NavLink>
 					</div>
 					<SidebarGroup className="p-0 space-y-2">
 						<h2 className="flex justify-between items-center font-semibold text-neutral-400 ">

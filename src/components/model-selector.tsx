@@ -39,7 +39,7 @@ export function DropdownMenuRadioGroupDemo({
 					{SUPPORTED_MODELS.toReversed().map((m, i) => (
 						<DropdownMenuRadioItem key={m} value={m} defaultChecked={i === 0}>
 							<div className="w-full flex justify-between items-center gap-2">
-								{modelsInfo[m].name}
+								{modelsInfo[m]?.name}
 								<div className="flex gap-2">
 									{modelsInfo[m]?.supportsImageGeneration && (
 										<div className=" text-pink-400 text-xs">

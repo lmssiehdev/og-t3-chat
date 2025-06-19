@@ -9,6 +9,10 @@ const nextConfig: NextConfig = {
 				destination: "/static-app-shell",
 			},
 			{
+				source: "/gallery/:slug*",
+				destination: "/static-app-shell",
+			},
+			{
 				source: "/",
 				destination: "/static-app-shell",
 			},
