@@ -1,5 +1,5 @@
 "use client";
-import { MessageSquarePlus, Search } from "lucide-react";
+import { ImagesIcon, MessageSquarePlus, Search } from "lucide-react";
 
 import { SearchThreads } from "@/components/search";
 import { Button } from "@/components/ui/button";
@@ -16,6 +16,7 @@ import { UserButton, useUser } from "@clerk/nextjs";
 import { memo, useEffect, useState } from "react";
 import { NavLink } from "react-router";
 import { ThreadLink } from "./t3-chat";
+import type { Thread } from "@/db/mutators";
 
 export const PrefetchThread = memo(
 	({ threadId, onFetched }: { threadId: string; onFetched?: () => void }) => {
@@ -52,8 +53,6 @@ export function AppSidebar() {
 		<>
 			<SearchThreads open={searchOpen} setOpen={setSearchOpen} />
 			<Sidebar>
-				{/* // TODO: change border radius default in shadcn */}
-
 				<SidebarContent className="p-4 clas">
 					<h2 className="text-lg font-semibold">
 						<a
@@ -66,10 +65,10 @@ export function AppSidebar() {
 							</span>
 						</a>
 					</h2>
-					<div className="pb-2 pt-4">
+					<div className="pb-2 pt-4 space-y-3">
 						<NavLink
 							to="/chat"
-							className="group flex flex-row items-center gap-2 text-pink-400 hover:opacity-80"
+							className="font-semibold group flex flex-row items-center gap-2 text-pink-400 hover:opacity-80"
 						>
 							<MessageSquarePlus className="size-4" />
 							<span className="">New Chat</span>
@@ -95,22 +94,7 @@ export function AppSidebar() {
 						</h2>
 						<SidebarGroupContent>
 							<SidebarMenu>
-								{(threadData?.threads ?? []).map((item, i, arr) => {
-									const ranking = arr.length - i;
-									return (
-										<SidebarMenuItem key={item.id}>
-											<ThreadLink
-												key={item.title}
-												isBranch={item.isBranch}
-												threadId={item.id}
-												title={item.title}
-											/>
-											{/* {ranking > arr.length - 5 && (
-											<PrefetchThread threadId={item.title} />
-										)} */}
-										</SidebarMenuItem>
-									);
-								})}
+								<ThreadItems threadData={threadData?.threads ?? []} />
 							</SidebarMenu>
 						</SidebarGroupContent>
 					</SidebarGroup>
@@ -140,6 +124,29 @@ export function AppSidebar() {
 			</Sidebar>
 		</>
 	);
+}
+function ThreadItems ({ threadData }: { threadData: Thread[] }) {
+	const pinnedThreads = threadData.filter(t => t.isPinned);
+	const unpinnedThreads = threadData.filter(t => !t.isPinned);
+	return (
+		[...pinnedThreads, ...unpinnedThreads].map((item, i, arr) => {
+			const ranking = arr.length - i;
+			return (
+				<SidebarMenuItem key={item.id}>
+					<ThreadLink
+						key={item.title}
+						isBranch={item.isBranch}
+						threadId={item.id}
+						title={item.title}
+						isPinned={item.isPinned}
+					/>
+					{/* {ranking > arr.length - 5 && (
+					<PrefetchThread threadId={item.title} />
+				)} */}
+				</SidebarMenuItem>
+			);
+		})
+	)
 }
 function SideBarUserArea() {
 	const { isSignedIn, user } = useUser();

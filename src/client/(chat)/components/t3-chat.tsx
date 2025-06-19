@@ -15,6 +15,8 @@ import {
 	FileVideoIcon,
 	GitBranch,
 	LucideCopy,
+	MessageSquare,
+	PinIcon,
 } from "lucide-react";
 import { memo, useState } from "react";
 import { NavLink, useLocation, useNavigate } from "react-router";
@@ -48,7 +50,10 @@ export const ChatUiMessageWithImageSupport = memo(
 						},
 						"group relative rounded-2xl p-4 inline-block text-left max-w-[80%] mb-8 break-words",
 					)}
-				>
+				>	
+				{
+					JSON.stringify(message?.annotations ?? [])
+				}
 					{editable ? (
 						<div>
 							<input
@@ -119,11 +124,13 @@ export const ThreadLink = memo(
 		threadId,
 		title,
 		isBranch,
+		isPinned,
 		useCustomLink = true,
 	}: {
 		useCustomLink?: boolean;
 		threadId: string;
 		title: string;
+		isPinned?: boolean;
 		isBranch?: boolean;
 	}) => {
 		const { pathname } = useLocation();
@@ -137,24 +144,12 @@ export const ThreadLink = memo(
 					`group/item relative flex items-start rounded-sm hover:bg-[#2D2D2D]/40 ${isActive ? "bg-[#2D2D2D]/60" : ""}`
 				}
 			>
-				<div className="flex flex-row gap-2 rounded-sm px-2 py-1 pr-8">
+				<div className="flex flex-row gap-2 rounded-sm px-2 py-1 pr-8 overflow-hidden">
+					{isPinned && <PinIcon className="block mt-1.5 size-3 shrink-0 text-neutral-400" />}
 					{isBranch ? (
 						<GitBranch className="mt-1.5 size-3 shrink-0 text-neutral-400" />
 					) : (
-						<svg
-							xmlns="http://www.w3.org/2000/svg"
-							width="24"
-							height="24"
-							viewBox="0 0 24 24"
-							fill="none"
-							stroke="currentColor"
-							strokeWidth="2"
-							strokeLinecap="round"
-							strokeLinejoin="round"
-							className="lucide lucide-message-square mt-1.5 size-3 shrink-0 text-neutral-400"
-						>
-							<path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" />
-						</svg>
+						<MessageSquare className="mt-1.5 size-3 shrink-0 text-neutral-400" />	
 					)}
 
 					<div className="line-clamp-2 overflow-hidden text-ellipsis">
@@ -191,9 +186,6 @@ export const ThreadLink = memo(
 				</button>
 			</CustomLink>
 		);
-	},
-	(prev, next) => {
-		return prev.threadId === next.threadId;
 	},
 );
 

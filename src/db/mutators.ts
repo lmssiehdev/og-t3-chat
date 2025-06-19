@@ -17,6 +17,7 @@ export const createThread = async (
 			metadata: {},
 			userAuthId,
 			isBranch: false,
+			isPinned: false,
 		}),
 		// Link the thread to the user
 		db.tx.$users[userAuthId].link({ threads: threadId }),
@@ -51,6 +52,14 @@ export async function createMessage(
 	]);
 
 	return messageId;
+}
+
+export async function pinThread(threadId: string, isPinned: boolean) {
+	await db.transact([
+		db.tx.threads[threadId].update({
+			isPinned,
+		}),
+	]);
 }
 
 // biome-ignore lint/complexity/noBannedTypes: <explanation>
