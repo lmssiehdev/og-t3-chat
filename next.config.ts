@@ -8,8 +8,8 @@ const nextConfig: NextConfig = {
 				source: "/go-home",
 				destination: "/chat/",
 				permanent: true,
-			}
-		]
+			},
+		];
 	},
 	rewrites: async () => {
 		return [
