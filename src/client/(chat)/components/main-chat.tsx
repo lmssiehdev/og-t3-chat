@@ -30,23 +30,26 @@ export function ChatComponent({
 	const navigate = useNavigate();
 
 	const { data: dbMessages, isLoading: isDbMessagesLoading } = db.useQuery(
-		threadId ? {
-		threads: {
-			$: { where: { id: threadId } },
-			messages: {
-				$: {
-					order: {
-						createdAt: "asc",
+		threadId
+			? {
+					threads: {
+						$: { where: { id: threadId } },
+						messages: {
+							$: {
+								order: {
+									createdAt: "asc",
+								},
+							},
+						},
 					},
-				},
-			},
-		},
-	} : null);
+				}
+			: null,
+	);
 
 	useEffect(() => {
 		console.log("window.location.pathname:", window.location.pathname);
-		if ( window.location.pathname === "/chat") {
-			document.title = "New chat"
+		if (window.location.pathname === "/chat") {
+			document.title = "New chat";
 		} else {
 			if (shouldCreateThread || !dbMessages?.threads[0]?.title) return;
 			document.title = dbMessages?.threads[0]?.title;

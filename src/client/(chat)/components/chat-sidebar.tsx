@@ -16,30 +16,31 @@ import type { Thread } from "@/db/mutators";
 import { UserButton, useUser } from "@clerk/nextjs";
 import { memo, useEffect, useState } from "react";
 import { NavLink } from "react-router";
-import { ThreadLink } from "./t3-chat";
 import { usePrefetchStore } from "./chat-link";
+import { ThreadLink } from "./t3-chat";
 
 export const PrefetchThread = memo(
 	({ threadId, onFetched }: { threadId: string; onFetched?: () => void }) => {
-		const {
-			completePrefetch,
-			completedThreads
-		} = usePrefetchStore();
-		db.useQuery((!completedThreads.has(threadId) && threadId) ?{
-			threads: {
-				$: { where: { id: threadId } },
-				messages: {
-					$: {
-						order: {
-							createdAt: "asc",
+		const { completePrefetch, completedThreads } = usePrefetchStore();
+		db.useQuery(
+			!completedThreads.has(threadId) && threadId
+				? {
+						threads: {
+							$: { where: { id: threadId } },
+							messages: {
+								$: {
+									order: {
+										createdAt: "asc",
+									},
+								},
+							},
 						},
-					},
-				},
-			},
-		}: null);
+					}
+				: null,
+		);
 
 		useEffect(() => {
-			if ( completedThreads.has(threadId) || !threadId ) return;
+			if (completedThreads.has(threadId) || !threadId) return;
 			completePrefetch(threadId);
 		}, [threadId]);
 
@@ -134,12 +135,13 @@ export function AppSidebar() {
 	);
 }
 function ThreadItems({ threadData }: { threadData: Thread[] }) {
-
 	const pinnedThreads = threadData.filter((t) => t.isPinned);
 	const unpinnedThreads = threadData.filter((t) => !t.isPinned);
-	const threadsToPrefetch = pinnedThreads.map((thread) => thread.id).concat([
-		...unpinnedThreads.map((thread) => thread.id).filter((_, i) => i < 5),
-	]);
+	const threadsToPrefetch = pinnedThreads
+		.map((thread) => thread.id)
+		.concat([
+			...unpinnedThreads.map((thread) => thread.id).filter((_, i) => i < 5),
+		]);
 	return [...pinnedThreads, ...unpinnedThreads].map((item, i, arr) => {
 		const ranking = arr.length - i;
 		return (
@@ -151,9 +153,9 @@ function ThreadItems({ threadData }: { threadData: Thread[] }) {
 					title={item.title}
 					isPinned={item.isPinned}
 				/>
-				{
-					threadsToPrefetch.includes(item.id) && <PrefetchThread threadId={item.id} />
-				}
+				{threadsToPrefetch.includes(item.id) && (
+					<PrefetchThread threadId={item.id} />
+				)}
 			</SidebarMenuItem>
 		);
 	});
