@@ -2,6 +2,15 @@ import million from "million/compiler";
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
+	redirects: async () => {
+		return [
+			{
+				source: "/go-home",
+				destination: "/chat/",
+				permanent: true,
+			}
+		]
+	},
 	rewrites: async () => {
 		return [
 			{
