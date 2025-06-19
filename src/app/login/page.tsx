@@ -9,7 +9,7 @@ export default async function LoginPage() {
 	return (
 		<div className="flex min-h-screen items-center justify-center p-8">
 			<div className="space-y-2">
-				<SignInButton forceRedirectUrl={"/go-home"}>
+				<SignInButton>
 					<GoogleSignInButton />
 				</SignInButton>
 				<span className=" block text-center text-xs w-fit text-neutral-400">
