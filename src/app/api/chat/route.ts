@@ -1,5 +1,5 @@
 import { modelsInfo } from "@/constants";
-import { createFal } from "@ai-sdk/fal";
+import { fal } from "@ai-sdk/fal";
 import { id } from "@instantdb/admin";
 import {
 	type LanguageModelV1,
@@ -34,28 +34,14 @@ export async function POST(req: Request) {
 			userAuthId,
 			shouldCreateThread,
 			timestamp,
+			search
 		} = parsedBody.data;
 
-		if (modelsInfo[model].requireApiKey && !clientApiKey) {
+		if (modelsInfo[model]?.requireApiKey && !clientApiKey) {
 			return new Response(JSON.stringify({ error: "Missing API key" }), {
 				status: 400,
 			});
 		}
-
-		// const payload: UpdateParams<AppSchema, "threads"> = {
-		// 	createdAt: timestamp,
-		// 	updatedAt: timestamp,
-		// };
-
-		// if (shouldCreateThread) {
-		// 	payload.title = "New Chat!";
-		// 	payload.userAuthId = userAuthId;
-		// 	payload.metadata = {};
-		// 	payload.isBranch = false;
-		// 	db.tx.$users[userAuthId].link({ threads: threadId });
-		// }
-
-		// await db.transact([db.tx.threads[threadId].update(payload)]);
 
 		let errorMessageKey: keyof typeof errorToMsg = "default_error";
 		const apiKey = clientApiKey?.trim() ?? process.env.OPENROUTER_API_KEY;
@@ -63,61 +49,36 @@ export async function POST(req: Request) {
 		const generatingAnImage = modelsInfo[model]?.supportsImageGeneration;
 
 		const openrouter = createOpenRouter({
+
 			apiKey: apiKey || process.env.OPENROUTER_API_KEY,
 		});
 
-		const openRouterModel: LanguageModelV1 = openrouter.chat(model);
 		const messageId = id();
 		const processedMessages = await processMessages(messages);
-		const Fal = createFal({
-			apiKey: process.env.FAL_API_KEY!,
-		});
+
 		if (generatingAnImage) {
 			try {
-				// Get the latest user message for the prompt
-				const latestMessage = messages[messages.length - 1];
-				const prompt = latestMessage?.content || "";
+				const prompt = messages[messages.length - 1]?.content.trim();
 
-				// Configure fal with API key if provided
-				const falModel = Fal.image("fal-ai/flux/schnell", {});
-
-				// Generate image using Vercel AI SDK
-				const { image } = await generateImage({
-					model: falModel,
-					prompt: prompt,
-					providerOptions: {
-						fal: {
-							image_size: "landscape_4_3",
-							num_inference_steps: 4,
-							num_images: 1,
-							enable_safety_checker: true,
-						},
-					},
+				if (!prompt) {
+					return new Response("No prompt provided", { status: 400 });
+				}
+				await generateFalImage({
+					prompt,
+					userAuthId,
+					threadId,
+					timestamp,
 				});
 
-				const imageUrl =
-					// @ts-expect-error image is not typed
-					image?.url || `data:${image.mimeType};base64,${image.base64}`;
-				const messageId = id();
-
-				await db.transact([
-					db.tx.messages[messageId].update({
-						createdAt: timestamp,
-						text: `Generated image for: "${prompt}"`,
-						role: "ai",
-						metadata: {
-							type: "image",
-							imageUrl: imageUrl,
-							prompt: prompt,
-							model: model,
-							mimeType: image.mimeType,
-						},
-						userAuthId,
-					}),
-					db.tx.$users[userAuthId].link({ messages: messageId }),
-					db.tx.messages[messageId].link({ thread: threadId }),
-					db.tx.threads[threadId].link({ messages: messageId }),
-				]);
+				if (shouldCreateThread) {
+					after(async () => {
+						await generateTitleFromUserMessage({
+							openRouterModel: openrouter.chat("qwen/qwen2.5-vl-32b-instruct"),
+							message: prompt,
+							threadId,
+						});
+					});
+				}
 
 				// we sync to the db and return an empty response
 				return new Response("", {
@@ -128,6 +89,7 @@ export async function POST(req: Request) {
 						"X-Thread-Id": threadId,
 					},
 				});
+
 			} catch (imageError) {
 				console.error("Image generation error:", imageError);
 
@@ -150,6 +112,8 @@ export async function POST(req: Request) {
 				});
 			}
 		}
+		const openRouterModel: LanguageModelV1 = openrouter.chat(model);
+
 		const result = streamText({
 			model: openRouterModel,
 			messages: processedMessages,
@@ -162,13 +126,22 @@ export async function POST(req: Request) {
 					errorMessageKey = "invalid_api_key";
 				}
 			},
-			onFinish: async ({ text, finishReason }) => {
+			onStepFinish: async (data) => {
+				const { stepType } = data;
+				console.log('Step finished:', stepType, data);
+			},
+			onFinish: async (data) => {
+				const { text, finishReason, response } = data;
+				console.log('Finish:', data);
 				await db.transact([
 					db.tx.messages[messageId].update({
+						hasImage: false,
 						createdAt: timestamp,
 						text,
 						role: "ai",
-						metadata: {},
+						metadata: {
+							// annotations: response?.annotations || []
+						},
 						userAuthId,
 					}),
 					db.tx.$users[userAuthId].link({ messages: messageId }),
@@ -177,6 +150,7 @@ export async function POST(req: Request) {
 				]);
 			},
 		});
+
 		// after the stream is finished, we generate a title from the first message
 		if (shouldCreateThread) {
 			const latestMessage = messages[0];
@@ -213,4 +187,48 @@ export async function POST(req: Request) {
 			},
 		);
 	}
+}
+
+async function generateFalImage({
+	prompt,
+	userAuthId,
+	threadId,
+	timestamp
+}: {
+	prompt: string;
+	userAuthId: string;
+	threadId: string;
+	timestamp?: number;
+}) {
+	// Generate image using Vercel AI SDK
+	const { image } = await generateImage({
+		model: fal.image("fal-ai/flux/schnell"),
+		prompt: prompt,
+	});
+
+	const imageUrl =
+		// @ts-expect-error image is not typed
+		image?.url || `data:${image.mimeType};base64,${image.base64}`;
+	const messageId = id();
+
+	await db.transact([
+		db.tx.messages[messageId].update({
+			searchableImagePrompt: prompt.substring(0, 400),
+			hasImage: true,
+			createdAt: timestamp,
+			text: `Generated image for: "${prompt}"`,
+			role: "ai",
+			metadata: {
+				type: "image",
+				imageUrl: imageUrl,
+				prompt: prompt,
+				model: "fal-ai/flux/schnell",
+				mimeType: image.mimeType,
+			},
+			userAuthId,
+		}),
+		db.tx.$users[userAuthId].link({ messages: messageId }),
+		db.tx.messages[messageId].link({ thread: threadId }),
+		db.tx.threads[threadId].link({ messages: messageId }),
+	]);
 }

@@ -19,6 +19,7 @@ export const zRouteParams = z.object({
 	shouldCreateThread: z.boolean().default(false),
 	apiKey: z.string().min(2).optional(),
 	timestamp: z.number().optional(),
+	search: z.boolean().optional().default(false),
 });
 
 export type RouteParams = z.infer<typeof zRouteParams>;

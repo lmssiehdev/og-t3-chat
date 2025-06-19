@@ -51,9 +51,6 @@ export const ChatUiMessageWithImageSupport = memo(
 						"group relative rounded-2xl p-4 inline-block text-left max-w-[80%] mb-8 break-words",
 					)}
 				>	
-				{
-					JSON.stringify(message?.annotations ?? [])
-				}
 					{editable ? (
 						<div>
 							<input

@@ -10,6 +10,7 @@ import { useLocation, useNavigate } from "react-router";
 import { toast } from "sonner";
 import { FileUploadChatInputDemo } from "./chat-input";
 import { ChatUiMessageWithImageSupport } from "./t3-chat";
+import { ChatTopNav } from "./chat-top-nav";
 
 //! TODO: split this bad boy
 export function ChatComponent({
@@ -70,6 +71,7 @@ export function ChatComponent({
 		setMessages,
 	} = useChat({
 		api: "/api/chat",
+		id: threadId,
 		body: {
 			threadId,
 			userAuthId,
@@ -144,6 +146,7 @@ export function ChatComponent({
 				userAuthId,
 				messageId,
 			);
+			toast.success("Branch created!");
 		},
 		[dbMessages, userAuthId, navigate],
 	);
@@ -189,50 +192,53 @@ export function ChatComponent({
 		return null;
 	}
 	return (
-		<div className="flex flex-col h-full relative w-full">
-			<div className="flex-1 mx-auto flex w-full max-w-3xl flex-col space-y-12 h-[calc(100dvh-120px)]">
-				<div className="flex-1 mb-4">
-					{dbMessages.threads[0].messages
-						.map((m) => ({ ...m, content: m.text }))
-						.map((message, i) => (
-							<Fragment key={message.id}>
-								<ChatUiMessageWithImageSupport
-									key={message.id}
-									onBranching={onBranching}
-									message={message as unknown as UIMessage}
-								/>
-							</Fragment>
-						))}
-					{activeStreamingMessage?.content.length && (
-						<ChatUiMessageWithImageSupport
-							onBranching={onBranching}
-							message={activeStreamingMessage}
-						/>
-					)}
-					{isLoading && (
-						<div className="text-left">
-							<span className="animate-pulse">▊</span>
-						</div>
-					)}
+		<>
+			<ChatTopNav thread={dbMessages?.threads[0]} />
+			<div className="flex flex-col h-full relative w-full">
+				<div className="flex-1 mx-auto flex w-full max-w-3xl flex-col space-y-12 h-[calc(100dvh-120px)]">
+					<div className="flex-1 mb-4">
+						{dbMessages.threads[0].messages
+							.map((m) => ({ ...m, content: m.text }))
+							.map((message, i) => (
+								<Fragment key={message.id}>
+									<ChatUiMessageWithImageSupport
+										key={message.id}
+										onBranching={onBranching}
+										message={message as unknown as UIMessage}
+									/>
+								</Fragment>
+							))}
+						{activeStreamingMessage?.content.length && (
+							<ChatUiMessageWithImageSupport
+								onBranching={onBranching}
+								message={activeStreamingMessage}
+							/>
+						)}
+						{isLoading && (
+							<div className="text-left">
+								<span className="animate-pulse">▊</span>
+							</div>
+						)}
+					</div>
 				</div>
+				<FileUploadChatInputDemo
+					showScrollButton={showScrollButton}
+					scrollToBottom={scrollToBottom}
+					shouldCreateThread={shouldCreateThread}
+					threadId={threadId}
+					onStop={onStop}
+					useChat={
+						{
+							messages,
+							input,
+							handleSubmit,
+							handleInputChange,
+							status,
+							stop,
+						} as UseChatHelpers
+					}
+				/>
 			</div>
-			<FileUploadChatInputDemo
-				showScrollButton={showScrollButton}
-				scrollToBottom={scrollToBottom}
-				shouldCreateThread={shouldCreateThread}
-				threadId={threadId}
-				onStop={onStop}
-				useChat={
-					{
-						messages,
-						input,
-						handleSubmit,
-						handleInputChange,
-						status,
-						stop,
-					} as UseChatHelpers
-				}
-			/>
-		</div>
+		</>
 	);
 }

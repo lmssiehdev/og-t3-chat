@@ -13,7 +13,7 @@ import {
 import { SUPPORTED_MODELS, modelsInfo } from "@/constants";
 import { ChevronDown, ImageIcon } from "lucide-react";
 
-export function DropdownMenuRadioGroupDemo({
+export function ModelSelector({
 	position,
 	setPosition,
 }: {
@@ -21,41 +21,47 @@ export function DropdownMenuRadioGroupDemo({
 	setPosition: (position: string) => void;
 }) {
 	return (
-		<DropdownMenu>
-			<DropdownMenuTrigger asChild>
-				<Button
-					type="button"
-					variant="ghost"
-					className="rounded-sm flex items-center justify-center text-xs h-auto p-1"
-				>
-					{modelsInfo[position as (typeof SUPPORTED_MODELS)[number]]?.name}{" "}
-					<ChevronDown className="size-4" />
-				</Button>
-			</DropdownMenuTrigger>
-			<DropdownMenuContent className="w-fit ">
-				<DropdownMenuLabel>Select Model</DropdownMenuLabel>
-				<DropdownMenuSeparator />
-				<DropdownMenuRadioGroup value={position} onValueChange={setPosition}>
-					{SUPPORTED_MODELS.toReversed().map((m, i) => (
-						<DropdownMenuRadioItem key={m} value={m} defaultChecked={i === 0}>
-							<div className="w-full flex justify-between items-center gap-2">
-								{modelsInfo[m]?.name}
-								<div className="flex gap-2">
-									{modelsInfo[m]?.supportsImageGeneration && (
-										<div className=" text-pink-400 text-xs">
-											<ImageIcon className="text-pink-400 text-xs" />
-										</div>
-									)}
+			<DropdownMenu>
+				<DropdownMenuTrigger asChild>
+					<Button
+						type="button"
+						variant="ghost"
+						className="rounded-sm flex items-center justify-center text-xs h-auto p-1"
+					>
+						{modelsInfo[position as (typeof SUPPORTED_MODELS)[number]]?.name}{" "}
+						<ChevronDown className="size-4" />
+					</Button>
+				</DropdownMenuTrigger>
+				<DropdownMenuContent className=" ">
+					<DropdownMenuLabel>Select Model</DropdownMenuLabel>
+					<DropdownMenuSeparator />
+					<DropdownMenuRadioGroup value={position} onValueChange={setPosition}>
+						{SUPPORTED_MODELS.map((model, i) => (
+							<DropdownMenuRadioItem key={model} value={model}>
+								<ModelName message={model} idx={i} />
+							</DropdownMenuRadioItem>
+						))}
+					</DropdownMenuRadioGroup>
+				</DropdownMenuContent>
+			</DropdownMenu>
+	);
+}
 
-									{modelsInfo[m]?.requireApiKey && (
-										<div className=" text-xs font-bold">Pro</div>
-									)}
-								</div>
-							</div>
-						</DropdownMenuRadioItem>
-					))}
-				</DropdownMenuRadioGroup>
-			</DropdownMenuContent>
-		</DropdownMenu>
+function ModelName({ message, idx }: { message: string; idx: number }) {
+	return (
+		<div className="w-full flex justify-between items-center gap-2">
+			{modelsInfo[message]?.name}
+			<div className="flex gap-2">
+				{modelsInfo[message]?.supportsImageGeneration && (
+					<div className=" text-pink-400 text-xs">
+						<ImageIcon className="text-pink-400 text-xs" />
+					</div>
+				)}
+
+				{modelsInfo[message]?.requireApiKey && (
+					<div className=" text-xs font-bold">Pro</div>
+				)}
+			</div>
+		</div>
 	);
 }

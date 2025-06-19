@@ -1,7 +1,7 @@
 "use client";
 
 import type { RouteParams } from "@/app/api/utils";
-import { DropdownMenuRadioGroupDemo } from "@/components/model-selector";
+import { ModelSelector } from "@/components/model-selector";
 import { Button } from "@/components/ui/button";
 import {
 	FileUpload,
@@ -30,6 +30,7 @@ import {
 	ArrowUp,
 	LoaderCircle,
 	Paperclip,
+	Search,
 	Upload,
 	X,
 } from "lucide-react";
@@ -37,7 +38,7 @@ import * as React from "react";
 import { useNavigate } from "react-router";
 import { toast } from "sonner";
 import { useLocalStorage } from "usehooks-ts";
-
+import { Toggle } from "@/components/ui/toggle";
 type FileUploadChatInputProps = {
 	threadId: string;
 	shouldCreateThread?: boolean;
@@ -58,6 +59,7 @@ export function FileUploadChatInputDemo({
 }: FileUploadChatInputProps) {
 	const navigate = useNavigate();
 	const { userAuthId } = useInstantAuth();
+	const [searchSelected, setSearchSelected] = React.useState(false);
 	const {
 		isLoading,
 		input,
@@ -179,6 +181,7 @@ export function FileUploadChatInputDemo({
 				apiKey: modelsInfo[selectedModel as AvailableModels].requireApiKey
 					? JSON.parse(localStorage.getItem("api-key") || '""')
 					: undefined,
+				search: searchSelected && modelsInfo[selectedModel]?.supportsWebSearch,
 				timestamp: Date.now(),
 			} satisfies Partial<RouteParams>;
 
@@ -359,22 +362,35 @@ export function FileUploadChatInputDemo({
 									)}
 								</div>
 								<div className="flex items-center gap-1.5 w-full justify-between">
-									<DropdownMenuRadioGroupDemo
-										position={selectedModel}
-										setPosition={(v) => {
-											const model = v as AvailableModels;
-											if (modelsInfo[model].requireApiKey) {
-												const data = prompt(
-													"This model requires an openrouter API key",
-													apiKeyInLocalStorage,
-												);
-												if (!data?.trim()) return;
-												setApiKeyInLocalStorage(data);
-											}
-											setSelectedModel(model);
-											setModelInStorage(model);
-										}}
-									/>
+									<div className="flex">
+										<ModelSelector
+											position={selectedModel}
+											setPosition={(v) => {
+												const model = v as AvailableModels;
+												if (modelsInfo[model]?.requireApiKey) {
+													const data = prompt(
+														"This model requires an openrouter API key",
+														apiKeyInLocalStorage,
+													);
+													if (!data?.trim()) return;
+													setApiKeyInLocalStorage(data);
+												}
+												setSelectedModel(model);
+												setModelInStorage(model);
+											}}
+										/>
+										{modelsInfo[selectedModel]?.supportsWebSearch && (
+											<Toggle
+												value={searchSelected}
+												onValueChange={() => setSearchSelected(p => !p)}
+												aria-label="Toggle italic"
+												className="flex gap-2 items-center"
+											>
+												<Search className="size-3.5" />
+												Search
+											</Toggle>
+										)}
+									</div>
 									<FileUploadTrigger asChild>
 										<Button
 											type="button"
