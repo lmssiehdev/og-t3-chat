@@ -34,8 +34,8 @@ export const modelsInfo: Record<
 		supportFileUpload: true,
 		supportsImageGeneration: false,
 	},
-	"openai/gpt-4o-search-preview:online": {
-		name: "GPT 4o (web)",
+	"perplexity/sonar:online": {
+		name: "Perplexity (web)",
 		description: "OpenAI's flagship; versatile and intelligent",
 		requireApiKey: true,
 		supportVision: true,
@@ -62,7 +62,7 @@ export const modelsInfo: Record<
 export const SUPPORTED_MODELS = [
 	"qwen/qwen2.5-vl-32b-instruct",
 	"google/gemini-2.5-flash-preview-05-20",
-	"openai/gpt-4o-search-preview:online",
+	"perplexity/sonar:online",
 	"openai/gpt-4o-mini",
 	"anthropic/claude-sonnet-4",
 	"fal-ai/flux/dev",

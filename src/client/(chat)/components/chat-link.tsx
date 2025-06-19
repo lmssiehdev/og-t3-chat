@@ -19,7 +19,7 @@ interface PrefetchStore {
 	shouldPrefetch: (threadId: string) => boolean;
 }
 
-const usePrefetchStore = create<PrefetchStore>()(
+export const usePrefetchStore = create<PrefetchStore>()(
 	immer((set, get) => ({
 		hoveredThreads: new Set(),
 		prefetchingThreads: new Set(),

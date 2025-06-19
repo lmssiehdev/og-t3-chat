@@ -32,6 +32,7 @@ export const PageData = {
 	},
 };
 function WelcomePage() {
+	document.title = "Welcome to OG T3 Chat";
 	return (
 		<>
 			<div className="mx-auto flex w-full max-w-3xl flex-col space-y-12 p-4 pb-16">
@@ -94,6 +95,7 @@ function WelcomePage() {
 }
 
 function WhyT3ChatPage() {
+	document.title = "Why OG T3 Chat";
 	return (
 		<>
 			<div className="mx-auto flex w-full max-w-3xl flex-col space-y-12 p-4 pb-16">
@@ -154,6 +156,7 @@ function WhyT3ChatPage() {
 }
 
 function FAQPage() {
+	document.title = "FAQ";
 	return (
 		<>
 			<div className="mx-auto flex w-full max-w-3xl flex-col space-y-12 p-4 pb-16">
