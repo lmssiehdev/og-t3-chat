@@ -381,8 +381,8 @@ export function FileUploadChatInputDemo({
 										/>
 										{modelsInfo[selectedModel]?.supportsWebSearch && (
 											<Toggle
-												value={searchSelected}
-												onValueChange={() => setSearchSelected((p) => !p)}
+												pressed={searchSelected}
+												onPressedChange={() => setSearchSelected((p) => !p)}
 												aria-label="Toggle italic"
 												className="flex gap-2 items-center"
 											>
