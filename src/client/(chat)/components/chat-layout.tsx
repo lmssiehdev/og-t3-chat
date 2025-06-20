@@ -42,8 +42,8 @@ export function ChatLayout({
 			<SignedIn>
 				<InstantAuthProvider>
 					<AwaitForInstantAuth>
-					<SidebarProvider>
-						<AppSidebar />
+						<SidebarProvider>
+							<AppSidebar />
 							<main className="flex flex-col w-full px-2 ">{children}</main>
 						</SidebarProvider>
 					</AwaitForInstantAuth>

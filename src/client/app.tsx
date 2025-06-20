@@ -1,4 +1,3 @@
-import { useEffect } from "react";
 import { BrowserRouter, Navigate, Route, Routes } from "react-router";
 import { ChatPageWithId } from "./(chat)/[id]";
 import { ChatLayout } from "./(chat)/components/chat-layout";

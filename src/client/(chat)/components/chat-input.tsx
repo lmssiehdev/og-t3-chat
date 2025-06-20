@@ -60,13 +60,7 @@ export function FileUploadChatInputDemo({
 	const navigate = useNavigate();
 	const { userAuthId } = useInstantAuth();
 	const [searchSelected, setSearchSelected] = React.useState(false);
-	const {
-		isLoading,
-		input,
-		handleSubmit,
-		handleInputChange,
-		status,
-	} = useChat;
+	const { isLoading, input, handleSubmit, handleInputChange, status } = useChat;
 	const [files, setFiles] = React.useState<File[]>([]);
 	const [isUploading, setIsUploading] = React.useState(false);
 	const [apiKeyInLocalStorage, setApiKeyInLocalStorage] =

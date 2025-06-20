@@ -121,8 +121,8 @@ export function EditThreadButton({
 					<Button
 						onClick={async () => {
 							setOpen(false);
-							await updateTitle(threadId, input)
-							
+							await updateTitle(threadId, input);
+
 							toast.success("Title updated!");
 						}}
 						type="button"
