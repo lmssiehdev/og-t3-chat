@@ -3,7 +3,6 @@ import { id } from "@instantdb/react";
 import { useParams } from "react-router";
 import { LoggedoutChatComponent } from "./components/logged-out";
 import { ChatComponent } from "./components/main-chat";
-
 export function ChatPageWithId() {
 	const params = useParams<{ id: string }>();
 	const newThreadId = id();

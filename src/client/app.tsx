@@ -33,24 +33,7 @@ export default function App() {
 						</ChatLayout>
 					}
 				/>
-				<Route
-					path="/chat/redirect"
-					element={
-						<ChatLayout>
-							<RedirectToChat />
-						</ChatLayout>
-					}
-				/>
 			</Routes>
 		</BrowserRouter>
 	);
-}
-
-function RedirectToChat() {
-	useEffect(() => {
-		setTimeout(() => {
-			window.location.href = "/chat";
-		}, 1000);
-	}, []);
-	return null;
 }

@@ -1,28 +1,38 @@
 import { type InstaQLResult, id } from "@instantdb/react";
 import type { AppSchema } from "../../instant.schema";
 import { db } from "./instant";
+import { toast } from "sonner";
 
 export const createThread = async (
 	threadId: string,
 	userAuthId: string,
 	title: string,
 ) => {
-	if (userAuthId === undefined) return;
+	try {
 
-	await db.transact([
-		db.tx.threads[threadId].update({
-			createdAt: Date.now(),
-			title,
-			updatedAt: Date.now(),
-			metadata: {},
+		await db.transact([
+			db.tx.threads[threadId].update({
+				createdAt: Date.now(),
+				title,
+				updatedAt: Date.now(),
+				metadata: {},
+				userAuthId,
+				isBranch: false,
+				isPinned: false,
+			}),
+			// Link the thread to the user
+			db.tx.$users[userAuthId].link({ threads: threadId }),
+		]);
+		return threadId;
+	} catch (e) {
+		console.error("Failed to create thread", {
+			threadId,
 			userAuthId,
-			isBranch: false,
-			isPinned: false,
-		}),
-		// Link the thread to the user
-		db.tx.$users[userAuthId].link({ threads: threadId }),
-	]);
-	return threadId;
+			title,
+		}, e);
+		toast.error("Failed to create thread");
+		return undefined;
+	}
 };
 
 export async function createMessage(
@@ -32,35 +42,78 @@ export async function createMessage(
 	role: "user" | "ai",
 	metadata = {},
 ) {
-	const messageId = id();
-	await db.transact([
-		db.tx.messages[messageId].update({
-			createdAt: Date.now(),
-			text,
-			role,
-			// @ts-expect-error
-			metadata,
-			userAuthId,
-		}),
-		//  Linking, there is one extra, remove it
-		db.tx.$users[userAuthId].link({ messages: messageId }),
-		db.tx.messages[messageId].link({ thread: threadId }),
-		db.tx.threads[threadId].link({ messages: messageId }),
-		db.tx.threads[threadId].update({
-			updatedAt: Date.now(),
-		}),
-	]);
-
-	return messageId;
+		try {
+			const messageId = id();
+			await db.transact([
+			db.tx.messages[messageId].update({
+				createdAt: Date.now(),
+				text,
+				role,
+				// @ts-expect-error
+				metadata,
+				userAuthId,
+			}),
+			//  Linking, there is one extra, remove it
+			db.tx.$users[userAuthId].link({ messages: messageId }),
+			db.tx.messages[messageId].link({ thread: threadId }),
+			db.tx.threads[threadId].link({ messages: messageId }),
+			db.tx.threads[threadId].update({
+				updatedAt: Date.now(),
+			}),
+		]);
+		
+		return messageId;
+	} catch (e) {
+		console.error("Failed to create message", {
+			threadId, userAuthId, text, role, metadata,
+		}, e);
+		toast.error("Failed to create message");
+		return undefined;
+	}
 }
 
 export async function pinThread(threadId: string, isPinned: boolean) {
-	await db.transact([
-		db.tx.threads[threadId].update({
+	try {
+		await db.transact([
+			db.tx.threads[threadId].update({
+				isPinned,
+			}),
+		]);
+	} catch (e) {
+		console.error("Failed to pin thread",{
+			threadId,
 			isPinned,
-		}),
-	]);
-}
+		}, e);
+		toast.error("Failed to pin thread");
+	}
+};
+
+export async function updateTitle(threadId: string, title: string) {
+	try {
+		await db.transact([
+			db.tx.threads[threadId].update({
+				title,
+			}),
+		]);
+	} catch (e) {
+		console.error("Failed to update title", {
+			threadId,
+			title,
+		}, e);
+		toast.error("Failed to update title");
+	}
+};
+
+export async function deleteThread(threadId: string) {
+	try {
+		await db.transact(db.tx.threads[threadId].delete());
+	} catch (e) {
+		console.error("Failed to delete thread", {
+			threadId,
+		}, e);
+		toast.error("Failed to delete thread");
+	}
+};
 
 // biome-ignore lint/complexity/noBannedTypes: <explanation>
 export type Thread = InstaQLResult<AppSchema, { threads: {} }>["threads"][0];
@@ -75,6 +128,7 @@ export async function createNewBranch(
 	userAuthId: string,
 	messageId: string,
 ) {
+	try {
 	const baseTimestamp = Date.now();
 
 	// create new thread
@@ -128,4 +182,16 @@ export async function createNewBranch(
 	}
 
 	return newThreadId;
+}
+	catch (e) {
+		console.error("Failed to create new branch", {
+			newThreadId,
+			data,
+			messages,
+			userAuthId,
+			messageId,
+		}, e);
+		toast.error("Failed to create new branch");
+		return undefined;
+	}
 }

@@ -1,5 +1,5 @@
 import { SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar";
-import { InstantAuthProvider } from "@/providers/instant-auth";
+import { InstantAuthProvider, useInstantAuth } from "@/providers/instant-auth";
 import { SignedIn, SignedOut } from "@clerk/nextjs";
 import { useEffect } from "react";
 import { useLocation, useNavigate } from "react-router";
@@ -40,13 +40,22 @@ export function ChatLayout({
 				</SidebarProvider>
 			</SignedOut>
 			<SignedIn>
-				<SidebarProvider>
-					<AppSidebar />
-					<InstantAuthProvider>
-						<main className="flex flex-col w-full px-2 ">{children}</main>
-					</InstantAuthProvider>
-				</SidebarProvider>
+				<InstantAuthProvider>
+					<AwaitForInstantAuth>
+					<SidebarProvider>
+						<AppSidebar />
+							<main className="flex flex-col w-full px-2 ">{children}</main>
+						</SidebarProvider>
+					</AwaitForInstantAuth>
+				</InstantAuthProvider>
 			</SignedIn>
 		</>
 	);
+}
+
+function AwaitForInstantAuth({ children }: { children: React.ReactNode }) {
+	const { userAuthId } = useInstantAuth();
+
+	if (!userAuthId) return null;
+	return <>{children}</>;
 }

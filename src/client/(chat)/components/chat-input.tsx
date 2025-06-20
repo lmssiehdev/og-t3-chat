@@ -66,8 +66,6 @@ export function FileUploadChatInputDemo({
 		handleSubmit,
 		handleInputChange,
 		status,
-		stop,
-		messages,
 	} = useChat;
 	const [files, setFiles] = React.useState<File[]>([]);
 	const [isUploading, setIsUploading] = React.useState(false);

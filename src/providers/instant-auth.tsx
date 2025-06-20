@@ -24,9 +24,10 @@ export function InstantAuthProvider({
 	children,
 }: { children: React.ReactNode }) {
 	const [userAuthId, setUserAuthId] = useState<string | undefined>();
-	const { isSignedIn } = useUser();
+	const { isSignedIn, isLoaded } = useUser();
 	const { getToken } = useAuth();
 
+	// biome-ignore lint/correctness/useExhaustiveDependencies: <explanation>
 	useEffect(() => {
 		if (isSignedIn) {
 			getToken()
@@ -34,7 +35,7 @@ export function InstantAuthProvider({
 					// Create a long-lived session with Instant for your Clerk user
 					// It will look up the user by email or create a new user with
 					// the email address in the session token.
-					db.auth.signInWithIdToken({
+					await db.auth.signInWithIdToken({
 						clientName: process.env.NEXT_PUBLIC_CLERK_CLIENT_NAME as string,
 						idToken: token as string,
 					});
@@ -48,7 +49,7 @@ export function InstantAuthProvider({
 		} else {
 			db.auth.signOut();
 		}
-	}, [isSignedIn, getToken]);
+	}, [isSignedIn, getToken, isLoaded]);
 
 	const value = useMemo(
 		() => ({

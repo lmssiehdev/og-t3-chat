@@ -1,7 +1,6 @@
 "use client";
 import { MemoizedMarkdownBlock } from "@/components/memoized-markdown";
-import { db } from "@/db/instant";
-import type { Message } from "@/db/mutators";
+import { type Message, deleteThread } from "@/db/mutators";
 import { cn } from "@/lib/utils";
 import type { UIMessage } from "ai";
 import "highlight.js/styles/vs2015.css";
@@ -164,7 +163,7 @@ export const ThreadLink = memo(
 						e.preventDefault();
 
 						if (pathname.includes(threadId)) navigate("/chat");
-						await db.transact(db.tx.threads[threadId].delete());
+						await deleteThread(threadId);
 					}}
 					className="absolute right-2 top-1/2 -translate-y-1/2 opacity-0 hover:text-red-500 group-hover/item:opacity-100"
 				>

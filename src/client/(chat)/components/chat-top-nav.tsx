@@ -11,8 +11,7 @@ import {
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { SidebarTrigger } from "@/components/ui/sidebar";
-import { db } from "@/db/instant";
-import { type Thread, pinThread } from "@/db/mutators";
+import { type Thread, pinThread, updateTitle } from "@/db/mutators";
 import { cn } from "@/lib/utils";
 import { CopyIcon, EditIcon, PinIcon, ShareIcon } from "lucide-react";
 import { useState } from "react";
@@ -122,11 +121,8 @@ export function EditThreadButton({
 					<Button
 						onClick={async () => {
 							setOpen(false);
-							await db.transact([
-								db.tx.threads[threadId].update({
-									title: input,
-								}),
-							]);
+							await updateTitle(threadId, input)
+							
 							toast.success("Title updated!");
 						}}
 						type="button"
