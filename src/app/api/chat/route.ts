@@ -63,6 +63,7 @@ export async function POST(req: Request) {
 					return new Response("No prompt provided", { status: 400 });
 				}
 				await generateFalImage({
+					messageId,
 					prompt,
 					userAuthId,
 					threadId,
@@ -192,7 +193,9 @@ async function generateFalImage({
 	userAuthId,
 	threadId,
 	timestamp,
+	messageId,
 }: {
+	messageId: string;
 	prompt: string;
 	userAuthId: string;
 	threadId: string;
@@ -207,7 +210,6 @@ async function generateFalImage({
 	const imageUrl =
 		// @ts-expect-error image is not typed
 		image?.url || `data:${image.mimeType};base64,${image.base64}`;
-	const messageId = id();
 
 	await db.transact([
 		db.tx.messages[messageId].update({
