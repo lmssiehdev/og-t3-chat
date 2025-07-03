@@ -16,9 +16,9 @@ import { ThreadLink } from "./t3-chat";
 import { PageData, sidebarLoggedoutThreads } from "./welcome";
 
 export function LoggedoutChatComponent() {
-	const { id } = useParams<{ id: string }>();
+	let { id } = useParams<{ id: string }>();
 	if (!id || !Object.keys(PageData).includes(id)) {
-		return null;
+		id = "welcome";
 	}
 
 	const { component, input } = PageData[id as keyof typeof PageData];
